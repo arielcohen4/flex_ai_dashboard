@@ -9,7 +9,7 @@ import {
   LucideIcon,
   Grid2x2X,
   KeyRound,
-  ShieldAlert
+  ShieldAlert,
 } from "lucide-react";
 
 type Submenu = {
@@ -22,7 +22,7 @@ type Menu = {
   href: string;
   label: string;
   active: boolean;
-  icon: LucideIcon
+  icon: LucideIcon;
   submenus: Submenu[];
 };
 
@@ -41,9 +41,9 @@ export function getMenuList(pathname: string): Group[] {
           label: "Dashboard",
           active: pathname === "/",
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
       groupLabel: "Contents",
@@ -53,14 +53,14 @@ export function getMenuList(pathname: string): Group[] {
           label: "Tasks",
           active: pathname.includes("/tasks"),
           icon: BookCheck,
-          submenus: []
+          submenus: [],
         },
         {
-          href: "/apps",
-          label: "Apps",
-          active: pathname.includes("/apps"),
+          href: "/models",
+          label: "Models",
+          active: pathname.includes("/models"),
           icon: Grid2x2X,
-          submenus: []
+          submenus: [],
         },
         {
           href: "",
@@ -71,29 +71,29 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/sign-in",
               label: "Sign In (email + password)",
-              active: pathname === "/sign-in"
+              active: pathname === "/sign-in",
             },
             {
               href: "/sign-in-2",
               label: "Sign In (Box)",
-              active: pathname === "/sign-in-2"
+              active: pathname === "/sign-in-2",
             },
             {
               href: "/sign-up",
               label: "Sign Up",
-              active: pathname === "/sign-up"
+              active: pathname === "/sign-up",
             },
             {
               href: "/forgot-password",
               label: "Forgot Password",
-              active: pathname === "/forgot-password"
+              active: pathname === "/forgot-password",
             },
             {
               href: "/otp",
               label: "OTP",
-              active: pathname === "/otp"
+              active: pathname === "/otp",
             },
-          ]
+          ],
         },
         {
           href: "",
@@ -104,26 +104,26 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/not-found",
               label: "Not Found",
-              active: pathname === "/not-found"
+              active: pathname === "/not-found",
             },
             {
               href: "/internal-server-error",
               label: "Internal Server Error",
-              active: pathname === "/internal-server-error"
+              active: pathname === "/internal-server-error",
             },
             {
               href: "/maintenance-error",
               label: "Maintenance Error",
-              active: pathname === "/maintenance-error"
+              active: pathname === "/maintenance-error",
             },
             {
               href: "/unauthorised-error",
               label: "Unauthorised Error",
-              active: pathname === "/unauthorised-error"
+              active: pathname === "/unauthorised-error",
             },
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
       groupLabel: "Settings",
@@ -133,16 +133,16 @@ export function getMenuList(pathname: string): Group[] {
           label: "Users",
           active: pathname.includes("/users"),
           icon: Users,
-          submenus: []
+          submenus: [],
         },
         {
           href: "/settings",
           label: "Settings",
           active: pathname.includes("/settings"),
           icon: Settings,
-          submenus: []
-        }
-      ]
-    }
+          submenus: [],
+        },
+      ],
+    },
   ];
 }

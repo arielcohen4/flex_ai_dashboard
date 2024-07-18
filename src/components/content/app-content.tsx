@@ -1,16 +1,20 @@
 "use client"
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { apps } from "@/constants/data/app/data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { IconAdjustmentsHorizontal, IconSortAscendingLetters, IconSortDescendingLetters } from "@tabler/icons-react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
+import { supabaseBrowser } from "@/lib/supabase/browser";
+import { useQuery } from "@tanstack/react-query";
+import { Database, Tables, Enums } from "@/lib/types/supabase";
+import { Badge } from "@/components/ui/badge";
+import { roundToK } from "@/lib/utils";
 
 const appText = new Map<string, string>([
-  ['all', 'All Apps'],
-  ['connected', 'Connected'],
-  ['notConnected', 'Not Connected'],
+  ['all', 'Family'],
+  ['qwen2', 'phi3'],
+  ['qwen2', 'phi3'],
 ])
 
 export default function AppContent() {
@@ -18,28 +22,42 @@ export default function AppContent() {
   const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const filteredApps = apps
+  const modelsQuery = useQuery({
+		queryKey: ["models"],
+		queryFn: async () => {
+			const supabase = supabaseBrowser();
+			const { data } = await supabase.auth.getSession();
+			if (data.session?.user) {
+
+				const { data, error } = await supabase.from('models').select('*')
+
+				return data;
+			}
+		}
+  });
+
+  if (!modelsQuery.data) {
+    return <div>Loading...</div>
+  }
+
+  const filteredApps = modelsQuery.data
     .sort((a, b) =>
       sort === 'ascending'
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name)
     )
     .filter((app) =>
-      appType === 'connected'
-        ? app.connected
-        : appType === 'notConnected'
-          ? !app.connected
-          : true
+      appType == "all" || appType === app.family
     )
     .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
 	return (
 		<div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
 			<div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            App Integrations
+            Models Hub
           </h1>
           <p className='text-muted-foreground'>
-            Here&apos;s a list of your apps for the integration!
+            Select the open source LLM you want to train
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
@@ -55,9 +73,13 @@ export default function AppContent() {
                 <SelectValue>{appText.get(appType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Apps</SelectItem>
-                <SelectItem value='connected'>Connected</SelectItem>
-                <SelectItem value='notConnected'>Not Connected</SelectItem>
+                <SelectItem value='all'>Family</SelectItem>
+                <SelectItem value='gemma2'>gemma2</SelectItem>
+                <SelectItem value='qwen2'>qwen2</SelectItem>
+                <SelectItem value='llama3'>llama3</SelectItem>
+                <SelectItem value='tinyllama'>tinyllama</SelectItem>
+                <SelectItem value='mixtral'>mixtral</SelectItem>
+                <SelectItem value='deepseek-coder-v2'>deepseek-coder-v2</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -95,19 +117,20 @@ export default function AppContent() {
                 <div
                   className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
                 >
-                  {app.logo}
+                 {null}
                 </div>
+                <Badge variant="secondary">{roundToK(app.context_length)} context size</Badge>
+                <Badge variant="secondary">{roundToK(app.params_count)}b params</Badge>
                 <Button
                   variant='outline'
                   size='sm'
-                  className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
                 >
-                  {app.connected ? 'Connected' : 'Connect'}
+                  View Code
                 </Button>
               </div>
               <div>
-                <h2 className='mb-1 font-semibold'>{app.name}</h2>
-                <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
+                <a href={`https://huggingface.co/${app.name}`} target="_blank" className='mb-1 font-semibold'>{app.name}</a>
+                <p className='line-clamp-2 text-gray-500'>{"desc"}</p>
               </div>
             </li>
           ))}

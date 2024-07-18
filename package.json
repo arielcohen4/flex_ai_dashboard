@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync-types": "supabase gen types typescript --project-id ywnpsnccvyblmwnnhkzl --schema public > src/lib/types/supabase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -27,7 +28,12 @@
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@stripe/stripe-js": "^4.1.0",
+    "@supabase/ssr": "^0.4.0",
+    "@supabase/supabase-js": "^2.44.4",
     "@tabler/icons-react": "^3.11.0",
+    "@tanstack/react-query": "^5.51.9",
+    "@tanstack/react-query-devtools": "^5.51.9",
     "@tanstack/react-table": "^8.19.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -42,7 +48,9 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
+    "react-icons": "^5.2.1",
     "recharts": "^2.12.7",
+    "stripe": "^16.2.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",

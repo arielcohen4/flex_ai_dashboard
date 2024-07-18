@@ -13,7 +13,7 @@ import AppContent from "@/components/content/app-content";
 
 export default function TagsPage() {
 	return (
-		<ContentLayout title="Apps">
+		<ContentLayout title="Models">
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem>
@@ -24,7 +24,7 @@ export default function TagsPage() {
 					<BreadcrumbSeparator />
 					<BreadcrumbItem>
 						<BreadcrumbLink asChild>
-							<Link href="/apps">Apps</Link>
+							<Link href="/models">Models</Link>
 						</BreadcrumbLink>
 					</BreadcrumbItem>
 				</BreadcrumbList>
