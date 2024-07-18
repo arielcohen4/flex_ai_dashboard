@@ -5,13 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { labels, priorities, statuses } from "@/constants/data/task/data";
-import { Tables } from "@/lib/types/supabase";
 import { roundToK } from "@/lib/utils";
-
-type TaskWithRelations = Tables<"tasks"> & {
-  models: Tables<"models"> | null;
-  datasets: Tables<"datasets"> | null;
-};
+import { TaskWithRelations } from "@/lib/types";
 
 export const columns: ColumnDef<TaskWithRelations>[] = [
 	{

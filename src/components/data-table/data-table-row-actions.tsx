@@ -17,6 +17,7 @@ import {
 
 import { Button } from "../ui/button";
 import { labels } from "@/constants/data/task/data";
+import { TaskWithRelations } from "@/lib/types";
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>;
@@ -25,7 +26,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
 	row
 }: DataTableRowActionsProps<TData>) {
-	const task = row.original;
+	const task = row.original as TaskWithRelations;
 
 	return (
 		<DropdownMenu>
@@ -40,12 +41,11 @@ export function DataTableRowActions<TData>({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-[160px]">
 				<DropdownMenuItem>Edit</DropdownMenuItem>
-				<DropdownMenuItem>Make a copy</DropdownMenuItem>
-				<DropdownMenuItem>Favorite</DropdownMenuItem>
+				{task.wandb_url &&<DropdownMenuItem><a href={task.wandb_url} target="_blank">Weights & Biases URL</a></DropdownMenuItem> }
 				<DropdownMenuSeparator />
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>
-					Delete
+					Cancel
 					<DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
 				</DropdownMenuItem>
 			</DropdownMenuContent>

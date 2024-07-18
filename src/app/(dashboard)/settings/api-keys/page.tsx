@@ -12,7 +12,7 @@ import SettingsAccount from "@/components/account/account";
 
 export default function AccountPage() {
 	return (
-		<ContentLayout title="Account">
+		<ContentLayout title="API Keys">
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem>
@@ -29,6 +29,10 @@ export default function AccountPage() {
 					<BreadcrumbSeparator />
 					<BreadcrumbItem>
 						<BreadcrumbPage>Settings</BreadcrumbPage>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>API Keys</BreadcrumbPage>
 					</BreadcrumbItem>
 				</BreadcrumbList>
 			</Breadcrumb>
