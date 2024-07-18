@@ -7,7 +7,7 @@ import {
   BookCheck,
   LayoutGrid,
   LucideIcon,
-  Grid2x2X,
+  Brain,
   KeyRound,
   ShieldAlert,
 } from "lucide-react";
@@ -59,7 +59,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/models",
           label: "Models",
           active: pathname.includes("/models"),
-          icon: Grid2x2X,
+          icon: Brain,
           submenus: [],
         },
         {

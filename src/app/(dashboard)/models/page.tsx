@@ -9,7 +9,7 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import AppContent from "@/components/content/app-content";
+import ModelsContent from "@/components/content/models-content";
 
 export default function TagsPage() {
 	return (
@@ -29,7 +29,7 @@ export default function TagsPage() {
 					</BreadcrumbItem>
 				</BreadcrumbList>
 			</Breadcrumb>
-			<AppContent />
+			<ModelsContent />
 		</ContentLayout>
 	);
 }

@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Database, Tables, Enums } from "@/lib/types/supabase";
 import { Badge } from "@/components/ui/badge";
 import { roundToK } from "@/lib/utils";
+import { CodeViewer } from "@/components/code-viewer";
 
 const appText = new Map<string, string>([
   ['all', 'Family'],
@@ -121,12 +122,7 @@ export default function AppContent() {
                 </div>
                 <Badge variant="secondary">{roundToK(app.context_length)} context size</Badge>
                 <Badge variant="secondary">{roundToK(app.params_count)}b params</Badge>
-                <Button
-                  variant='outline'
-                  size='sm'
-                >
-                  View Code
-                </Button>
+                <CodeViewer model={app} />
               </div>
               <div>
                 <a href={`https://huggingface.co/${app.name}`} target="_blank" className='mb-1 font-semibold'>{app.name}</a>
