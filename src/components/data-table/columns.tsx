@@ -71,6 +71,21 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
 		}
 	},
 	{
+		accessorKey: "name",
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Name" />
+		),
+		cell: ({ row }) => {
+			return (
+				<div className="flex space-x-2">
+					<a className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
+						{ row.original?.name }
+					</a>
+				</div>
+			);
+		}
+	},
+	{
 		accessorKey: "epochs",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Epochs" />

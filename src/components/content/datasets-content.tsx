@@ -110,7 +110,7 @@ export default function AppContent() {
           >
             <div className='mb-4'>
               <div className='flex justify-between items-center'>
-                <a href={`https://huggingface.co/${app.name}`} target="_blank" className='text-xl font-semibold'>
+                <a className='text-xl font-semibold'>
                   {app.name}
                 </a>
                 <span className='text-sm text-gray-500'>
