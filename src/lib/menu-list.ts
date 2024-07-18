@@ -11,6 +11,8 @@ import {
   KeyRound,
   ShieldAlert,
   Grid2X2,
+  ScrollText,
+  SquareArrowOutUpRightIcon,
 } from "lucide-react";
 
 type Submenu = {
@@ -70,79 +72,11 @@ export function getMenuList(pathname: string): Group[] {
           icon: Grid2X2,
           submenus: [],
         },
-        {
-          href: "",
-          label: "Authentication",
-          active: pathname.includes("/authentication"),
-          icon: KeyRound,
-          submenus: [
-            {
-              href: "/sign-in",
-              label: "Sign In (email + password)",
-              active: pathname === "/sign-in",
-            },
-            {
-              href: "/sign-in-2",
-              label: "Sign In (Box)",
-              active: pathname === "/sign-in-2",
-            },
-            {
-              href: "/sign-up",
-              label: "Sign Up",
-              active: pathname === "/sign-up",
-            },
-            {
-              href: "/forgot-password",
-              label: "Forgot Password",
-              active: pathname === "/forgot-password",
-            },
-            {
-              href: "/otp",
-              label: "OTP",
-              active: pathname === "/otp",
-            },
-          ],
-        },
-        {
-          href: "",
-          label: "Error Pages",
-          active: pathname.includes("/error-pages"),
-          icon: ShieldAlert,
-          submenus: [
-            {
-              href: "/not-found",
-              label: "Not Found",
-              active: pathname === "/not-found",
-            },
-            {
-              href: "/internal-server-error",
-              label: "Internal Server Error",
-              active: pathname === "/internal-server-error",
-            },
-            {
-              href: "/maintenance-error",
-              label: "Maintenance Error",
-              active: pathname === "/maintenance-error",
-            },
-            {
-              href: "/unauthorised-error",
-              label: "Unauthorised Error",
-              active: pathname === "/unauthorised-error",
-            },
-          ],
-        },
       ],
     },
     {
       groupLabel: "Settings",
       menus: [
-        {
-          href: "/users",
-          label: "Users",
-          active: pathname.includes("/users"),
-          icon: Users,
-          submenus: [],
-        },
         {
           href: "/settings",
           label: "Settings",

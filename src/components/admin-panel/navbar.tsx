@@ -16,7 +16,8 @@ export function Navbar({ title }: NavbarProps) {
 					<h1 className="font-bold">{title}</h1>
 				</div>
 				<div className="flex flex-1 items-center space-x-2 justify-end">
-					<div className="md:block hidden">
+					<a href="https://docs.getflex.ai/quickstart" target="_blank" className="text-primary hover:underline">Docs</a>
+					<div  className="md:block hidden">
 						<Search />
 					</div>
 					<ModeToggle />
