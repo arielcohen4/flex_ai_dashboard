@@ -10,6 +10,7 @@ import {
   Brain,
   KeyRound,
   ShieldAlert,
+  Grid2X2,
 } from "lucide-react";
 
 type Submenu = {
@@ -60,6 +61,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Models",
           active: pathname.includes("/models"),
           icon: Brain,
+          submenus: [],
+        },
+        {
+          href: "/datasets",
+          label: "Datasets",
+          active: pathname.includes("/datasets"),
+          icon: Grid2X2,
           submenus: [],
         },
         {

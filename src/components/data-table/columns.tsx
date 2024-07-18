@@ -5,9 +5,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { labels, priorities, statuses } from "@/constants/data/task/data";
-import { Task } from "@/constants/data/task/schema";
+import { Tables } from "@/lib/types/supabase";
+import { roundToK } from "@/lib/utils";
 
-export const columns: ColumnDef<Task>[] = [
+type TaskWithRelations = Tables<"tasks"> & {
+  models: Tables<"models"> | null;
+  datasets: Tables<"datasets"> | null;
+};
+
+export const columns: ColumnDef<TaskWithRelations>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -37,23 +43,60 @@ export const columns: ColumnDef<Task>[] = [
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Task" />
 		),
-		cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+		cell: ({ row }) => <div className="w-[80px]">{row.original.id.substring(0, 7)}</div>,
 		enableSorting: false,
 		enableHiding: false
 	},
 	{
-		accessorKey: "title",
+		accessorKey: "created_at",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Title" />
+			<DataTableColumnHeader column={column} title="Created At" />
 		),
 		cell: ({ row }) => {
-			const label = labels.find((label) => label.value === row.original.label);
 
+			const date = new Date(row.original.created_at);
+
+		// Format the date
+	  // Format the date
+		const options: Intl.DateTimeFormatOptions = { year: '2-digit', month: 'numeric', day: 'numeric' };
+		const formattedDate = date.toLocaleDateString('en-US', options) + ' ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+		
 			return (
 				<div className="flex space-x-2">
-					{label && <Badge variant="outline">{label.label}</Badge>}
 					<span className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
-						{row.getValue("title")}
+						{formattedDate}
+					</span>
+				</div>
+			);
+		}
+	},
+	{
+		accessorKey: "epochs",
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Epochs" />
+		),
+		cell: ({ row }) => {
+			return (
+				<div className="flex space-x-2">
+					<span className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
+					{row.original.current_epoch && row.original.config && typeof row.original.config === 'object' && 'num_epochs' in row.original.config
+					? `${row.original.config.num_epochs} / ${row.original.current_epoch}`
+					: ""}
+					</span>
+				</div>
+			);
+		}
+	},
+	{
+		accessorKey: "steps",
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Steps" />
+		),
+		cell: ({ row }) => {
+			return (
+				<div className="flex space-x-2">
+					<span className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
+						{ row.original.current_step ? `${row.original.total_steps} / ${row.original.current_epoch}` : ""}
 					</span>
 				</div>
 			);
@@ -62,11 +105,11 @@ export const columns: ColumnDef<Task>[] = [
 	{
 		accessorKey: "status",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Status" />
+			<DataTableColumnHeader column={column} title="Stage" />
 		),
 		cell: ({ row }) => {
 			const status = statuses.find(
-				(status) => status.value === row.getValue("status")
+				(status) => status.value === row.original.stage
 			);
 
 			if (!status) {
@@ -87,30 +130,37 @@ export const columns: ColumnDef<Task>[] = [
 		}
 	},
 	{
-		accessorKey: "priority",
+		accessorKey: "model",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Priority" />
+			<DataTableColumnHeader column={column} title="Model" />
 		),
 		cell: ({ row }) => {
-			const priority = priorities.find(
-				(priority) => priority.value === row.getValue("priority")
-			);
-
-			if (!priority) {
-				return null;
-			}
-
 			return (
-				<div className="flex items-center">
-					{priority.icon && (
-						<priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-					)}
-					<span>{priority.label}</span>
+				<div className="flex space-x-2">
+					<a className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
+						{ row.original.models?.name }
+					</a>
 				</div>
 			);
-		},
-		filterFn: (row, id, value) => {
-			return value.includes(row.getValue(id));
+		}
+	},
+	{
+		accessorKey: "dataset",
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Dataset" />
+		),
+		cell: ({ row }) => {
+			return (
+				<div className="flex space-x-2">
+					
+					<a className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
+						{ `${row.original.datasets?.name}` }
+					</a>
+					<Badge variant="outline">{`${roundToK(row.original.datasets?.total_tokens ?? 0)} Tokens`}</Badge>
+					<Badge variant="outline">{`${row.original.datasets?.type}`}</Badge>
+					<Badge variant="outline">{`${row.original.datasets?.train_rows_count} rows`}</Badge>
+				</div>
+			);
 		}
 	},
 	{
