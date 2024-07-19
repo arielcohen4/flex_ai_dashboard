@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 
 export function RecentSales() {
 	const tasksQuery = useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks_sorted"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
-        const { data, error } = await supabase.from('tasks').select('*, models(*), datasets(*)');
+        const { data, error } = await supabase.from('tasks').select('*, models(*), datasets(*)').order('created_at', { ascending: false });
         return data ?? [];
       }
 
