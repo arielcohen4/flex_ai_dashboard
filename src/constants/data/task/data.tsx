@@ -7,70 +7,70 @@ import {
   CrossCircledIcon,
   QuestionMarkCircledIcon,
   StopwatchIcon,
-} from '@radix-ui/react-icons'
+} from "@radix-ui/react-icons";
 
 export const labels = [
   {
-    value: 'bug',
-    label: 'Bug',
+    value: "bug",
+    label: "Bug",
   },
   {
-    value: 'feature',
-    label: 'Feature',
+    value: "feature",
+    label: "Feature",
   },
   {
-    value: 'documentation',
-    label: 'Documentation',
+    value: "documentation",
+    label: "Documentation",
   },
-]
+];
 
 export const statuses = [
   {
-    value: 'COMPLETED',
-    label: 'Completed',
+    value: "COMPLETED",
+    label: "Completed",
     icon: CheckCircledIcon,
   },
   {
-    value: 'PENDING',
-    label: 'Pending',
+    value: "PENDING",
+    label: "Pending",
     icon: CircleIcon,
   },
   {
-    value: 'IN_PROGRESS',
-    label: 'In Progress',
+    value: "IN_PROGRESS",
+    label: "In Progress",
     icon: StopwatchIcon,
   },
   {
-    value: 'DOWNLOADING_MODEL',
-    label: 'Downloading Model',
+    value: "DOWNLOADING_MODEL",
+    label: "Downloading Model",
     icon: StopwatchIcon,
   },
   {
-    value: 'TRAINING',
-    label: 'Training',
+    value: "TRAINING",
+    label: "Training",
     icon: StopwatchIcon,
   },
   {
-    value: 'CANCELLED',
-    label: 'Canceled',
+    value: "CANCELED",
+    label: "Canceled",
     icon: CrossCircledIcon,
   },
-]
+];
 
 export const priorities = [
   {
-    label: 'Low',
-    value: 'low',
+    label: "Low",
+    value: "low",
     icon: ArrowDownIcon,
   },
   {
-    label: 'Medium',
-    value: 'medium',
+    label: "Medium",
+    value: "medium",
     icon: ArrowRightIcon,
   },
   {
-    label: 'High',
-    value: 'high',
+    label: "High",
+    value: "high",
     icon: ArrowUpIcon,
   },
-]
+];
