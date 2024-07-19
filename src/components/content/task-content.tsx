@@ -1,11 +1,13 @@
 "use client";
-import { tasks } from "@/constants/data/task/tasks";
 import { DataTable } from "../data-table/data-table";
 import { columns } from "../data-table/columns";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export default function TaskContent() {
+	const queryClient = useQueryClient();
+	
 	const tasksQuery = useQuery({
 		queryKey: ["tasks"],
 		queryFn: async () => {
@@ -20,6 +22,19 @@ export default function TaskContent() {
 			return [];
 		}
   });
+
+	useEffect(() => {
+    const supabase = supabaseBrowser();
+		const subscription = supabase
+		.channel('tasks')
+		.on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, payload => {
+			console.log('Change received!', payload);
+			// Refetch the tasks data
+			queryClient.invalidateQueries({ queryKey: ['tasks'] });
+			})
+		.subscribe()
+  }, [queryClient]);
+
 
 	if (tasksQuery.isLoading) {
 		return <div>Loading...</div>;
