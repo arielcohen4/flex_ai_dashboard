@@ -1,1 +1,8 @@
-export const protectedPaths = ["/", "/profile"];
+export const protectedPaths = [
+  "/",
+  "/tasks",
+  "/models",
+  "/settings",
+  "/datasets",
+  "/settings/api-keys",
+];

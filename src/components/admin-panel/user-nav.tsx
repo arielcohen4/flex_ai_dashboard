@@ -21,9 +21,24 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import useUser from "@/app/hook/useUser";
+import { supabaseBrowser } from "@/lib/supabase/browser";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 
 export function UserNav() {
   const user = useUser();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLogout = async () => {
+		const supabase = supabaseBrowser();
+		queryClient.clear();
+		await supabase.auth.signOut();
+		router.refresh();
+		router.replace("/sign-in?next=" + pathname);
+	};
+  
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -70,7 +85,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => handleLogout()}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

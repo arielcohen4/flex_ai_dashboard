@@ -3,7 +3,7 @@ import { HTMLAttributes, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconBrandFacebook, IconBrandGithub } from "@tabler/icons-react";
+import { IconBrandGoogle, IconBrandGithub } from "@tabler/icons-react";
 import {
 	Form,
 	FormControl,
@@ -17,6 +17,8 @@ import { Button } from "@/components/custom/button";
 import { PasswordInput } from "@/components/custom/password-input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -37,6 +39,30 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 	const [isLoading, setIsLoading] = useState(false);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const params = useSearchParams();
+	const next = params.get("next") || "";
+	const handleLoginWithOAuth = (provider: "github" | "google") => {
+		const supabase = supabaseBrowser();
+		console.log(location.origin + "/auth/callback?next=" + next)
+		supabase.auth.signInWithOAuth({
+			provider,
+			options: {
+				redirectTo: location.origin + "/auth/callback?next=" + next,
+			},
+		});
+	};
+
+	const handleLoginWithPassword = () => {
+		const supabase = supabaseBrowser();
+		console.log(location.origin + "/auth/callback?next=" + next)
+		supabase.auth.signInWithPassword({
+			email: email,
+			password: password,
+		});
+	};
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -67,7 +93,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 								<FormItem className="space-y-1">
 									<FormLabel>Email</FormLabel>
 									<FormControl>
-										<Input placeholder="name@example.com" {...field} />
+										<Input placeholder="name@example.com" {...field} value={email}
+											onChange={(e) => {
+												field.onChange(e);
+												setEmail(e.target.value);
+											}}/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -88,13 +118,18 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 										</Link>
 									</div>
 									<FormControl>
-										<PasswordInput placeholder="********" {...field} />
+										<PasswordInput placeholder="********" {...field} value={password}
+											onChange={(e) => {
+												field.onChange(e);
+												setPassword(e.target.value);
+											}}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						<Button className="mt-2" loading={isLoading}>
+						<Button className="mt-2" loading={isLoading} onClick={() => handleLoginWithPassword()}>
 							Login
 						</Button>
 
@@ -114,6 +149,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 								variant="outline"
 								className="w-full"
 								type="button"
+								onClick={() => handleLoginWithOAuth("github")}
 								loading={isLoading}
 								leftSection={<IconBrandGithub className="h-4 w-4" />}
 							>
@@ -123,10 +159,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 								variant="outline"
 								className="w-full"
 								type="button"
+								onClick={() => handleLoginWithOAuth("google")}
 								loading={isLoading}
-								leftSection={<IconBrandFacebook className="h-4 w-4" />}
+								leftSection={<IconBrandGoogle className="h-4 w-4" />}
 							>
-								Facebook
+								Google
 							</Button>
 						</div>
 					</div>
