@@ -1,4 +1,5 @@
 import { UserAuthForm } from "@/components/auth/components/user-auth-form";
+import { Suspense } from 'react';
 
 export default function SignIn() {
 	return (
@@ -50,7 +51,9 @@ export default function SignIn() {
 								to log into your account
 							</p>
 						</div>
+						<Suspense fallback={<div>Loading...</div>}>
 						<UserAuthForm />
+      		</Suspense>
 						<p className="px-8 text-center text-sm text-muted-foreground">
 							By clicking login, you agree to our{" "}
 							<a
