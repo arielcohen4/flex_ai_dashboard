@@ -8,10 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { supabaseBrowser } from "@/lib/supabase/browser";
-
 import { Tables } from "@/lib/types/supabase";
-import { useQuery } from "@tanstack/react-query";
 
 export function CodeViewer({ model }: {model: Tables<"models">}) {
   const user = useUser()

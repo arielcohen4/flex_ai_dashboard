@@ -1,3 +1,5 @@
+"use client"
+
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Row } from "@tanstack/react-table";
 
@@ -18,6 +20,8 @@ import {
 import { Button } from "../ui/button";
 import { labels } from "@/constants/data/task/data";
 import { TaskWithRelations } from "@/lib/types";
+import { CheckpointsViewer } from "../checkpoints-viewer";
+import { useState } from "react";
 
 interface DataTableRowActionsProps<TData> {
 	row: Row<TData>;
@@ -27,8 +31,11 @@ export function DataTableRowActions<TData>({
 	row
 }: DataTableRowActionsProps<TData>) {
 	const task = row.original as TaskWithRelations;
+	const [showCheckpoints, setShowCheckpoints] = useState(false);
+	
 
 	return (
+		<>
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
@@ -42,6 +49,9 @@ export function DataTableRowActions<TData>({
 			<DropdownMenuContent align="end" className="w-[160px]">
 				<DropdownMenuItem>Edit</DropdownMenuItem>
 				{task.wandb_url &&<DropdownMenuItem><a href={task.wandb_url} target="_blank">Weights & Biases URL</a></DropdownMenuItem> }
+				<DropdownMenuItem onSelect={() => setShowCheckpoints(true)}>
+            View checkpoints
+          </DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>
@@ -50,5 +60,9 @@ export function DataTableRowActions<TData>({
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
+		{showCheckpoints && (
+			<CheckpointsViewer task={task} isOpen={showCheckpoints} onClose={() => setShowCheckpoints(false)} />
+		)}
+		</>
 	);
 }

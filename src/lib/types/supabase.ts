@@ -14,40 +14,40 @@ export type Database = {
           created_at: string
           id: string
           logs: Json | null
-          size: number | null
+          size: number
           stage: string
-          step: number | null
+          step: number
           storage_key: string | null
-          task_id: string | null
-          type: Database["public"]["Enums"]["CHECKPOINT_TYPE"] | null
-          updated_at: string | null
-          volume_path: string | null
+          task_id: string
+          type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at: string
+          volume_path: string
         }
         Insert: {
           created_at?: string
           id?: string
           logs?: Json | null
-          size?: number | null
+          size: number
           stage?: string
-          step?: number | null
+          step: number
           storage_key?: string | null
-          task_id?: string | null
-          type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"] | null
-          updated_at?: string | null
-          volume_path?: string | null
+          task_id: string
+          type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at?: string
+          volume_path: string
         }
         Update: {
           created_at?: string
           id?: string
           logs?: Json | null
-          size?: number | null
+          size?: number
           stage?: string
-          step?: number | null
+          step?: number
           storage_key?: string | null
-          task_id?: string | null
-          type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"] | null
-          updated_at?: string | null
-          volume_path?: string | null
+          task_id?: string
+          type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at?: string
+          volume_path?: string
         }
         Relationships: [
           {
