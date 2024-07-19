@@ -1,8 +1,10 @@
-import React from 'react';
-import { useQuery } from "@tanstack/react-query";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { TaskWithRelations } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import {
   Dialog,
   DialogContent,
@@ -10,13 +12,41 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { formatSize } from '@/lib/utils';
+import { formatSize } from "@/lib/utils";
+import { getDownloadUrl } from "@/lib/actions/checkpoints";
+import { Loader2 } from "lucide-react";
 
-const REMOVE_LOGS_KEYS = ['step', 'epoch', 'eval_runtime', 'eval_steps_per_second', 'eval_samples_per_second'];
+const REMOVE_LOGS_KEYS = [
+  "step",
+  "epoch",
+  "eval_runtime",
+  "eval_steps_per_second",
+  "eval_samples_per_second",
+];
 
-export function CheckpointsViewer({ task, isOpen, onClose }: { task: TaskWithRelations, isOpen: boolean, onClose: () => void }) {
+export function CheckpointsViewer({
+  task,
+  isOpen,
+  onClose,
+}: {
+  task: TaskWithRelations;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [loadingCheckpoints, setLoadingCheckpoints] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const queryClient = useQueryClient();
+
   const checkpointsQuery = useQuery({
     queryKey: ["checkpoints", task.id],
     queryFn: async () => {
@@ -24,21 +54,50 @@ export function CheckpointsViewer({ task, isOpen, onClose }: { task: TaskWithRel
       const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user) {
         const { data, error } = await supabase
-          .from('checkpoints')
-          .select('*')
+          .from("checkpoints")
+          .select("*")
           .eq("task_id", task.id)
-          .order('created_at', { ascending: true });
+          .order("created_at", { ascending: true });
         return data ?? [];
       }
       return [];
-    } 
+    },
   });
 
-  const downloadCheckpoint = ({id}: {id:string}) => {
-    return
-  };
+  useEffect(() => {
+    const supabase = supabaseBrowser();
+    const subscription = supabase
+      .channel("checkpoints")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "checkpoints" },
+        (payload) => {
+          const newPayload = payload.new as { task_id?: string };
+          console.log("Change received!", payload);
+          // Refetch the checkpoints data
+          queryClient.invalidateQueries({
+            queryKey: ["checkpoints", newPayload?.task_id],
+          });
+        }
+      )
+      .subscribe();
+  }, [queryClient]);
 
-  console.log(checkpointsQuery?.data);
+  const downloadCheckpoint = async ({ id }: { id: string }) => {
+    setLoadingCheckpoints((prev) => ({ ...prev, [id]: true }));
+    try {
+      const url = await getDownloadUrl({ id });
+      if (url) {
+        window.open(url, "_blank");
+      } else {
+        console.error("Failed to generate download URL");
+      }
+    } catch (error) {
+      console.error("Error downloading checkpoint:", error);
+    } finally {
+      setLoadingCheckpoints((prev) => ({ ...prev, [id]: false }));
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -50,38 +109,88 @@ export function CheckpointsViewer({ task, isOpen, onClose }: { task: TaskWithRel
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Step</TableHead>
-                <TableHead>Epoch</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Metrics</TableHead>
-                <TableHead>Download</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {checkpointsQuery.data?.map((checkpoint, index) => (
-                <TableRow key={checkpoint.id}>
-                  <TableCell>{checkpoint.step}</TableCell>
-                  <TableCell>{(checkpoint.step / task.total_steps * ((task.config as { num_epochs: number }).num_epochs)).toFixed(2)}</TableCell>
-                  <TableCell>{formatSize(checkpoint.size)}</TableCell>
-                  <TableCell>{checkpoint.type === 'LORA' ? 'LoRA' : 'Regular'}</TableCell>
-                  <TableCell>
-                    {checkpoint?.logs && Object.entries(checkpoint.logs as Record<string, string | number>).map(([key, value]) => {
-                      if  (!REMOVE_LOGS_KEYS.includes(key)) {
-                        return <Badge key={key} variant="secondary" className="mr-1 mb-1">
-                        {key}: {typeof value === 'number' ? value.toFixed(4) : value}
-                      </Badge>
-                      }
-                    })}
-                  </TableCell>
-                  <TableCell><Button variant="secondary" onClick={() => downloadCheckpoint({ id: checkpoint.id })}>Download</Button></TableCell>
+          {checkpointsQuery.data?.length == 0 ? (
+            <div className="flex justify-center items-center">
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              <span>Waiting for first checkpoints...</span>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Step</TableHead>
+                  <TableHead>Epoch</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Metrics</TableHead>
+                  <TableHead>Stage</TableHead>
+                  <TableHead>Download</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {checkpointsQuery.data?.map((checkpoint) => (
+                  <TableRow key={checkpoint.id}>
+                    <TableCell>{checkpoint.step}</TableCell>
+                    <TableCell>
+                      {(
+                        (checkpoint.step / task.total_steps) *
+                        (task.config as { num_epochs: number }).num_epochs
+                      ).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      {checkpoint.size ? formatSize(checkpoint.size) : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {checkpoint.type === "LORA" ? "LoRA" : "Regular"}
+                    </TableCell>
+                    <TableCell>
+                      {checkpoint?.logs &&
+                        Object.entries(
+                          checkpoint.logs as Record<string, string | number>
+                        ).map(([key, value]) => {
+                          if (!REMOVE_LOGS_KEYS.includes(key)) {
+                            return (
+                              <Badge
+                                key={key}
+                                variant="secondary"
+                                className="mr-1 mb-1"
+                              >
+                                {key}:{" "}
+                                {typeof value === "number"
+                                  ? value.toFixed(4)
+                                  : value}
+                              </Badge>
+                            );
+                          }
+                        })}
+                    </TableCell>
+                    <TableCell>
+                      {checkpoint.stage === "FINISHED" ? (
+                        <Badge variant="secondary">Finished</Badge>
+                      ) : (
+                        <div className="flex items-center">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <span>{checkpoint.stage}</span>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        loading={loadingCheckpoints[checkpoint.id]}
+                        variant="secondary"
+                        onClick={() =>
+                          downloadCheckpoint({ id: checkpoint.id })
+                        }
+                        disabled={checkpoint.stage !== "FINISHED"}
+                      >
+                        Download
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </DialogContent>
     </Dialog>

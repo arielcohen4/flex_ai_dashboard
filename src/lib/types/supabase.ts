@@ -14,7 +14,7 @@ export type Database = {
           created_at: string
           id: string
           logs: Json | null
-          size: number
+          size: number | null
           stage: string
           step: number
           storage_key: string | null
@@ -27,7 +27,7 @@ export type Database = {
           created_at?: string
           id?: string
           logs?: Json | null
-          size: number
+          size?: number | null
           stage?: string
           step: number
           storage_key?: string | null
@@ -40,7 +40,7 @@ export type Database = {
           created_at?: string
           id?: string
           logs?: Json | null
-          size?: number
+          size?: number | null
           stage?: string
           step?: number
           storage_key?: string | null
