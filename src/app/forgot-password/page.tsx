@@ -2,6 +2,12 @@ import { ForgotForm } from "@/components/auth/components/forgot-form";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Forgot Password | Flex AI'
+}
+
 export default function ForgotPassword() {
 	return (
 		<>

@@ -10,6 +10,11 @@ import {
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import ModelsContent from "@/components/content/models-content";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Models | Flex AI'
+}
 
 export default function TagsPage() {
 	return (

@@ -11,6 +11,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import TaskContent from "@/components/content/task-content";
 
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Tasks | Flex AI'
+}
+
 export default function DashboardPage() {
 	return (
 		<ContentLayout title="Tasks">

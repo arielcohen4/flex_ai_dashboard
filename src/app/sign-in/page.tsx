@@ -1,5 +1,10 @@
 import { UserAuthForm } from "@/components/auth/components/user-auth-form";
 import { Suspense } from 'react';
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Sign In | Flex AI'
+}
 
 export default function SignIn() {
 	return (

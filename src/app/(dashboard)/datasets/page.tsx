@@ -10,6 +10,11 @@ import {
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import DatasetsContent from "@/components/content/datasets-content";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Datasets | Flex AI'
+}
 
 export default function TagsPage() {
 	return (
@@ -18,13 +23,13 @@ export default function TagsPage() {
 				<BreadcrumbList>
 					<BreadcrumbItem>
 						<BreadcrumbLink asChild>
-							<Link href="/">Datasets</Link>
+							<Link href="/">Dashboard</Link>
 						</BreadcrumbLink>
 					</BreadcrumbItem>
 					<BreadcrumbSeparator />
 					<BreadcrumbItem>
 						<BreadcrumbLink asChild>
-							<Link href="/models">Datasets</Link>
+							<Link href="/datasets">Datasets</Link>
 						</BreadcrumbLink>
 					</BreadcrumbItem>
 				</BreadcrumbList>

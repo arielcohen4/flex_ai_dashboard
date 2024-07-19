@@ -10,6 +10,11 @@ import {
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import DashboardContent from "@/components/content/dashboard-content";
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Dashboard | Flex AI'
+}
 
 export default function DashboardPage() {
 	return (

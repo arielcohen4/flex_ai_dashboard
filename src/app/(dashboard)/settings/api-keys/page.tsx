@@ -9,6 +9,11 @@ import {
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import SettingsAccount from "@/components/account/account";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'API Keys | Flex AI'
+}
 
 export default function AccountPage() {
 	return (

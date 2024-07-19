@@ -2,6 +2,12 @@ import { SignUpForm } from "@/components/auth/components/sign-up-form";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
+import type { Metadata } from 'next'
+ 
+export const metadata: Metadata = {
+  title: 'Sign Up | Flex AI'
+}
+
 export default function SignUp() {
 	return (
 		<>
