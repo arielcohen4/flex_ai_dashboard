@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,8 +15,62 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { CalendarDateRangePicker } from "./dashboard/date-range-picker";
 import { RecentSales } from "./dashboard/recent-sales";
 import { Overview } from "./dashboard/overview";
+import { useQuery } from "@tanstack/react-query";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export default function DashboardContent() {
+	const tasksCountQuery = useQuery({
+    queryKey: ["tasks_count"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data, error } = await supabase.from('tasks').select('*');
+        return data;
+      }
+    }
+  });
+
+	const datasetsCountQuery = useQuery({
+    queryKey: ["datasets_count"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data, error } = await supabase.from('datasets').select('*');
+        return data;
+      }
+    }
+  });
+
+	const checkpointsCountQuery = useQuery({
+    queryKey: ["checkpoints_count"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data, error } = await supabase.from('checkpoints').select('*');
+        return data;
+      }
+    }
+  });
+
+	const modelsCountQuery = useQuery({
+    queryKey: ["models_count"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data, error } = await supabase.from('models').select('*');
+        return data;
+      }
+    }
+  });
+
+
+	console.log(tasksCountQuery.data)
+
+
 	return (
 		<div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
 			<div className="flex flex-wrap items-center justify-between space-y-2">
@@ -42,7 +98,7 @@ export default function DashboardContent() {
 						<Card className="overflow-hidden">
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 								<CardTitle className="text-sm font-medium">
-									Total Revenue
+									Total Tasks
 								</CardTitle>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +114,7 @@ export default function DashboardContent() {
 								</svg>
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">$45,231.89</div>
+								<div className="text-2xl font-bold">{tasksCountQuery.data?.length}</div>
 								<p className="text-xs text-muted-foreground">
 									+20.1% from last month
 								</p>
@@ -67,7 +123,7 @@ export default function DashboardContent() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 								<CardTitle className="text-sm font-medium">
-									Subscriptions
+									Datasets
 								</CardTitle>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +141,7 @@ export default function DashboardContent() {
 								</svg>
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">+2350</div>
+								<div className="text-2xl font-bold">{datasetsCountQuery.data?.length}</div>
 								<p className="text-xs text-muted-foreground">
 									+180.1% from last month
 								</p>
@@ -93,7 +149,7 @@ export default function DashboardContent() {
 						</Card>
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-								<CardTitle className="text-sm font-medium">Sales</CardTitle>
+								<CardTitle className="text-sm font-medium">Checkpoints</CardTitle>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 24 24"
@@ -109,7 +165,7 @@ export default function DashboardContent() {
 								</svg>
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">+12,234</div>
+								<div className="text-2xl font-bold">{checkpointsCountQuery.data?.length}</div>
 								<p className="text-xs text-muted-foreground">
 									+19% from last month
 								</p>
@@ -118,7 +174,7 @@ export default function DashboardContent() {
 						<Card>
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 								<CardTitle className="text-sm font-medium">
-									Active Now
+									Supported Models
 								</CardTitle>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -134,7 +190,7 @@ export default function DashboardContent() {
 								</svg>
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">+573</div>
+								<div className="text-2xl font-bold">+{modelsCountQuery.data?.length}</div>
 								<p className="text-xs text-muted-foreground">
 									+201 since last hour
 								</p>
@@ -152,9 +208,9 @@ export default function DashboardContent() {
 						</Card>
 						<Card className="col-span-3 overflow-x-auto">
 							<CardHeader>
-								<CardTitle>Recent Sales</CardTitle>
+								<CardTitle>Recent Tasks</CardTitle>
 								<CardDescription>
-									You made 265 sales this month.
+									You made {tasksCountQuery.data?.length} tasks this month.
 								</CardDescription>
 							</CardHeader>
 							<CardContent>

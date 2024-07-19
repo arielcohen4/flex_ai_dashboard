@@ -1,67 +1,39 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { supabaseBrowser } from "@/lib/supabase/browser";
+import { useQuery } from "@tanstack/react-query";
 
 export function RecentSales() {
+	const tasksQuery = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        const { data, error } = await supabase.from('tasks').select('*, models(*), datasets(*)');
+        return data ?? [];
+      }
+
+			return [];
+    }
+  });
+
+	console.log(tasksQuery.data);
+	
 	return (
 		<div className="space-y-8">
-			<div className="flex items-center">
-				<Avatar className="h-9 w-9">
-					<AvatarImage src="/avatars/01.png" alt="Avatar" />
-					<AvatarFallback>OM</AvatarFallback>
-				</Avatar>
-				<div className="ml-4 space-y-1">
-					<p className="text-sm font-medium leading-none">Olivia Martin</p>
-					<p className="text-sm text-muted-foreground">
-						olivia.martin@email.com
-					</p>
+			{tasksQuery.data?.slice(-5).map((task) => (
+				<div key={task.id} className="flex items-center">
+					<Avatar className="h-9 w-9">
+						<AvatarImage src="/avatars/01.png" alt="Avatar" />
+						<AvatarFallback>OM</AvatarFallback>
+					</Avatar>
+					<div className="ml-4 space-y-1">
+						<p className="text-sm font-medium leading-none">{task.name}</p>
+						<p className="text-sm text-muted-foreground">{task.models?.name}</p>
+					</div>
+					<div className="ml-auto font-medium">{task.datasets?.total_tokens} Tokens</div>
 				</div>
-				<div className="ml-auto font-medium">+$1,999.00</div>
-			</div>
-			<div className="flex items-center">
-				<Avatar className="flex h-9 w-9 items-center justify-center space-y-0 border">
-					<AvatarImage src="/avatars/02.png" alt="Avatar" />
-					<AvatarFallback>JL</AvatarFallback>
-				</Avatar>
-				<div className="ml-4 space-y-1">
-					<p className="text-sm font-medium leading-none">Jackson Lee</p>
-					<p className="text-sm text-muted-foreground">jackson.lee@email.com</p>
-				</div>
-				<div className="ml-auto font-medium">+$39.00</div>
-			</div>
-			<div className="flex items-center">
-				<Avatar className="h-9 w-9">
-					<AvatarImage src="/avatars/03.png" alt="Avatar" />
-					<AvatarFallback>IN</AvatarFallback>
-				</Avatar>
-				<div className="ml-4 space-y-1">
-					<p className="text-sm font-medium leading-none">Isabella Nguyen</p>
-					<p className="text-sm text-muted-foreground">
-						isabella.nguyen@email.com
-					</p>
-				</div>
-				<div className="ml-auto font-medium">+$299.00</div>
-			</div>
-			<div className="flex items-center">
-				<Avatar className="h-9 w-9">
-					<AvatarImage src="/avatars/04.png" alt="Avatar" />
-					<AvatarFallback>WK</AvatarFallback>
-				</Avatar>
-				<div className="ml-4 space-y-1">
-					<p className="text-sm font-medium leading-none">William Kim</p>
-					<p className="text-sm text-muted-foreground">will@email.com</p>
-				</div>
-				<div className="ml-auto font-medium">+$99.00</div>
-			</div>
-			<div className="flex items-center">
-				<Avatar className="h-9 w-9">
-					<AvatarImage src="/avatars/05.png" alt="Avatar" />
-					<AvatarFallback>SD</AvatarFallback>
-				</Avatar>
-				<div className="ml-4 space-y-1">
-					<p className="text-sm font-medium leading-none">Sofia Davis</p>
-					<p className="text-sm text-muted-foreground">sofia.davis@email.com</p>
-				</div>
-				<div className="ml-auto font-medium">+$39.00</div>
-			</div>
+			))}
 		</div>
 	);
 }
