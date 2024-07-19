@@ -106,7 +106,7 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
 			return (
 				<div className="flex space-x-2">
 					<span className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
-						{ row.original.current_step ? `${row.original.total_steps} / ${row.original.current_epoch}` : ""}
+						{ row.original.current_step ? `${row.original.total_steps} / ${row.original.current_step}` : ""}
 					</span>
 				</div>
 			);
