@@ -13,6 +13,7 @@ import {
   Grid2X2,
   ScrollText,
   SquareArrowOutUpRightIcon,
+  CircleFadingPlusIcon,
 } from "lucide-react";
 
 type Submenu = {
@@ -51,6 +52,13 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "Contents",
       menus: [
+        {
+          href: "/create",
+          label: "Create Task",
+          active: pathname.includes("/create"),
+          icon: CircleFadingPlusIcon,
+          submenus: [],
+        },
         {
           href: "/tasks",
           label: "Tasks",
