@@ -24,10 +24,19 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
+import useUser from "@/app/hook/useUser";
+import { baseApiUrl } from "@/lib/constant";
+import axios from "axios";
+
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function LLMTrainingTaskForm() {
+  const user = useUser();
+  const { toast } = useToast();
   const [name, setName] = useState("");
-  const [modelId, setModelId] = useState("");
+  const [modelName, setModelName] = useState("");
   const [datasetId, setDatasetId] = useState("");
   const [nEpochs, setNEpochs] = useState(1);
   const [trainWithLora, setTrainWithLora] = useState(true);
@@ -47,11 +56,18 @@ export default function LLMTrainingTaskForm() {
   const [earlyStoppingPatience, setEarlyStoppingPatience] = useState(3);
   const [earlyStoppingThreshold, setEarlyStoppingThreshold] = useState(0.001);
 
+  const [loadingCreateTask, setLoadingCreateTask] = useState(false);
+
+  const router = useRouter();
+
   const { data: models, isLoading: isLoadingModels } = useQuery({
     queryKey: ["models"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
-      const { data } = await supabase.from("models").select("*");
+      const { data } = await supabase
+        .from("models")
+        .select("*")
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
@@ -60,49 +76,72 @@ export default function LLMTrainingTaskForm() {
     queryKey: ["datasets"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
-      const { data } = await supabase.from("datasets").select("*");
+      const { data } = await supabase
+        .from("datasets")
+        .select("*")
+        .order("created_at", { ascending: false });
       return data ?? [];
     },
   });
 
-  const handleSubmit = () => {
-    const fineTuneRequest: CreateFinetuneRequest = {
-      name,
-      model: modelId,
-      datasetId,
-      nEpochs,
-      trainWithLora,
-      batchSize,
-      learningRate,
-      wandbKey,
-      nCheckpointsAndEvaluationsPerEpoch: nCheckpoints,
-      saveOnlyBestCheckpoint,
-      loraConfig: null,
-      earlyStoppingConfig: null,
+  const handleSubmit = async () => {
+    const apiKey = user?.data?.api_key;
+
+    const url = `${baseApiUrl}/v1/fine_tunes/create_finetune`;
+    const headers = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     };
 
-    if (trainWithLora) {
-      fineTuneRequest.loraConfig = {
-        loraR,
-        loraAlpha,
-        loraDropout,
-      };
-    }
+    const payload: CreateFinetuneRequest = {
+      name,
+      dataset_id: datasetId,
+      model: modelName,
+      n_epochs: nEpochs,
+      train_with_lora: trainWithLora,
+      save_only_best_checkpoint: false,
+    };
 
-    if (useEarlyStopping) {
-      fineTuneRequest.earlyStoppingConfig = {
+    if (batchSize) payload.batch_size = batchSize;
+    if (learningRate) payload.learning_rate = learningRate;
+    if (nCheckpoints)
+      payload.n_checkpoints_and_evaluations_per_epoch = nCheckpoints;
+    if (saveOnlyBestCheckpoint)
+      payload.save_only_best_checkpoint = saveOnlyBestCheckpoint;
+    if (trainWithLora)
+      payload.lora_config = {
+        lora_alpha: loraAlpha,
+        lora_dropout: loraDropout,
+        lora_r: loraR,
+      };
+    if (wandbKey) payload.wandb_key = wandbKey;
+    if (useEarlyStopping)
+      payload.early_stopping_config = {
         patience: earlyStoppingPatience,
         threshold: earlyStoppingThreshold,
       };
-    }
 
-    console.log(fineTuneRequest);
-    // Here you would typically send the form data to your backend
+    try {
+      setLoadingCreateTask(true);
+      const response = await axios.post(url, payload, { headers });
+      // move to tasks page
+      toast({
+        title: "New Training Task created",
+        description: `${name} has been created successfully`,
+      });
+      router.push("/tasks");
+      return response.data;
+    } catch (error) {
+      console.error("Error creating fine-tune:", error);
+      throw error;
+    } finally {
+      setLoadingCreateTask(false);
+    }
   };
 
   useEffect(() => {
-    if (modelId && models) {
-      const selectedModel = models.find((model) => model.id === modelId);
+    if (modelName && models) {
+      const selectedModel = models.find((model) => model.name === modelName);
       if (
         selectedModel &&
         typeof selectedModel.default_config === "object" &&
@@ -117,7 +156,7 @@ export default function LLMTrainingTaskForm() {
         setLearningRate(config.learning_rate ?? null);
       }
     }
-  }, [modelId, models]);
+  }, [modelName, models]);
 
   const handleCheckboxChange = (checked: boolean | "indeterminate") => {
     setSaveOnlyBestCheckpoint(checked === true);
@@ -145,7 +184,7 @@ export default function LLMTrainingTaskForm() {
 
           <div className="space-y-2">
             <Label htmlFor="model">Model</Label>
-            <Select onValueChange={setModelId} required>
+            <Select onValueChange={setModelName} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a model" />
               </SelectTrigger>
@@ -154,7 +193,7 @@ export default function LLMTrainingTaskForm() {
                   <div></div>
                 ) : (
                   models?.map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
+                    <SelectItem key={model.id} value={model.name}>
                       {model.name}
                     </SelectItem>
                   ))
@@ -209,25 +248,39 @@ export default function LLMTrainingTaskForm() {
               <h4 className="font-semibold">LoRA Configuration</h4>
               <div className="space-y-2">
                 <Label htmlFor="loraR">LoRA R: {loraR}</Label>
-                <Slider
-                  id="loraR"
-                  min={1}
-                  max={64}
-                  step={1}
-                  value={[loraR]}
-                  onValueChange={([value]) => setLoraR(value)}
-                />
+                <Select
+                  onValueChange={(value) => setLoraR(Number(value))}
+                  value={loraR.toString()}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select LoRA R value" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[8, 16, 32, 64, 128].map((value) => (
+                      <SelectItem key={value} value={value.toString()}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="loraAlpha">LoRA Alpha: {loraAlpha}</Label>
-                <Slider
-                  id="loraAlpha"
-                  min={1}
-                  max={128}
-                  step={1}
-                  value={[loraAlpha]}
-                  onValueChange={([value]) => setLoraAlpha(value)}
-                />
+                <Select
+                  onValueChange={(value) => setLoraAlpha(Number(value))}
+                  value={loraAlpha.toString()}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select LoRA Alpha value" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[8, 16].map((value) => (
+                      <SelectItem key={value} value={value.toString()}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="loraDropout">LoRA Dropout: {loraDropout}</Label>
@@ -343,7 +396,11 @@ export default function LLMTrainingTaskForm() {
         </form>
       </CardContent>
       <CardFooter>
-        <Button type="submit" onClick={handleSubmit}>
+        <Button
+          loading={loadingCreateTask}
+          type="submit"
+          onClick={() => handleSubmit()}
+        >
           Create Task
         </Button>
       </CardFooter>

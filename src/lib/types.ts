@@ -6,9 +6,9 @@ export type TaskWithRelations = Tables<"tasks"> & {
 };
 
 export type LoraConfig = {
-  loraR: number;
-  loraAlpha: number;
-  loraDropout: number;
+  lora_r: number;
+  lora_alpha: number;
+  lora_dropout: number;
 };
 
 export type EarlyStoppingConfig = {
@@ -18,15 +18,15 @@ export type EarlyStoppingConfig = {
 
 export type CreateFinetuneRequest = {
   name: string;
-  datasetId: string;
+  dataset_id: string;
   model: string;
-  nEpochs: number;
-  batchSize: number | null;
-  learningRate: number | null;
-  nCheckpointsAndEvaluationsPerEpoch: number;
-  saveOnlyBestCheckpoint: boolean;
-  trainWithLora: boolean;
-  loraConfig: LoraConfig | null;
-  earlyStoppingConfig: EarlyStoppingConfig | null;
-  wandbKey: string | null;
+  n_epochs: number;
+  batch_size?: number;
+  learning_rate?: number;
+  n_checkpoints_and_evaluations_per_epoch?: number;
+  save_only_best_checkpoint: boolean;
+  train_with_lora: boolean;
+  lora_config?: LoraConfig;
+  early_stopping_config?: EarlyStoppingConfig;
+  wandb_key?: string;
 };

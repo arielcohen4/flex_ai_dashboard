@@ -6,3 +6,4 @@ export const protectedPaths = [
   "/datasets",
   "/settings/api-keys",
 ];
+export const baseApiUrl = "https://api.getflex.ai";
