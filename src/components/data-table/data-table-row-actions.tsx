@@ -21,6 +21,7 @@ import { Button } from "../ui/button";
 import { labels } from "@/constants/data/task/data";
 import { TaskWithRelations } from "@/lib/types";
 import { CheckpointsViewer } from "../checkpoints-viewer";
+import { TrainingConfigsViewer } from "../training-config-viewer";
 import { useState } from "react";
 import { cancelTask } from "@/lib/actions/tasks";
 
@@ -33,6 +34,7 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
   const task = row.original as TaskWithRelations;
   const [showCheckpoints, setShowCheckpoints] = useState(false);
+  const [showTrainingConfig, setShowTrainingConfig] = useState(false);
   const [loadingCancelTask, setLoadingCancelTask] = useState<boolean>(false);
 
   const handleCancelTask = async () => {
@@ -70,6 +72,9 @@ export function DataTableRowActions<TData>({
           <DropdownMenuItem onSelect={() => setShowCheckpoints(true)}>
             View checkpoints
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShowTrainingConfig(true)}>
+            View training config
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => handleCancelTask()}>
@@ -83,6 +88,13 @@ export function DataTableRowActions<TData>({
           task={task}
           isOpen={showCheckpoints}
           onClose={() => setShowCheckpoints(false)}
+        />
+      )}
+      {showTrainingConfig && (
+        <TrainingConfigsViewer
+          task={task}
+          isOpen={showTrainingConfig}
+          onClose={() => setShowTrainingConfig(false)}
         />
       )}
     </>
