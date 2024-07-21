@@ -9,7 +9,10 @@ export async function cancelTask({ id }: { id: string }) {
 
   await cancelJobId({ id: (task.data?.engine_data as any).runpod_run_id });
 
-  await supabase.from("tasks").update({ stage: "CANCELED" }).eq("id", id);
+  await supabase
+    .from("tasks")
+    .update({ stage: "CANCELED", end_time: new Date().toISOString() })
+    .eq("id", id);
 
   return true;
 }
