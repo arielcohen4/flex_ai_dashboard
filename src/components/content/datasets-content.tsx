@@ -52,11 +52,6 @@ export default function AppContent() {
   }
 
   const filteredApps = datasetsQuery.data
-    .sort((a, b) =>
-      sort === "ascending"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
     .filter((app) => appType === "all" || appType === app.type)
     .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
