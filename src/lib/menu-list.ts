@@ -14,6 +14,7 @@ import {
   ScrollText,
   SquareArrowOutUpRightIcon,
   CircleFadingPlusIcon,
+  BarChart,
 } from "lucide-react";
 
 type Submenu = {
@@ -95,6 +96,18 @@ export function getMenuList(pathname: string): Group[] {
           label: "Settings",
           active: pathname.includes("/settings"),
           icon: Settings,
+          submenus: [],
+        },
+      ],
+    },
+    {
+      groupLabel: "External",
+      menus: [
+        {
+          href: "https://chat.lmsys.org/?leaderboard",
+          label: "Leaderboard",
+          active: pathname.includes("/leaderboard"),
+          icon: BarChart,
           submenus: [],
         },
       ],

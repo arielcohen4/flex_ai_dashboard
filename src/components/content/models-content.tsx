@@ -34,21 +34,27 @@ export default function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const modelsQuery = useQuery({
-    queryKey: ["models"],
+    queryKey: ["models_tasks_count"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
         const { data } = await supabase
           .from("models")
-          .select("*")
+          .select(
+            `
+          *,
+          tasks:tasks(count)
+        `
+          )
+
           .order("created_at", { ascending: false });
         return data ?? [];
-
-        return data;
       }
     },
   });
+
+  console.log(modelsQuery.data);
 
   if (!modelsQuery.data) {
     return <div>Loading...</div>;
@@ -144,7 +150,9 @@ export default function AppContent() {
               >
                 {app.name}
               </a>
-              <p className="line-clamp-2 text-gray-500">{"desc"}</p>
+              <p className="line-clamp-2 text-gray-500 text-sm">
+                {app.tasks[0].count + " Total community finetunes"}
+              </p>
             </div>
           </li>
         ))}
