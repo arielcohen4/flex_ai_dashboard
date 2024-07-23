@@ -9,6 +9,8 @@ import { roundToK } from "@/lib/utils";
 import { TaskWithRelations } from "@/lib/types";
 import { TimeProgressCell } from "./TimeProgressCell";
 import { PriceEstimationCell } from "./PriceEstimationCell";
+import Image from "next/image";
+import { familyToLogo } from "@/lib/constant";
 
 export const columns: ColumnDef<TaskWithRelations>[] = [
   {
@@ -185,7 +187,22 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2">
+          <div
+            className={`items-center justify-center rounded-lg bg-muted p-1`}
+          >
+            {row.original?.models?.family &&
+            familyToLogo.hasOwnProperty(row.original.models.family) ? (
+              <Image
+                src={`/model_families/${
+                  familyToLogo[row.original.models.family]
+                }`}
+                alt={row.original.models.name}
+                width={10}
+                height={10}
+              />
+            ) : null}
+          </div>
           <a className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
             {row.original.models?.name}
           </a>

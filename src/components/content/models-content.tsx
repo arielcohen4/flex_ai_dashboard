@@ -21,6 +21,8 @@ import { Database, Tables, Enums } from "@/lib/types/supabase";
 import { Badge } from "@/components/ui/badge";
 import { roundToK } from "@/lib/utils";
 import { CodeViewer } from "@/components/code-viewer";
+import Image from "next/image";
+import { familyToLogo } from "@/lib/constant";
 
 const appText = new Map<string, string>([
   ["all", "Family"],
@@ -130,9 +132,16 @@ export default function AppContent() {
           <li key={app.name} className="rounded-lg border p-4 hover:shadow-md">
             <div className="mb-8 flex items-center justify-between">
               <div
-                className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
+                className={`items-center justify-center rounded-lg bg-muted p-2`}
               >
-                {null}
+                {app.family && familyToLogo.hasOwnProperty(app.family) ? (
+                  <Image
+                    src={`/model_families/${familyToLogo[app.family]}`}
+                    alt={app.name}
+                    width={20}
+                    height={20}
+                  />
+                ) : null}
               </div>
               <Badge variant="secondary">
                 {roundToK(app.context_length)} context size
