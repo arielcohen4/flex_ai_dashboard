@@ -12,6 +12,7 @@ import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
+  IconCheck,
 } from "@tabler/icons-react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
@@ -161,6 +162,15 @@ export default function AppContent() {
               </a>
               <p className="line-clamp-2 text-gray-500 text-sm">
                 {app.tasks[0].count + " Total community finetunes"}
+              </p>
+              <p className="line-clamp-2 text-gray-500 text-sm">
+                Inference:
+                {app.vllm_support && (
+                  <Badge variant="outline" className="ml-1">
+                    vLLM
+                    {app.vllm_lora_support && " & LoRA"}
+                  </Badge>
+                )}
               </p>
             </div>
           </li>

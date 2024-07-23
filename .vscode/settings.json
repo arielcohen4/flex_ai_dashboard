@@ -12,6 +12,7 @@
     "supabase",
     "tabler",
     "tanstack",
+    "vllm",
     "wandb"
   ]
 }

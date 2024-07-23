@@ -122,6 +122,9 @@ export type Database = {
           model_class: string
           name: string
           params_count: number
+          vllm_context_length: number | null
+          vllm_lora_support: boolean
+          vllm_support: boolean
         }
         Insert: {
           context_length: number
@@ -132,6 +135,9 @@ export type Database = {
           model_class?: string
           name?: string
           params_count: number
+          vllm_context_length?: number | null
+          vllm_lora_support: boolean
+          vllm_support: boolean
         }
         Update: {
           context_length?: number
@@ -142,6 +148,9 @@ export type Database = {
           model_class?: string
           name?: string
           params_count?: number
+          vllm_context_length?: number | null
+          vllm_lora_support?: boolean
+          vllm_support?: boolean
         }
         Relationships: []
       }
@@ -241,12 +250,15 @@ export type Database = {
           current_epoch: number | null
           current_step: number | null
           dataset_id: string
+          end_time: string | null
           engine: Database["public"]["Enums"]["engine"]
           engine_data: Json | null
           id: string
           model_id: string
           name: string
           stage: string
+          start_time: string | null
+          start_train_time: string | null
           total_steps: number
           updated_at: string
           user_id: string
@@ -259,12 +271,15 @@ export type Database = {
           current_epoch?: number | null
           current_step?: number | null
           dataset_id: string
+          end_time?: string | null
           engine?: Database["public"]["Enums"]["engine"]
           engine_data?: Json | null
           id?: string
           model_id: string
           name: string
           stage?: string
+          start_time?: string | null
+          start_train_time?: string | null
           total_steps: number
           updated_at?: string
           user_id: string
@@ -277,12 +292,15 @@ export type Database = {
           current_epoch?: number | null
           current_step?: number | null
           dataset_id?: string
+          end_time?: string | null
           engine?: Database["public"]["Enums"]["engine"]
           engine_data?: Json | null
           id?: string
           model_id?: string
           name?: string
           stage?: string
+          start_time?: string | null
+          start_train_time?: string | null
           total_steps?: number
           updated_at?: string
           user_id?: string
