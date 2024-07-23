@@ -31,19 +31,29 @@ export function TimeProgressCell({ row }: { row: any }) {
       </div>
     );
   } else if (doneStages.includes(row.original.stage)) {
-    const startTime = new Date(row.original.start_time);
-    const endTime = new Date(row.original.end_time);
-    const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
-    const formattedTime = formatDuration(timePassed);
-    const formattedEstimation = formatDuration(timePassed);
+    if (row.original.start_time == null) {
+      return (
+        <div className="flex w-[50px] items-center justify-between">
+          <span></span>
+          <span className="text-muted-foreground">/</span>
+          <span></span>
+        </div>
+      );
+    } else {
+      const startTime = new Date(row.original.start_time);
+      const endTime = new Date(row.original.end_time);
+      const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
+      const formattedTime = formatDuration(timePassed);
+      const formattedEstimation = formatDuration(timePassed);
 
-    return (
-      <div className="flex w-[50px] items-center justify-between">
-        <span>{formattedTime}</span>
-        <span className="text-muted-foreground">/</span>
-        <span>{formattedEstimation}</span>
-      </div>
-    );
+      return (
+        <div className="flex w-[50px] items-center justify-between">
+          <span>{formattedTime}</span>
+          <span className="text-muted-foreground">/</span>
+          <span>{formattedEstimation}</span>
+        </div>
+      );
+    }
   } else {
     const startTime = new Date(row.original.start_time);
     const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;

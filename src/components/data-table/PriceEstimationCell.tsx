@@ -37,18 +37,28 @@ export function PriceEstimationCell({ row }: { row: any }) {
       </div>
     );
   } else if (doneStages.includes(row.original.stage)) {
-    const startTime = new Date(row.original.start_time);
-    const endTime = new Date(row.original.end_time);
-    const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
-    const cost = calculateCost(timePassed);
+    if (row.original.start_time == null) {
+      return (
+        <div className="flex w-[50px] items-center justify-between">
+          <span></span>
+          <span className="text-muted-foreground">/</span>
+          <span></span>
+        </div>
+      );
+    } else {
+      const startTime = new Date(row.original.start_time);
+      const endTime = new Date(row.original.end_time);
+      const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
+      const cost = calculateCost(timePassed);
 
-    return (
-      <div className="flex w-[50px] items-center justify-between">
-        <span>{cost}$</span>
-        <span className="text-muted-foreground">/</span>
-        <span>{cost}$</span>
-      </div>
-    );
+      return (
+        <div className="flex w-[50px] items-center justify-between">
+          <span>{cost}$</span>
+          <span className="text-muted-foreground">/</span>
+          <span>{cost}$</span>
+        </div>
+      );
+    }
   } else {
     const startTime = new Date(row.original.start_time);
     const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;
