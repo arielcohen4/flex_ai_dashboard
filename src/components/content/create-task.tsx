@@ -31,6 +31,8 @@ import axios from "axios";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
+import { Tables } from "@/lib/types/supabase";
 
 export default function LLMTrainingTaskForm() {
   const user = useUser();
@@ -45,6 +47,7 @@ export default function LLMTrainingTaskForm() {
   const [wandbKey, setWandbKey] = useState("");
   const [nCheckpoints, setNCheckpoints] = useState<number>(1);
   const [saveOnlyBestCheckpoint, setSaveOnlyBestCheckpoint] = useState(false);
+  const [targetInferenceLibrary, setTargetInferenceLibrary] = useState("vllm");
 
   // LoRA configuration
   const [loraR, setLoraR] = useState(16);
@@ -57,6 +60,13 @@ export default function LLMTrainingTaskForm() {
   const [earlyStoppingThreshold, setEarlyStoppingThreshold] = useState(0.001);
 
   const [loadingCreateTask, setLoadingCreateTask] = useState(false);
+
+  // New state for the alert dialog
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertText, setAlertText] = useState("");
+  const [canProceed, setCanProceed] = useState(false);
+  const [isAlertError, setIsAlertError] = useState(false);
 
   const router = useRouter();
 
@@ -83,6 +93,78 @@ export default function LLMTrainingTaskForm() {
       return data ?? [];
     },
   });
+
+  const validate = async () => {
+    const model = models?.find(
+      (model) => model.name === modelName
+    ) as Tables<"models">;
+    const dataset = datasets?.find(
+      (dataset) => dataset.id === datasetId
+    ) as Tables<"datasets">;
+
+    if (targetInferenceLibrary == "vllm") {
+      if (!model?.vllm_support) {
+        setAlertTitle(`vLLM Inference Not Supported for ${modelName}`);
+        setAlertText(
+          "Please select a model that supports vLLM inference or remove LLM as the target inference library."
+        );
+        setIsAlertError(true);
+        setIsAlertOpen(true);
+        return false;
+      }
+
+      if (!model?.vllm_lora_support && trainWithLora) {
+        setAlertTitle(
+          `vLLM Inference Not Supported for ${modelName} with Multi LoRA Adapters`
+        );
+        setAlertText(
+          "You can still train this model but merge the lora adapter weights to the model at the end. Do you want to continue?"
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(false);
+        return false;
+      }
+
+      if (model?.vllm_lora_support && trainWithLora && loraR > 64) {
+        setAlertTitle(
+          `vLLM Inference Not Supported for ${modelName} with Multi LoRA Adapters with LoRA Rank more then 64`
+        );
+        setAlertText(
+          `You can still train this model with ${loraR}, but in order to inference  you will need to merge the lora adapter weights to the model at the end. Do you want to continue?`
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(false);
+        return false;
+      }
+
+      if (
+        model?.vllm_context_length &&
+        model?.vllm_context_length < dataset?.max_tokens
+      ) {
+        setAlertTitle(
+          `vLLM Inference will reduce the context length for ${modelName} to ${model.vllm_context_length}`
+        );
+        setAlertText(
+          `vLLM Inference will reduce the context length for ${modelName} to ${model.vllm_context_length} and your dataset has max tokens of ${dataset.max_tokens}. So training will be fine, but on inference you wont be able to use that context size, Do you want to continue?`
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(true);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const validateAndSubmit = async () => {
+    const validated = await validate();
+
+    if (!validated) {
+      return;
+    }
+
+    handleSubmit();
+  };
 
   const handleSubmit = async () => {
     const apiKey = user?.data?.api_key;
@@ -139,6 +221,18 @@ export default function LLMTrainingTaskForm() {
     }
   };
 
+  const handleAlertClose = () => {
+    setIsAlertOpen(false);
+    if (!isAlertError) {
+      router.push("/tasks");
+    }
+  };
+
+  const handleAlertConfirm = () => {
+    setIsAlertOpen(false);
+    handleSubmit();
+  };
+
   useEffect(() => {
     if (modelName && models) {
       const selectedModel = models.find((model) => model.name === modelName);
@@ -171,7 +265,7 @@ export default function LLMTrainingTaskForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Task Name</Label>
             <Input
@@ -393,17 +487,43 @@ export default function LLMTrainingTaskForm() {
               </div>
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label htmlFor="targetInferenceLibrary">
+              Target Inference Library (For validation)
+            </Label>
+            <Select
+              onValueChange={setTargetInferenceLibrary}
+              value={targetInferenceLibrary}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select target inference library" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vllm">vLLM</SelectItem>
+                <SelectItem value="none">None</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </form>
       </CardContent>
       <CardFooter>
         <Button
           loading={loadingCreateTask}
           type="submit"
-          onClick={() => handleSubmit()}
+          onClick={() => validateAndSubmit()}
         >
           Create Task
         </Button>
       </CardFooter>
+      <CreateTaskAlertDialog
+        isOpen={isAlertOpen}
+        onClose={handleAlertClose}
+        onConfirm={handleAlertConfirm}
+        title={alertTitle}
+        text={alertText}
+        isError={isAlertError}
+      />
     </Card>
   );
 }

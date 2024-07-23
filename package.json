@@ -13,6 +13,7 @@
     "@aws-sdk/client-s3": "^3.616.0",
     "@aws-sdk/s3-request-presigner": "^3.616.0",
     "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.0.3",
