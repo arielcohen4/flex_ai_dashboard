@@ -26,7 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
 import useUser from "@/app/hook/useUser";
 import { baseApiUrl } from "@/lib/constant";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
@@ -214,8 +214,26 @@ export default function LLMTrainingTaskForm() {
       router.push("/tasks");
       return response.data;
     } catch (error) {
-      console.error("Error creating fine-tune:", error);
-      throw error;
+      if (axios.isAxiosError(error)) {
+        // Type guard to check if it's an AxiosError
+        const axiosError = error as AxiosError<any>; // Cast to AxiosError
+        setAlertTitle(
+          `${axiosError.response?.data?.detail || "An error occurred"}`
+        );
+        setAlertText(
+          `${axiosError.response?.data?.detail || "Please try again later"}`
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(true);
+        console.error("Error creating fine-tune:", axiosError);
+      } else {
+        // Handle non-Axios errors
+        setAlertTitle("An unexpected error occurred");
+        setAlertText("Please try again later");
+        setIsAlertOpen(true);
+        setIsAlertError(true);
+        console.error("Unexpected error:", error);
+      }
     } finally {
       setLoadingCreateTask(false);
     }
