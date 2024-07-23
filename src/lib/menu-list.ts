@@ -50,7 +50,7 @@ export function getMenuList(pathname: string): Group[] {
       ],
     },
     {
-      groupLabel: "Contents",
+      groupLabel: "Create",
       menus: [
         {
           href: "/create",
@@ -59,6 +59,11 @@ export function getMenuList(pathname: string): Group[] {
           icon: CircleFadingPlusIcon,
           submenus: [],
         },
+      ],
+    },
+    {
+      groupLabel: "Contents",
+      menus: [
         {
           href: "/tasks",
           label: "Tasks",

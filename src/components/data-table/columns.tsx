@@ -8,6 +8,7 @@ import { labels, priorities, statuses } from "@/constants/data/task/data";
 import { roundToK } from "@/lib/utils";
 import { TaskWithRelations } from "@/lib/types";
 import { TimeProgressCell } from "./TimeProgressCell";
+import { PriceEstimationCell } from "./PriceEstimationCell";
 
 export const columns: ColumnDef<TaskWithRelations>[] = [
   {
@@ -168,6 +169,16 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
     },
   },
   {
+    accessorKey: "price",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Estimation $" />
+    ),
+    cell: ({ row }) => <PriceEstimationCell row={row} />,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
     accessorKey: "model",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Model" />
@@ -193,11 +204,6 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
           <a className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
             {`${row.original.datasets?.name}`}
           </a>
-          <Badge variant="outline">{`${roundToK(
-            row.original.datasets?.total_tokens ?? 0
-          )} Tokens`}</Badge>
-          <Badge variant="outline">{`${row.original.datasets?.type}`}</Badge>
-          <Badge variant="outline">{`${row.original.datasets?.train_rows_count} rows`}</Badge>
         </div>
       );
     },
