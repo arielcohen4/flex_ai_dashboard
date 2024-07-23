@@ -24,6 +24,12 @@ import { Badge } from "@/components/ui/badge";
 import { formatSize } from "@/lib/utils";
 import { getDownloadUrl } from "@/lib/actions/checkpoints";
 import { Loader2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const REMOVE_LOGS_KEYS = [
   "step",
@@ -45,6 +51,9 @@ export function CheckpointsViewer({
   const [loadingCheckpoints, setLoadingCheckpoints] = useState<{
     [key: string]: boolean;
   }>({});
+  const [openTooltips, setOpenTooltips] = useState<{ [key: string]: boolean }>(
+    {}
+  );
   const queryClient = useQueryClient();
 
   const checkpointsQuery = useQuery({
@@ -127,6 +136,13 @@ export function CheckpointsViewer({
         copyToClipboard(downloadCommand);
 
         console.log("Download command copied to clipboard:", downloadCommand);
+        // Open the tooltip for this specific button
+        setOpenTooltips((prev) => ({ ...prev, [id]: true }));
+
+        // Close the tooltip after 2 seconds
+        setTimeout(() => {
+          setOpenTooltips((prev) => ({ ...prev, [id]: false }));
+        }, 500);
       } else {
         console.error("Failed to generate download URL");
       }
@@ -224,19 +240,34 @@ export function CheckpointsViewer({
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="secondary"
-                        onClick={() =>
-                          downloadCliCheckpoint({
-                            id: checkpoint.id,
-                            name: checkpoint.tasks?.name as string,
-                            checkpointNumber: checkpoint.step,
-                          })
-                        }
-                        disabled={checkpoint.stage !== "FINISHED"}
-                      >
-                        Copy
-                      </Button>
+                      <TooltipProvider>
+                        <Tooltip
+                          open={
+                            openTooltips[checkpoint.id] == undefined
+                              ? false
+                              : openTooltips[checkpoint.id]
+                          }
+                        >
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="secondary"
+                              onClick={() =>
+                                downloadCliCheckpoint({
+                                  id: checkpoint.id,
+                                  name: checkpoint.tasks?.name as string,
+                                  checkpointNumber: checkpoint.step,
+                                })
+                              }
+                              disabled={checkpoint.stage !== "FINISHED"}
+                            >
+                              Copy
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copied</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                   </TableRow>
                 ))}
