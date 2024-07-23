@@ -55,7 +55,7 @@ export function CheckpointsViewer({
       if (sessionData.session?.user) {
         const { data, error } = await supabase
           .from("checkpoints")
-          .select("*")
+          .select("*, tasks(*)")
           .eq("task_id", task.id)
           .order("created_at", { ascending: true });
         return data ?? [];
@@ -99,6 +99,42 @@ export function CheckpointsViewer({
     }
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      console.log("Text copied to clipboard");
+      // Optionally, you can show a success message to the user here
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      // Optionally, you can show an error message to the user here
+    }
+  };
+
+  const downloadCliCheckpoint = async ({
+    id,
+    name,
+    checkpointNumber,
+  }: {
+    id: string;
+    name: string;
+    checkpointNumber: number;
+  }) => {
+    try {
+      const url = await getDownloadUrl({ id });
+      if (url) {
+        const fileName = `${id}_${name}_checkpoint-${checkpointNumber}.tar.gz`;
+        const downloadCommand = `wget -O ${fileName} "${url}" && tar -xzvf "${fileName}"`;
+        copyToClipboard(downloadCommand);
+
+        console.log("Download command copied to clipboard:", downloadCommand);
+      } else {
+        console.error("Failed to generate download URL");
+      }
+    } catch (error) {
+      console.error("Error downloading checkpoint:", error);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[800px]">
@@ -125,6 +161,7 @@ export function CheckpointsViewer({
                   <TableHead>Metrics</TableHead>
                   <TableHead>Stage</TableHead>
                   <TableHead>Download</TableHead>
+                  <TableHead>Download CLI</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -184,6 +221,21 @@ export function CheckpointsViewer({
                         disabled={checkpoint.stage !== "FINISHED"}
                       >
                         Download
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="secondary"
+                        onClick={() =>
+                          downloadCliCheckpoint({
+                            id: checkpoint.id,
+                            name: checkpoint.tasks?.name as string,
+                            checkpointNumber: checkpoint.step,
+                          })
+                        }
+                        disabled={checkpoint.stage !== "FINISHED"}
+                      >
+                        Copy
                       </Button>
                     </TableCell>
                   </TableRow>
