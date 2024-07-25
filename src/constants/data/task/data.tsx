@@ -51,6 +51,11 @@ export const statuses = [
     icon: StopwatchIcon,
   },
   {
+    value: "ERRORED",
+    label: "Errored",
+    icon: CrossCircledIcon,
+  },
+  {
     value: "CANCELED",
     label: "Canceled",
     icon: CrossCircledIcon,
