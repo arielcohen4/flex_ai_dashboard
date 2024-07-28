@@ -16,7 +16,7 @@ export default function TaskContent() {
       if (data.session?.user) {
         const { data, error } = await supabase
           .from("tasks")
-          .select("*, models(*), datasets(*)")
+          .select("*, models(*), datasets(*), computes(*)")
           .order("created_at", { ascending: false });
         return data ?? [];
       }
@@ -44,8 +44,6 @@ export default function TaskContent() {
   if (tasksQuery.isLoading) {
     return <div>Loading...</div>;
   }
-
-  console.log(tasksQuery.data);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">

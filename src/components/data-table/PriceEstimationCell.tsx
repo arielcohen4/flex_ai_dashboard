@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 
-const GPU_PRICe_PER_SECOND = 0.00076;
-
-function calculateCost(seconds: number) {
-  return (seconds * GPU_PRICe_PER_SECOND).toFixed(2);
+function calculateCost(seconds: number, priceForSecond: number) {
+  return (seconds * priceForSecond).toFixed(2);
 }
 
 function formatDuration(seconds: number) {
@@ -27,6 +25,7 @@ export function PriceEstimationCell({ row }: { row: any }) {
   }, []);
 
   const doneStages = ["COMPLETED", "ERRORED", "CANCELED"];
+  const pricePerSecond = row.original?.computes.price_per_second;
 
   if (row.original.stage === "PENDING") {
     return (
@@ -49,7 +48,7 @@ export function PriceEstimationCell({ row }: { row: any }) {
       const startTime = new Date(row.original.start_time);
       const endTime = new Date(row.original.end_time);
       const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
-      const cost = calculateCost(timePassed);
+      const cost = calculateCost(timePassed, pricePerSecond);
 
       return (
         <div className="flex w-[50px] items-center justify-between">
@@ -62,7 +61,7 @@ export function PriceEstimationCell({ row }: { row: any }) {
   } else {
     const startTime = new Date(row.original.start_time);
     const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;
-    const constUntilNow = calculateCost(timePassed);
+    const constUntilNow = calculateCost(timePassed, pricePerSecond);
 
     if (row.original.current_step > 10) {
       const startTrainTime = new Date(row.original.start_train_time);
@@ -70,7 +69,7 @@ export function PriceEstimationCell({ row }: { row: any }) {
         (new Date().getTime() - startTrainTime.getTime()) / 1000;
       const secondsForStep = timePassFromFirstStep / row.original.current_step;
       const totalTime = row.original.total_steps * secondsForStep;
-      const constPrediction = calculateCost(totalTime);
+      const constPrediction = calculateCost(totalTime, pricePerSecond);
       return (
         <div className="flex w-[50px] items-center justify-between">
           <span>{constUntilNow}$</span>
