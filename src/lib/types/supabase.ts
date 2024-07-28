@@ -59,6 +59,33 @@ export type Database = {
           },
         ]
       }
+      computes: {
+        Row: {
+          gpus_count: number | null
+          id: string
+          identifier: string
+          name: string
+          price_per_second: number
+          type: string
+        }
+        Insert: {
+          gpus_count?: number | null
+          id?: string
+          identifier?: string
+          name?: string
+          price_per_second: number
+          type?: string
+        }
+        Update: {
+          gpus_count?: number | null
+          id?: string
+          identifier?: string
+          name?: string
+          price_per_second?: number
+          type?: string
+        }
+        Relationships: []
+      }
       datasets: {
         Row: {
           created_at: string
@@ -118,7 +145,11 @@ export type Database = {
           created_at: string
           default_config: Json
           family: string | null
+          fft_compute: string
+          fft_compute_batch_size: number
           id: string
+          lora_compute: string
+          lora_compute_batch_size: number
           model_class: string
           name: string
           params_count: number
@@ -131,7 +162,11 @@ export type Database = {
           created_at?: string
           default_config: Json
           family?: string | null
+          fft_compute?: string
+          fft_compute_batch_size?: number
           id?: string
+          lora_compute?: string
+          lora_compute_batch_size?: number
           model_class?: string
           name?: string
           params_count: number
@@ -144,7 +179,11 @@ export type Database = {
           created_at?: string
           default_config?: Json
           family?: string | null
+          fft_compute?: string
+          fft_compute_batch_size?: number
           id?: string
+          lora_compute?: string
+          lora_compute_batch_size?: number
           model_class?: string
           name?: string
           params_count?: number
@@ -152,25 +191,22 @@ export type Database = {
           vllm_lora_support?: boolean
           vllm_support?: boolean
         }
-        Relationships: []
-      }
-      post: {
-        Row: {
-          created_at: string
-          id: string
-          text: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          text?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          text?: string | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "models_fft_compute_fkey"
+            columns: ["fft_compute"]
+            isOneToOne: false
+            referencedRelation: "computes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "models_lora_compute_fkey"
+            columns: ["lora_compute"]
+            isOneToOne: false
+            referencedRelation: "computes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -245,6 +281,7 @@ export type Database = {
       tasks: {
         Row: {
           checkpoints_count: number
+          compute: string
           config: Json
           created_at: string
           current_epoch: number | null
@@ -266,6 +303,7 @@ export type Database = {
         }
         Insert: {
           checkpoints_count: number
+          compute: string
           config: Json
           created_at?: string
           current_epoch?: number | null
@@ -287,6 +325,7 @@ export type Database = {
         }
         Update: {
           checkpoints_count?: number
+          compute?: string
           config?: Json
           created_at?: string
           current_epoch?: number | null
@@ -307,6 +346,13 @@ export type Database = {
           wandb_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_compute_fkey"
+            columns: ["compute"]
+            isOneToOne: false
+            referencedRelation: "computes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_dataset_id_fkey"
             columns: ["dataset_id"]

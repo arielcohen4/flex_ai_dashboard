@@ -2,10 +2,16 @@
 import axios from "axios";
 const API_KEY = "1PR807JX2IWODKRE997ONQNIF9GVTT5YREAM9E3L";
 
-export async function cancelJobId({ id }: { id: string }) {
+export async function cancelJobId({
+  endpointId,
+  id,
+}: {
+  endpointId: string;
+  id: string;
+}) {
   try {
     const response = await axios.post(
-      `https://api.runpod.ai/v2/d1943b5dxkvq9m/cancel/${id}`,
+      `https://api.runpod.ai/v2/${endpointId}/cancel/${id}`,
       {},
       {
         headers: {
