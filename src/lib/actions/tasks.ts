@@ -16,7 +16,7 @@ export async function cancelTask({ id }: { id: string }) {
   if (compute?.type == "RUNPOD") {
     await cancelJobId({
       endpointId: compute.identifier,
-      id: (task.data?.engine_data as any).runpod_run_id,
+      id: (task.data?.compute_data as any).runpod_run_id,
     });
   }
 

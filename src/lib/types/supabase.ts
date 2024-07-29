@@ -15,7 +15,7 @@ export type Database = {
           id: string
           logs: Json | null
           size: number | null
-          stage: string
+          stage: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
           step: number
           storage_key: string | null
           task_id: string
@@ -28,7 +28,7 @@ export type Database = {
           id?: string
           logs?: Json | null
           size?: number | null
-          stage?: string
+          stage?: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
           step: number
           storage_key?: string | null
           task_id: string
@@ -41,7 +41,7 @@ export type Database = {
           id?: string
           logs?: Json | null
           size?: number | null
-          stage?: string
+          stage?: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
           step?: number
           storage_key?: string | null
           task_id?: string
@@ -66,7 +66,7 @@ export type Database = {
           identifier: string
           name: string
           price_per_second: number
-          type: string
+          type: Database["public"]["Enums"]["COMPUTE_TYPE"]
         }
         Insert: {
           gpus_count?: number | null
@@ -74,7 +74,7 @@ export type Database = {
           identifier?: string
           name?: string
           price_per_second: number
-          type?: string
+          type?: Database["public"]["Enums"]["COMPUTE_TYPE"]
         }
         Update: {
           gpus_count?: number | null
@@ -82,7 +82,7 @@ export type Database = {
           identifier?: string
           name?: string
           price_per_second?: number
-          type?: string
+          type?: Database["public"]["Enums"]["COMPUTE_TYPE"]
         }
         Relationships: []
       }
@@ -282,18 +282,17 @@ export type Database = {
         Row: {
           checkpoints_count: number
           compute: string
+          compute_data: Json | null
           config: Json
           created_at: string
           current_epoch: number | null
           current_step: number | null
           dataset_id: string
           end_time: string | null
-          engine: Database["public"]["Enums"]["engine"]
-          engine_data: Json | null
           id: string
           model_id: string
           name: string
-          stage: string
+          stage: Database["public"]["Enums"]["TASK_STAGE"]
           start_time: string | null
           start_train_time: string | null
           total_steps: number
@@ -304,18 +303,17 @@ export type Database = {
         Insert: {
           checkpoints_count: number
           compute: string
+          compute_data?: Json | null
           config: Json
           created_at?: string
           current_epoch?: number | null
           current_step?: number | null
           dataset_id: string
           end_time?: string | null
-          engine?: Database["public"]["Enums"]["engine"]
-          engine_data?: Json | null
           id?: string
           model_id: string
           name: string
-          stage?: string
+          stage?: Database["public"]["Enums"]["TASK_STAGE"]
           start_time?: string | null
           start_train_time?: string | null
           total_steps: number
@@ -326,18 +324,17 @@ export type Database = {
         Update: {
           checkpoints_count?: number
           compute?: string
+          compute_data?: Json | null
           config?: Json
           created_at?: string
           current_epoch?: number | null
           current_step?: number | null
           dataset_id?: string
           end_time?: string | null
-          engine?: Database["public"]["Enums"]["engine"]
-          engine_data?: Json | null
           id?: string
           model_id?: string
           name?: string
-          stage?: string
+          stage?: Database["public"]["Enums"]["TASK_STAGE"]
           start_time?: string | null
           start_train_time?: string | null
           total_steps?: number
@@ -387,9 +384,18 @@ export type Database = {
       }
     }
     Enums: {
+      CHECKPOINT_STAGE: "PENDING" | "ARCHIVING" | "UPLOADING" | "FINISHED"
       CHECKPOINT_TYPE: "LORA" | "REGULAR"
+      COMPUTE_TYPE: "RUNPOD"
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
-      engine: "RUNPOD" | "SWARM_ONE"
+      TASK_STAGE:
+        | "DOWNLOADING_MODEL"
+        | "DOWNLOADING_DATA"
+        | "TRAINING"
+        | "COMPLETED"
+        | "ERRORED"
+        | "PENDING"
+        | "CANCELED"
     }
     CompositeTypes: {
       [_ in never]: never
