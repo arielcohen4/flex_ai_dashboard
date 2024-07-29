@@ -93,11 +93,12 @@ export default function AppContent() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Family</SelectItem>
+              <SelectItem value="llama3">llama3.1</SelectItem>
               <SelectItem value="gemma2">gemma2</SelectItem>
               <SelectItem value="qwen2">qwen2</SelectItem>
               <SelectItem value="llama3">llama3</SelectItem>
               <SelectItem value="tinyllama">tinyllama</SelectItem>
-              <SelectItem value="mixtral">mixtral</SelectItem>
+              <SelectItem value="mistral">mistral</SelectItem>
               <SelectItem value="deepseek-coder-v2">
                 deepseek-coder-v2
               </SelectItem>

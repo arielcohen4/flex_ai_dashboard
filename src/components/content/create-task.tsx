@@ -20,12 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
 import useUser from "@/app/hook/useUser";
-import { baseApiUrl } from "@/lib/constant";
+import { baseApiUrl, familyToLogo } from "@/lib/constant";
 import axios, { AxiosError } from "axios";
 
 import { ToastAction } from "@/components/ui/toast";
@@ -305,8 +306,29 @@ export default function LLMTrainingTaskForm() {
                   <div></div>
                 ) : (
                   models?.map((model) => (
-                    <SelectItem key={model.id} value={model.name}>
-                      {model.name}
+                    <SelectItem
+                      key={model.id}
+                      value={model.name}
+                      className="flex items-center space-x-2"
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center space-x-2">
+                          {model.family &&
+                            familyToLogo.hasOwnProperty(model.family) && (
+                              <Image
+                                src={`/model_families/${
+                                  familyToLogo[model.family]
+                                }`}
+                                alt={model.name}
+                                width={14}
+                                height={14}
+                                className="rounded-lg"
+                              />
+                            )}
+                          <span>{model.name}</span>
+                        </div>
+                        <span>{model.name}</span>
+                      </div>
                     </SelectItem>
                   ))
                 )}
