@@ -18,4 +18,7 @@ export const familyToLogo: { [key: string]: string } = {
   "deepseek-coder-v2": "deepseek.webp",
   gemma2: "google.webp",
   phi3: "microsoft.webp",
+  jamba: "ai21.webp",
+  "yi-1.5": "01-ai.webp",
+  "internlm2.5": "internlm.webp",
 };

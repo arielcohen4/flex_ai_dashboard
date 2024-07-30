@@ -99,6 +99,9 @@ export default function AppContent() {
               <SelectItem value="llama3">llama3</SelectItem>
               <SelectItem value="tinyllama">tinyllama</SelectItem>
               <SelectItem value="mistral">mistral</SelectItem>
+              <SelectItem value="internlm2.5">internlm2.5</SelectItem>
+              <SelectItem value="jamba">jamba</SelectItem>
+              <SelectItem value="yi-1.5">yi-1.5</SelectItem>
               <SelectItem value="deepseek-coder-v2">
                 deepseek-coder-v2
               </SelectItem>
