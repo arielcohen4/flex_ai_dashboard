@@ -327,7 +327,6 @@ export default function LLMTrainingTaskForm() {
                             )}
                           <span>{model.name}</span>
                         </div>
-                        <span>{model.name}</span>
                       </div>
                     </SelectItem>
                   ))
