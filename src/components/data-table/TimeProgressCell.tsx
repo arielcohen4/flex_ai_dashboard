@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 function formatDuration(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
+  // const remainingSeconds = Math.floor(seconds % 60);
 
-  return [hours, minutes, remainingSeconds]
-    .map((v) => v.toString().padStart(2, "0"))
-    .join(":");
+  return [hours, minutes].map((v) => v.toString().padStart(2, "0")).join(":");
 }
 export function TimeProgressCell({ row }: { row: any }) {
   const [currentTime, setCurrentTime] = useState(new Date());
