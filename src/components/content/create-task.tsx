@@ -34,6 +34,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
 import { Tables } from "@/lib/types/supabase";
+import SearchableSelect from "@/components/searchable-select";
 
 export default function LLMTrainingTaskForm() {
   const user = useUser();
@@ -313,42 +314,12 @@ export default function LLMTrainingTaskForm() {
 
           <div className="space-y-2">
             <Label htmlFor="model">Model</Label>
-            <Select onValueChange={setModelName} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoadingModels ? (
-                  <div></div>
-                ) : (
-                  models?.map((model) => (
-                    <SelectItem
-                      key={model.id}
-                      value={model.name}
-                      className="flex items-center space-x-2"
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center space-x-2">
-                          {model.family &&
-                            familyToLogo.hasOwnProperty(model.family) && (
-                              <Image
-                                src={`/model_families/${
-                                  familyToLogo[model.family]
-                                }`}
-                                alt={model.name}
-                                width={14}
-                                height={14}
-                                className="rounded-lg"
-                              />
-                            )}
-                          <span>{model.name}</span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={models || []}
+              onValueChange={setModelName}
+              placeholder="Select a model"
+              familyToLogo={familyToLogo}
+            />
           </div>
 
           <div className="space-y-2">
