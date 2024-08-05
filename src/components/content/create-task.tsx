@@ -77,11 +77,27 @@ export default function LLMTrainingTaskForm() {
       const supabase = supabaseBrowser();
       const { data } = await supabase
         .from("models")
-        .select("*")
+        .select(
+          `
+          *,
+          tasks:tasks(count)
+        `
+        )
+
         .order("created_at", { ascending: false });
-      return data ?? [];
+
+      // Sort the data by task count after fetching
+      const sortedData = data?.sort((a, b) => {
+        const countA = a.tasks[0]?.count ?? 0;
+        const countB = b.tasks[0]?.count ?? 0;
+        return countB - countA; // Descending order
+      });
+
+      return sortedData ?? [];
     },
   });
+
+  console.log(models);
 
   const { data: datasets, isLoading: isLoadingDatasets } = useQuery({
     queryKey: ["datasets"],
