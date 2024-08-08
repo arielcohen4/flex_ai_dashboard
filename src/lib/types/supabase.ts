@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          inference_cached: boolean
           logs: Json | null
           size: number | null
           stage: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          inference_cached?: boolean
           logs?: Json | null
           size?: number | null
           stage?: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
@@ -39,6 +41,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          inference_cached?: boolean
           logs?: Json | null
           size?: number | null
           stage?: Database["public"]["Enums"]["CHECKPOINT_STAGE"]
@@ -139,6 +142,66 @@ export type Database = {
           },
         ]
       }
+      endpoints: {
+        Row: {
+          checkpoint_id: string | null
+          created_at: string
+          id: string
+          inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          lora_base_model_id: string
+          lora_checkpoints: Json | null
+          model_name: string | null
+          name: string
+          type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          checkpoint_id?: string | null
+          created_at?: string
+          id?: string
+          inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          lora_base_model_id: string
+          lora_checkpoints?: Json | null
+          model_name?: string | null
+          name: string
+          type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at?: string
+          url?: string
+          user_id: string
+        }
+        Update: {
+          checkpoint_id?: string | null
+          created_at?: string
+          id?: string
+          inference_library?: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          lora_base_model_id?: string
+          lora_checkpoints?: Json | null
+          model_name?: string | null
+          name?: string
+          type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "endpoints_lora_base_model_id_fkey"
+            columns: ["lora_base_model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "endpoints_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       models: {
         Row: {
           context_length: number
@@ -148,6 +211,8 @@ export type Database = {
           fft_compute: string
           fft_compute_batch_size: number
           id: string
+          inference_cached: boolean
+          inference_cached_path: string | null
           lora_compute: string
           lora_compute_batch_size: number
           model_class: string
@@ -165,6 +230,8 @@ export type Database = {
           fft_compute?: string
           fft_compute_batch_size?: number
           id?: string
+          inference_cached?: boolean
+          inference_cached_path?: string | null
           lora_compute?: string
           lora_compute_batch_size?: number
           model_class?: string
@@ -182,6 +249,8 @@ export type Database = {
           fft_compute?: string
           fft_compute_batch_size?: number
           id?: string
+          inference_cached?: boolean
+          inference_cached_path?: string | null
           lora_compute?: string
           lora_compute_batch_size?: number
           model_class?: string
@@ -388,6 +457,7 @@ export type Database = {
       CHECKPOINT_TYPE: "LORA" | "REGULAR"
       COMPUTE_TYPE: "RUNPOD"
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
+      INFERENCE_LIBRARY: "VLLM"
       TASK_STAGE:
         | "DOWNLOADING_MODEL"
         | "DOWNLOADING_DATA"

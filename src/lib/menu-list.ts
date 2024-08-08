@@ -14,6 +14,7 @@ import {
   ScrollText,
   SquareArrowOutUpRightIcon,
   CircleFadingPlusIcon,
+  NetworkIcon,
   BarChart,
 } from "lucide-react";
 
@@ -84,6 +85,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Datasets",
           active: pathname.includes("/datasets"),
           icon: Grid2X2,
+          submenus: [],
+        },
+        {
+          href: "/endpoints",
+          label: "Endpoints",
+          active: pathname.includes("/endpoints"),
+          icon: NetworkIcon,
           submenus: [],
         },
       ],
