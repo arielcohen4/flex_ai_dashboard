@@ -67,9 +67,11 @@ export default function AppContent() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Endpoints</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Serverless Endpoints
+        </h1>
         <p className="text-muted-foreground">
-          All your serverless endpoints of your finetune models
+          All your serverless endpoints of your finetune models. Pay as you go
         </p>
       </div>
       <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
