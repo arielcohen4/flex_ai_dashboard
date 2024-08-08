@@ -34,6 +34,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
 import { Tables } from "@/lib/types/supabase";
+import SearchableSelect from "@/components/searchable-select";
 
 export default function LLMTrainingTaskForm() {
   const user = useUser();
@@ -77,11 +78,27 @@ export default function LLMTrainingTaskForm() {
       const supabase = supabaseBrowser();
       const { data } = await supabase
         .from("models")
-        .select("*")
+        .select(
+          `
+          *,
+          tasks:tasks(count)
+        `
+        )
+
         .order("created_at", { ascending: false });
-      return data ?? [];
+
+      // Sort the data by task count after fetching
+      const sortedData = data?.sort((a, b) => {
+        const countA = a.tasks[0]?.count ?? 0;
+        const countB = b.tasks[0]?.count ?? 0;
+        return countB - countA; // Descending order
+      });
+
+      return sortedData ?? [];
     },
   });
+
+  console.log(models);
 
   const { data: datasets, isLoading: isLoadingDatasets } = useQuery({
     queryKey: ["datasets"],
@@ -297,42 +314,12 @@ export default function LLMTrainingTaskForm() {
 
           <div className="space-y-2">
             <Label htmlFor="model">Model</Label>
-            <Select onValueChange={setModelName} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoadingModels ? (
-                  <div></div>
-                ) : (
-                  models?.map((model) => (
-                    <SelectItem
-                      key={model.id}
-                      value={model.name}
-                      className="flex items-center space-x-2"
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center space-x-2">
-                          {model.family &&
-                            familyToLogo.hasOwnProperty(model.family) && (
-                              <Image
-                                src={`/model_families/${
-                                  familyToLogo[model.family]
-                                }`}
-                                alt={model.name}
-                                width={14}
-                                height={14}
-                                className="rounded-lg"
-                              />
-                            )}
-                          <span>{model.name}</span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={models || []}
+              onValueChange={setModelName}
+              placeholder="Select a model"
+              familyToLogo={familyToLogo}
+            />
           </div>
 
           <div className="space-y-2">
