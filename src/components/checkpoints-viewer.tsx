@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { TaskWithRelations } from "@/lib/types";
 import { Button } from "@/components/custom/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { setCheckpointsState, endpointSlice } from "@/lib/store/endpointSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/store/store";
+import { Tables } from "@/lib/types/supabase";
 
 const REMOVE_LOGS_KEYS = [
   "step",
@@ -55,6 +59,10 @@ export function CheckpointsViewer({
     {}
   );
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+  const selectedCheckpoints = useAppSelector(
+    (state) => state.endpoint.checkpoints
+  );
 
   const checkpointsQuery = useQuery({
     queryKey: ["checkpoints", task.id],
@@ -151,6 +159,20 @@ export function CheckpointsViewer({
     }
   };
 
+  const toggleCheckpoint = (
+    checkpoint: Tables<"checkpoints">,
+    checked: boolean
+  ) => {
+    const updatedCheckpoints = checked
+      ? [...selectedCheckpoints, checkpoint]
+      : selectedCheckpoints.filter((x) => x.id !== checkpoint.id);
+    dispatch(setCheckpointsState(updatedCheckpoints));
+  };
+
+  const isCheckpointSelected = (checkpointId: string) => {
+    return selectedCheckpoints.some((c) => c.id === checkpointId);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[800px]">
@@ -178,6 +200,7 @@ export function CheckpointsViewer({
                   <TableHead>Stage</TableHead>
                   <TableHead>Download</TableHead>
                   <TableHead>Download CLI</TableHead>
+                  <TableHead>Deploy</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -268,6 +291,15 @@ export function CheckpointsViewer({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={isCheckpointSelected(checkpoint.id)}
+                        onCheckedChange={(checked) =>
+                          toggleCheckpoint(checkpoint, checked as boolean)
+                        }
+                        disabled={checkpoint.stage !== "FINISHED"}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
