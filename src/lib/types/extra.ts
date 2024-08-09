@@ -6,5 +6,6 @@ export type JoinedCheckpoint = Tables<"checkpoints"> & {
     | null
     | (Tables<"tasks"> & {
         models: Tables<"models"> | null;
+        datasets: Tables<"datasets"> | null;
       });
 };

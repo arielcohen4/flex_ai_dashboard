@@ -10,6 +10,7 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { priorities, statuses } from "@/constants/data/task/data";
 import { Button } from "../ui/button";
 import { useAppSelector } from "@/lib/store/store";
+import DeployCheckpointsModal from "@/components/deploy-checkpoints-viewer";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -50,9 +51,7 @@ export function DataTableToolbar<TData>({
             />
           )}
         </div>
-        {endpointState.checkpoints && (
-          <Button>Deploy {endpointState.checkpoints.length} checkpoints</Button>
-        )}
+        {endpointState.checkpoints.length > 0 && <DeployCheckpointsModal />}
         {isFiltered && (
           <Button
             variant="ghost"

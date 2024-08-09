@@ -72,7 +72,7 @@ export function CheckpointsViewer({
       if (sessionData.session?.user) {
         const { data, error } = await supabase
           .from("checkpoints")
-          .select("*, tasks(*, models(*))")
+          .select("*, tasks(*, models(*), datasets(*))")
           .eq("task_id", task.id)
           .order("created_at", { ascending: true });
         return data ?? [];
@@ -174,6 +174,30 @@ export function CheckpointsViewer({
     if (checkpoint.stage !== "FINISHED") {
       return {
         message: "Checkpoint must be finished before it can be deployed",
+        valid: false,
+      };
+    }
+    if (!checkpoint.tasks?.models?.vllm_support) {
+      return {
+        message: `${checkpoint.tasks?.models?.name} is not supported by VLLM or nay other library we have now`,
+        valid: false,
+      };
+    }
+    if (
+      checkpoint.type == "LORA" &&
+      !checkpoint.tasks?.models?.vllm_lora_support
+    ) {
+      return {
+        message: `${checkpoint.tasks?.models?.name} is not supported by VLLM with Lora Adapters or nay other library we have now`,
+        valid: false,
+      };
+    }
+    if (
+      checkpoint.type == "LORA" &&
+      (checkpoint.tasks?.config as any)?.lora_config?.lora_r > 64
+    ) {
+      return {
+        message: `VLLM doesn't support Lora Adapters with r > 64`,
         valid: false,
       };
     } else if (
