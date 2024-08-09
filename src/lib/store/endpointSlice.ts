@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Tables } from "../types/supabase";
+import { Database, Tables } from "../types/supabase";
+import { JoinedCheckpoint } from "../types/extra";
 
 // Type for our state
 export interface IEndpointState {
   type: string | null;
-  checkpoints: Tables<"endpoints">[];
+  checkpoints: JoinedCheckpoint[];
 }
 
 const initialState: IEndpointState = {

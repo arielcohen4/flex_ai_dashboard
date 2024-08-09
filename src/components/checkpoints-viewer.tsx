@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/tooltip";
 import { setCheckpointsState, endpointSlice } from "@/lib/store/endpointSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/store";
-import { Tables } from "@/lib/types/supabase";
+import { JoinedCheckpoint } from "@/lib/types/extra";
 
 const REMOVE_LOGS_KEYS = [
   "step",
@@ -72,7 +72,7 @@ export function CheckpointsViewer({
       if (sessionData.session?.user) {
         const { data, error } = await supabase
           .from("checkpoints")
-          .select("*, tasks(*)")
+          .select("*, tasks(*, models(*))")
           .eq("task_id", task.id)
           .order("created_at", { ascending: true });
         return data ?? [];
@@ -159,10 +159,7 @@ export function CheckpointsViewer({
     }
   };
 
-  const toggleCheckpoint = (
-    checkpoint: Tables<"checkpoints">,
-    checked: boolean
-  ) => {
+  const toggleCheckpoint = (checkpoint: JoinedCheckpoint, checked: boolean) => {
     const updatedCheckpoints = checked
       ? [...selectedCheckpoints, checkpoint]
       : selectedCheckpoints.filter((x) => x.id !== checkpoint.id);
@@ -171,6 +168,50 @@ export function CheckpointsViewer({
 
   const isCheckpointSelected = (checkpointId: string) => {
     return selectedCheckpoints.some((c) => c.id === checkpointId);
+  };
+
+  const validateDeployCheckpoint = (checkpoint: JoinedCheckpoint) => {
+    if (checkpoint.stage !== "FINISHED") {
+      return {
+        message: "Checkpoint must be finished before it can be deployed",
+        valid: false,
+      };
+    } else if (
+      selectedCheckpoints.length > 0 &&
+      selectedCheckpoints[0].type == "REGULAR"
+    ) {
+      return {
+        message:
+          "You already selected full fine tune checkpoint, you cant deploy it with other",
+        valid: false,
+      };
+    } else if (
+      selectedCheckpoints.length > 0 &&
+      selectedCheckpoints[0].type == "LORA" &&
+      checkpoint.type !== "LORA"
+    ) {
+      return {
+        message:
+          "You cant deploy full fine tune checkpoint with the lora you already selected",
+        valid: false,
+      };
+    } else if (
+      selectedCheckpoints.length > 0 &&
+      selectedCheckpoints[0].type == "LORA" &&
+      checkpoint.type === "LORA" &&
+      selectedCheckpoints[0]?.tasks?.models?.id !==
+        checkpoint?.tasks?.models?.id
+    ) {
+      return {
+        message: `You already selected the lora with base model ${selectedCheckpoints[0]?.tasks?.models?.name}. You cant deploy lora adapters that doesn't have the same base model`,
+        valid: false,
+      };
+    } else {
+      return {
+        message: `Select the checkpoint to add it to the deployment endpoint`,
+        valid: true,
+      };
+    }
   };
 
   return (
@@ -293,13 +334,30 @@ export function CheckpointsViewer({
                       </TooltipProvider>
                     </TableCell>
                     <TableCell>
-                      <Checkbox
-                        checked={isCheckpointSelected(checkpoint.id)}
-                        onCheckedChange={(checked) =>
-                          toggleCheckpoint(checkpoint, checked as boolean)
-                        }
-                        disabled={checkpoint.stage !== "FINISHED"}
-                      />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <Checkbox
+                                checked={isCheckpointSelected(checkpoint.id)}
+                                onCheckedChange={(checked) =>
+                                  toggleCheckpoint(
+                                    checkpoint,
+                                    checked as boolean
+                                  )
+                                }
+                                disabled={
+                                  validateDeployCheckpoint(checkpoint).valid ==
+                                  false
+                                }
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {validateDeployCheckpoint(checkpoint).message}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                   </TableRow>
                 ))}
