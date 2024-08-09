@@ -1,8 +1,18 @@
-import { Tables } from "./types/supabase";
+import { Tables, Enums } from "./types/supabase";
 
 export type TaskWithRelations = Tables<"tasks"> & {
   models: Tables<"models"> | null;
   datasets: Tables<"datasets"> | null;
+};
+
+// Define the type for your joined query result
+export type JoinedCheckpoint = Tables<"checkpoints"> & {
+  tasks:
+    | null
+    | (Tables<"tasks"> & {
+        models: Tables<"models"> | null;
+        datasets: Tables<"datasets"> | null;
+      });
 };
 
 export type LoraConfig = {
@@ -29,4 +39,12 @@ export type CreateFinetuneRequest = {
   lora_config?: LoraConfig;
   early_stopping_config?: EarlyStoppingConfig;
   wandb_key?: string;
+};
+
+export type CreateEndpointRequest = {
+  name: string;
+  type: Enums<"CHECKPOINT_TYPE">;
+  lora_checkpoints?: { name: string; id: string }[];
+  model_name?: string;
+  checkpoint_id?: string;
 };

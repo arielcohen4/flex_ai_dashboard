@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/tooltip";
 import { setCheckpointsState, endpointSlice } from "@/lib/store/endpointSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/store";
-import { JoinedCheckpoint } from "@/lib/types/extra";
+import { JoinedCheckpoint } from "@/lib/types";
 
 const REMOVE_LOGS_KEYS = [
   "step",

@@ -16,11 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/custom/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import useUser from "@/app/hook/useUser";
+import { baseApiUrl } from "@/lib/constant";
+import { CreateEndpointRequest } from "@/lib/types";
+import axios from "axios";
+import { toast } from "./ui/use-toast";
+import { useRouter } from "next/navigation";
+import { supabaseBrowser } from "@/lib/supabase/browser";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DeployCheckpointsModal = () => {
+  const supabase = supabaseBrowser();
+  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const selectedCheckpoints = useAppSelector(
     (state) => state.endpoint.checkpoints
@@ -28,6 +38,13 @@ const DeployCheckpointsModal = () => {
   const [inferenceLibrary, setInferenceLibrary] = useState("VLLM");
   const [maxContextSize, setMaxContextSize] = useState<number | null>(null);
   const [editedNames, setEditedNames] = useState({});
+  const [loadingCreateEndpoint, setLoadingCreateEndpoint] = useState(false);
+  const [endpointName, setEndpointName] = useState(""); // New state for endpoint name
+  const [endpointNameError, setEndpointNameError] = useState("");
+
+  const user = useUser();
+  const router = useRouter();
+  const checkpointType = selectedCheckpoints[0].type;
 
   useEffect(() => {
     if (inferenceLibrary === "VLLM") {
@@ -56,13 +73,71 @@ const DeployCheckpointsModal = () => {
     setEditedNames((prev) => ({ ...prev, [checkpointId]: newName }));
   };
 
-  const handleDeploy = () => {
-    // console.log("Deploying checkpoints:", deployCheckpoints);
-    // console.log("Inference library:", inferenceLibrary);
+  const handleDeploy = async () => {
+    const ifExists = await checkEndpointNameExists(
+      user.data?.id as string,
+      endpointName
+    );
+    if (ifExists) {
+      setEndpointNameError("An endpoint with this name already exists");
+      return;
+    } else {
+      setEndpointNameError("");
+    }
+
+    const apiKey = user?.data?.api_key;
+
+    const url = `${baseApiUrl}/v1/endpoints/create_endpoint`;
+    const headers = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    };
+
+    const payload: CreateEndpointRequest = {
+      name: endpointName,
+      type: checkpointType,
+      lora_checkpoints: selectedCheckpoints.map((c) => ({
+        name: (editedNames as any)[c.id] || c.tasks?.name + "-step-" + c.step,
+        id: c.id,
+      })),
+    };
+
+    try {
+      setLoadingCreateEndpoint(true);
+      const response = await axios.post(url, payload, { headers });
+      queryClient.invalidateQueries({ queryKey: ["endpoints_count"] });
+      // move to tasks page
+      toast({
+        title: "New Endpoint created",
+        description: `${endpointName} has been created successfully`,
+      });
+      router.push("/endpoints");
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error creating fine-tune:", error);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    } finally {
+      setLoadingCreateEndpoint(false);
+    }
   };
 
-  const checkpointType =
-    selectedCheckpoints.length > 0 ? selectedCheckpoints[0].type : "N/A";
+  const checkEndpointNameExists = async (id: string, name: string) => {
+    const { data, error } = await supabase
+      .from("endpoints")
+      .select("*")
+      .eq("name", id.substring(0, 5) + "_" + name)
+      .single();
+
+    if (error) {
+      console.error("Error checking endpoint name:", error);
+      return false;
+    }
+
+    return !!data;
+  };
 
   return (
     <Dialog>
@@ -78,6 +153,25 @@ const DeployCheckpointsModal = () => {
         <div className="py-4">
           <p>Total checkpoints to deploy: {selectedCheckpoints.length}</p>
           <p>Endpoint type: {checkpointType}</p>
+
+          <div className="mt-4">
+            <label
+              htmlFor="endpoint-name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Endpoint Name
+            </label>
+            <Input
+              id="endpoint-name"
+              value={endpointName}
+              onChange={(e) => setEndpointName(e.target.value)}
+              placeholder="Enter endpoint name"
+              className={`mt-1 ${endpointNameError ? "border-red-500" : ""}`}
+            />
+            {endpointNameError && (
+              <p className="mt-1 text-sm text-red-500">{endpointNameError}</p>
+            )}
+          </div>
 
           <div className="mt-4">
             <label
@@ -146,6 +240,7 @@ const DeployCheckpointsModal = () => {
         <DialogFooter>
           <Button variant="outline">Cancel</Button>
           <Button
+            loading={loadingCreateEndpoint}
             onClick={handleDeploy}
             disabled={selectedCheckpoints.length === 0}
           >

@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Database, Tables } from "../types/supabase";
-import { JoinedCheckpoint } from "../types/extra";
+import { JoinedCheckpoint } from "../types";
 
 // Type for our state
 export interface IEndpointState {
