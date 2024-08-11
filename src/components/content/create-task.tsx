@@ -155,6 +155,18 @@ export default function LLMTrainingTaskForm() {
         return false;
       }
 
+      if (model?.context_length < dataset?.max_tokens) {
+        setAlertTitle(
+          `Model max context size is not enough for your dataset for ${modelName}`
+        );
+        setAlertText(
+          `Model max context size for ${modelName} is ${model.context_length} and your dataset has max tokens of ${dataset.max_tokens}. You should train different model or reduce the dataset max context size.`
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(true);
+        return false;
+      }
+
       if (
         model?.vllm_context_length &&
         model?.vllm_context_length < dataset?.max_tokens
