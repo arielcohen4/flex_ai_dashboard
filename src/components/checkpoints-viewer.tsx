@@ -290,16 +290,23 @@ export function CheckpointsViewer({
                           checkpoint.logs as Record<string, string | number>
                         ).map(([key, value]) => {
                           if (!REMOVE_LOGS_KEYS.includes(key)) {
+                            let formattedValue = value;
+                            if (typeof value === "number") {
+                              if (Math.abs(value) < 0.0001) {
+                                // 1e-4
+                                formattedValue = value.toExponential(0);
+                              } else {
+                                formattedValue = value.toFixed(4);
+                              }
+                            }
+
                             return (
                               <Badge
                                 key={key}
                                 variant="secondary"
                                 className="mr-1 mb-1"
                               >
-                                {key}:{" "}
-                                {typeof value === "number"
-                                  ? value.toFixed(4)
-                                  : value}
+                                {key}: {formattedValue}
                               </Badge>
                             );
                           }
