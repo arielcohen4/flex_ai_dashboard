@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useUser from "@/app/hook/useUser";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,14 +22,39 @@ import {
 export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
   const user = useUser();
   const [selectedModel, setSelectedModel] = useState("");
+  const [allModels, setAllModels] = useState<string[]>([]);
 
   if (!user.data) {
     return <div>Loading...</div>;
   }
 
-  const baseModel = (endpoint as any).models?.name || "default-model";
-  const checkpoints = (endpoint.lora_checkpoints as { name: string }[]) || [];
-  const allModels = [baseModel, ...checkpoints.map((cp) => cp.name)];
+  console.log(endpoint);
+
+  useEffect(() => {
+    if (endpoint.type === "LORA") {
+      const baseModel = (endpoint as any).models?.name || "default-model";
+      const checkpoints =
+        (endpoint.lora_checkpoints as { name: string }[]) || [];
+      const models = [baseModel, ...checkpoints.map((cp) => cp.name)];
+      setAllModels(models);
+      setSelectedModel(baseModel);
+    } else {
+      const modelName = endpoint.model_name as string;
+      setAllModels([modelName]);
+      setSelectedModel(modelName);
+    }
+  }, [endpoint]);
+
+  // let allModels: string[] = [];
+  // if (endpoint.type == "LORA") {
+  //   const baseModel = (endpoint as any).models?.name || "default-model";
+  //   const checkpoints = (endpoint.lora_checkpoints as { name: string }[]) || [];
+  //   allModels = [baseModel, ...checkpoints.map((cp) => cp.name)];
+  //   setSelectedModel(baseModel);
+  // } else {
+  //   allModels = [endpoint.model_name as string];
+  //   setSelectedModel(endpoint.model_name as string);
+  // }
 
   const renderPythonCode = (modelName: string) => (
     <pre className="rounded-md bg-black p-6">
@@ -149,7 +174,7 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
           </DialogDescription>
         </DialogHeader>
         <div className="mb-4">
-          <Select onValueChange={setSelectedModel} defaultValue={baseModel}>
+          <Select onValueChange={setSelectedModel} defaultValue={selectedModel}>
             <SelectTrigger>
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
@@ -168,18 +193,15 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
             <TabsTrigger value="javascript">JavaScript</TabsTrigger>
           </TabsList>
           <TabsContent value="python">
-            {renderPythonCode(selectedModel || baseModel)}
+            {renderPythonCode(selectedModel)}
           </TabsContent>
           <TabsContent value="javascript">
-            {renderJavaScriptCode(selectedModel || baseModel)}
+            {renderJavaScriptCode(selectedModel)}
           </TabsContent>
         </Tabs>
         <div>
           <p className="text-sm text-muted-foreground">
-            {`Remember to replace '${user.data.api_key}' with your actual OpenAI
-            API key and update the custom URL if necessary. Always use
-            environment variables or a secure secret management system in
-            production.`}
+            {`This is your api_key '${user.data.api_key}'`}
           </p>
         </div>
       </DialogContent>

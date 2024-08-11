@@ -144,11 +144,11 @@ export type Database = {
       }
       endpoints: {
         Row: {
+          base_model_id: string
           checkpoint_id: string | null
           created_at: string
           id: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
-          lora_base_model_id: string
           lora_checkpoints: Json | null
           model_name: string | null
           name: string
@@ -158,11 +158,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          base_model_id: string
           checkpoint_id?: string | null
           created_at?: string
           id?: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
-          lora_base_model_id: string
           lora_checkpoints?: Json | null
           model_name?: string | null
           name: string
@@ -172,11 +172,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          base_model_id?: string
           checkpoint_id?: string | null
           created_at?: string
           id?: string
           inference_library?: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
-          lora_base_model_id?: string
           lora_checkpoints?: Json | null
           model_name?: string | null
           name?: string
@@ -187,8 +187,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "endpoints_lora_base_model_id_fkey"
-            columns: ["lora_base_model_id"]
+            foreignKeyName: "endpoints_base_model_id_fkey"
+            columns: ["base_model_id"]
             isOneToOne: false
             referencedRelation: "models"
             referencedColumns: ["id"]

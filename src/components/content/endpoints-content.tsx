@@ -151,19 +151,21 @@ export default function AppContent() {
               <p className="line-clamp-2 text-gray-500 text-sm">
                 Base Model: {app.models?.name}
               </p>
-              <p className="line-clamp-2 text-gray-500 text-sm">
-                Lora Adapters Models:{" "}
-                {(app.lora_checkpoints as any[])?.map(
-                  (c: any, index: number) => (
-                    <span key={index}>
-                      {c.name}
-                      {index < (app.lora_checkpoints as any[])?.length - 1
-                        ? ", "
-                        : ""}
-                    </span>
-                  )
-                )}
-              </p>
+              {app.type == "LORA" && (
+                <p className="line-clamp-2 text-gray-500 text-sm">
+                  Lora Adapters Models:{" "}
+                  {(app.lora_checkpoints as any[])?.map(
+                    (c: any, index: number) => (
+                      <span key={index}>
+                        {c.name}
+                        {index < (app.lora_checkpoints as any[])?.length - 1
+                          ? ", "
+                          : ""}
+                      </span>
+                    )
+                  )}
+                </p>
+              )}
             </div>
           </li>
         ))}
