@@ -93,7 +93,7 @@ export default function AppContent() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Family</SelectItem>
-              <SelectItem value="llama3">llama3.1</SelectItem>
+              <SelectItem value="llama3.1">llama3.1</SelectItem>
               <SelectItem value="gemma2">gemma2</SelectItem>
               <SelectItem value="qwen2">qwen2</SelectItem>
               <SelectItem value="llama3">llama3</SelectItem>
