@@ -40,6 +40,9 @@ const DeployCheckpointsModal = () => {
   const [editedNames, setEditedNames] = useState({});
   const [loadingCreateEndpoint, setLoadingCreateEndpoint] = useState(false);
   const [endpointName, setEndpointName] = useState(""); // New state for endpoint name
+  const [regularModelName, setRegularModelName] = useState(
+    selectedCheckpoints[0].tasks?.name + "-step-" + selectedCheckpoints[0].step
+  ); // New state for endpoint name
   const [endpointNameError, setEndpointNameError] = useState("");
 
   const user = useUser();
@@ -73,6 +76,10 @@ const DeployCheckpointsModal = () => {
     setEditedNames((prev) => ({ ...prev, [checkpointId]: newName }));
   };
 
+  const handleRegularModelNameChange = (newName: string) => {
+    setRegularModelName(newName);
+  };
+
   const handleDeploy = async () => {
     const ifExists = await checkEndpointNameExists(
       user.data?.id as string,
@@ -96,11 +103,17 @@ const DeployCheckpointsModal = () => {
     const payload: CreateEndpointRequest = {
       name: endpointName,
       type: checkpointType,
-      lora_checkpoints: selectedCheckpoints.map((c) => ({
+    };
+
+    if (checkpointType == "LORA") {
+      payload.lora_checkpoints = selectedCheckpoints.map((c) => ({
         name: (editedNames as any)[c.id] || c.tasks?.name + "-step-" + c.step,
         id: c.id,
-      })),
-    };
+      }));
+    } else {
+      payload.checkpoint_id = selectedCheckpoints[0].id;
+      payload.model_name = regularModelName;
+    }
 
     try {
       setLoadingCreateEndpoint(true);
@@ -199,43 +212,71 @@ const DeployCheckpointsModal = () => {
             </div>
           )}
 
-          <div className="mt-4">
-            <h3 className="text-sm font-medium text-gray-700">
-              Selected Checkpoints
-            </h3>
-            <ul className="mt-2 space-y-4">
-              {selectedCheckpoints.map((checkpoint) => (
-                <li
-                  key={checkpoint.id}
-                  className="flex items-center justify-between py-2 border-b"
-                >
+          {checkpointType == "LORA" && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700">
+                Selected Checkpoints
+              </h3>
+              <ul className="mt-2 space-y-4">
+                {selectedCheckpoints.map((checkpoint) => (
+                  <li
+                    key={checkpoint.id}
+                    className="flex items-center justify-between py-2 border-b"
+                  >
+                    <div className="flex-grow mr-4">
+                      <Input
+                        value={
+                          (editedNames as any)[checkpoint.id] ||
+                          checkpoint.tasks?.name + "-step-" + checkpoint.step
+                        }
+                        onChange={(e) =>
+                          handleNameChange(checkpoint.id, e.target.value)
+                        }
+                        placeholder="Enter model name"
+                      />
+                      <div className="text-xs text-gray-500 mt-1">
+                        <span>Task: {checkpoint.tasks?.name}</span>
+                        <span className="mx-2">|</span>
+                        <span>Dataset: {checkpoint.tasks?.datasets?.name}</span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      onClick={() => removeCheckpoint(checkpoint.id)}
+                    >
+                      Remove
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {checkpointType == "REGULAR" && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-700">Model Name</h3>
+              <ul className="mt-2 space-y-4">
+                <div className="flex items-center justify-between py-2 border-b">
                   <div className="flex-grow mr-4">
                     <Input
-                      value={
-                        (editedNames as any)[checkpoint.id] ||
-                        checkpoint.tasks?.name + "-step-" + checkpoint.step
-                      }
+                      value={regularModelName}
                       onChange={(e) =>
-                        handleNameChange(checkpoint.id, e.target.value)
+                        handleRegularModelNameChange(e.target.value)
                       }
                       placeholder="Enter model name"
                     />
                     <div className="text-xs text-gray-500 mt-1">
-                      <span>Task: {checkpoint.tasks?.name}</span>
+                      <span>Task: {selectedCheckpoints[0].tasks?.name}</span>
                       <span className="mx-2">|</span>
-                      <span>Dataset: {checkpoint.tasks?.datasets?.name}</span>
+                      <span>
+                        Dataset: {selectedCheckpoints[0].tasks?.datasets?.name}
+                      </span>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    onClick={() => removeCheckpoint(checkpoint.id)}
-                  >
-                    Remove
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+              </ul>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline">Cancel</Button>
