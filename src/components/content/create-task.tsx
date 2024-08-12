@@ -181,6 +181,21 @@ export default function LLMTrainingTaskForm() {
         setIsAlertError(true);
         return false;
       }
+
+      if (
+        model?.vllm_lora_context_length &&
+        model?.vllm_lora_context_length < dataset?.max_tokens
+      ) {
+        setAlertTitle(
+          `vLLM Inference with Multi Lora adapters will reduce the context length for ${modelName} to ${model.vllm_lora_context_length}`
+        );
+        setAlertText(
+          `vLLM Inference with Multi Lora adapters will reduce the context length for ${modelName} to ${model.vllm_lora_context_length} and your dataset has max tokens of ${dataset.max_tokens}. So training will be fine, but on inference you wont be able to use that context size, Do you want to continue?`
+        );
+        setIsAlertOpen(true);
+        setIsAlertError(false);
+        return false;
+      }
     }
 
     return true;

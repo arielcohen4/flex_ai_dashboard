@@ -124,10 +124,18 @@ export default function AppContent() {
                   />
                 ) : null}
               </div>
-              <Badge variant="secondary">
-                {roundToK(app.models?.vllm_context_length ?? 0)} vLLM context
-                size
-              </Badge>
+              {app.type == "LORA" &&
+              app.models?.vllm_lora_context_length != null ? (
+                <Badge variant="secondary">
+                  {roundToK(app.models?.vllm_lora_context_length ?? 0)} vLLM
+                  Lora context size
+                </Badge>
+              ) : (
+                <Badge variant="secondary">
+                  {roundToK(app.models?.vllm_context_length ?? 0)} vLLM context
+                  size
+                </Badge>
+              )}
               <Badge variant="secondary">
                 {roundToK(app.models?.params_count ?? 0)}b params
               </Badge>

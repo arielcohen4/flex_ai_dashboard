@@ -219,6 +219,7 @@ export type Database = {
           name: string
           params_count: number
           vllm_context_length: number | null
+          vllm_lora_context_length: number | null
           vllm_lora_support: boolean
           vllm_support: boolean
         }
@@ -238,6 +239,7 @@ export type Database = {
           name?: string
           params_count: number
           vllm_context_length?: number | null
+          vllm_lora_context_length?: number | null
           vllm_lora_support: boolean
           vllm_support: boolean
         }
@@ -257,6 +259,7 @@ export type Database = {
           name?: string
           params_count?: number
           vllm_context_length?: number | null
+          vllm_lora_context_length?: number | null
           vllm_lora_support?: boolean
           vllm_support?: boolean
         }
