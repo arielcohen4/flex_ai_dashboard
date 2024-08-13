@@ -21,6 +21,7 @@ import Image from "next/image";
 import { familyToLogo } from "@/lib/constant";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { roundToK } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppContent() {
   const [sort, setSort] = useState("ascending");
@@ -61,13 +62,11 @@ export default function AppContent() {
     },
   });
 
-  if (!endpointsQuery.data) {
-    return <div>Loading...</div>;
-  }
-
-  const filteredApps = endpointsQuery.data.filter((app) =>
-    app.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredApps = endpointsQuery.data
+    ? endpointsQuery.data.filter((app) =>
+        app.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -113,86 +112,115 @@ export default function AppContent() {
       </div>
       <Separator className="shadow" />
       <ul className="faded-bottom no-scrollbar grid gap-4 overflow-auto pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredApps.map((app) => (
-          <li key={app.name} className="rounded-lg border p-4 hover:shadow-md">
-            <div className="mb-8 flex items-center justify-between">
-              <div
-                className={`items-center justify-center rounded-lg bg-muted p-2`}
+        {endpointsQuery.isLoading
+          ? // Skeleton loading
+            Array.from({ length: 6 }).map((_, index) => (
+              <li key={index} className="rounded-lg border p-4">
+                <div className="mb-8 flex items-center justify-between">
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-6 w-24" />
+                  </div>
+                  <Skeleton className="h-4 w-3/4 mt-2" />
+                  <Skeleton className="h-4 w-2/3 mt-2" />
+                  <Skeleton className="h-4 w-3/4 mt-2" />
+                </div>
+              </li>
+            ))
+          : filteredApps.map((app) => (
+              <li
+                key={app.name}
+                className="rounded-lg border p-4 hover:shadow-md"
               >
-                {app.models?.family &&
-                familyToLogo.hasOwnProperty(app.models.family) ? (
-                  <Image
-                    src={`/model_families/${familyToLogo[app.models.family]}`}
-                    alt={app.models?.name}
-                    width={20}
-                    height={20}
-                  />
-                ) : null}
-              </div>
-              {app.type == "LORA" &&
-              app.models?.vllm_lora_context_length != null ? (
-                <Badge variant="secondary">
-                  {roundToK(app.models?.vllm_lora_context_length ?? 0)} vLLM
-                  Lora context size
-                </Badge>
-              ) : (
-                <Badge variant="secondary">
-                  {roundToK(app.models?.vllm_context_length ?? 0)} vLLM context
-                  size
-                </Badge>
-              )}
-              <Badge variant="secondary">
-                {roundToK(app.models?.params_count ?? 0)}b params
-              </Badge>
-              <ApiViewer endpoint={app} />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <a target="_blank" className="font-semibold">
-                  {app.name.split("_")[1]}
-                </a>
-                {app.stage === "INITIALIZING" ? (
-                  <Badge variant="outline" className="animate-pulse">
-                    Initializing
-                  </Badge>
-                ) : app.stage === "LIVE" ? (
-                  <Badge variant="default" className="bg-green-500 text-white">
-                    Live
-                  </Badge>
-                ) : null}
-              </div>
-              <p className="line-clamp-2 text-gray-500 text-sm">
-                Type: {app.type}
-              </p>
-              <p className="line-clamp-2 text-gray-500 text-sm">
-                Inference Lib:
-                {app.inference_library == "VLLM" && (
-                  <Badge variant="outline" className="ml-1">
-                    vLLM
-                  </Badge>
-                )}
-              </p>
-              <p className="line-clamp-2 text-gray-500 text-sm">
-                Base Model: {app.models?.name}
-              </p>
-              {app.type == "LORA" && (
-                <p className="line-clamp-2 text-gray-500 text-sm">
-                  Lora Adapters Models:{" "}
-                  {(app.lora_checkpoints as any[])?.map(
-                    (c: any, index: number) => (
-                      <span key={index}>
-                        {c.name}
-                        {index < (app.lora_checkpoints as any[])?.length - 1
-                          ? ", "
-                          : ""}
-                      </span>
-                    )
+                <div className="mb-8 flex items-center justify-between">
+                  <div
+                    className={`items-center justify-center rounded-lg bg-muted p-2`}
+                  >
+                    {app.models?.family &&
+                    familyToLogo.hasOwnProperty(app.models.family) ? (
+                      <Image
+                        src={`/model_families/${
+                          familyToLogo[app.models.family]
+                        }`}
+                        alt={app.models?.name}
+                        width={20}
+                        height={20}
+                      />
+                    ) : null}
+                  </div>
+                  {app.type == "LORA" &&
+                  app.models?.vllm_lora_context_length != null ? (
+                    <Badge variant="secondary">
+                      {roundToK(app.models?.vllm_lora_context_length ?? 0)} vLLM
+                      Lora context size
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">
+                      {roundToK(app.models?.vllm_context_length ?? 0)} vLLM
+                      context size
+                    </Badge>
                   )}
-                </p>
-              )}
-            </div>
-          </li>
-        ))}
+                  <Badge variant="secondary">
+                    {roundToK(app.models?.params_count ?? 0)}b params
+                  </Badge>
+                  <ApiViewer endpoint={app} />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <a target="_blank" className="font-semibold">
+                      {app.name.split("_")[1]}
+                    </a>
+                    {app.stage === "INITIALIZING" ? (
+                      <Badge variant="outline" className="animate-pulse">
+                        Initializing
+                      </Badge>
+                    ) : app.stage === "LIVE" ? (
+                      <Badge
+                        variant="default"
+                        className="bg-green-500 text-white"
+                      >
+                        Live
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <p className="line-clamp-2 text-gray-500 text-sm">
+                    Type: {app.type}
+                  </p>
+                  <p className="line-clamp-2 text-gray-500 text-sm">
+                    Inference Lib:
+                    {app.inference_library == "VLLM" && (
+                      <Badge variant="outline" className="ml-1">
+                        vLLM
+                      </Badge>
+                    )}
+                  </p>
+                  <p className="line-clamp-2 text-gray-500 text-sm">
+                    Base Model: {app.models?.name}
+                  </p>
+                  {app.type == "LORA" && (
+                    <p className="line-clamp-2 text-gray-500 text-sm">
+                      Lora Adapters Models:{" "}
+                      {(app.lora_checkpoints as any[])?.map(
+                        (c: any, index: number) => (
+                          <span key={index}>
+                            {c.name}
+                            {index < (app.lora_checkpoints as any[])?.length - 1
+                              ? ", "
+                              : ""}
+                          </span>
+                        )
+                      )}
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
       </ul>
     </div>
   );

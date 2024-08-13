@@ -19,6 +19,7 @@ import { roundToK } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -47,13 +48,13 @@ export default function AppContent() {
     },
   });
 
-  if (!datasetsQuery.data) {
-    return <div>Loading...</div>;
-  }
-
   const filteredApps = datasetsQuery.data
-    .filter((app) => appType === "all" || appType === app.type)
-    .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    ? datasetsQuery.data
+        .filter((app) => appType === "all" || appType === app.type)
+        .filter((app) =>
+          app.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    : [];
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -105,38 +106,59 @@ export default function AppContent() {
       </div>
       <Separator className="shadow" />
       <ul className="grid gap-4 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredApps.map((app) => (
-          <li key={app.name} className="rounded-lg border p-4 hover:shadow-md">
-            <div className="mb-4">
-              <div className="flex justify-between items-center">
-                <a className="text-xl font-semibold">{app.name}</a>
-                <span className="text-sm text-gray-500">
-                  {format(new Date(app.created_at), "MMM dd, yyyy")}
-                </span>
-              </div>
-              <p className="text-gray-500 text-xs">{app.id}</p>
-            </div>
-            <div className="space-y-2">
-              <Badge variant="secondary">{app.type}</Badge>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">
-                  {roundToK(app.train_rows_count)} train rows
-                </Badge>
-                {app.eval_rows_count && (
-                  <Badge variant="secondary">
-                    {roundToK(app.eval_rows_count)} eval rows
-                  </Badge>
-                )}
-                <Badge variant="secondary">
-                  {roundToK(app.max_tokens)} max tokens
-                </Badge>
-                <Badge variant="secondary">
-                  {roundToK(app.total_tokens)} tokens
-                </Badge>
-              </div>
-            </div>
-          </li>
-        ))}
+        {datasetsQuery.isLoading
+          ? // Skeleton loading
+            Array.from({ length: 12 }).map((_, index) => (
+              <li key={index} className="rounded-lg border p-4">
+                <div className="mb-4">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-1/4" />
+                  <div className="flex flex-wrap gap-2">
+                    <Skeleton className="h-6 w-1/4" />
+                    <Skeleton className="h-6 w-1/4" />
+                    <Skeleton className="h-6 w-1/4" />
+                  </div>
+                </div>
+              </li>
+            ))
+          : filteredApps.map((app) => (
+              <li
+                key={app.name}
+                className="rounded-lg border p-4 hover:shadow-md"
+              >
+                <div className="mb-4">
+                  <div className="flex justify-between items-center">
+                    <a className="text-xl font-semibold">{app.name}</a>
+                    <span className="text-sm text-gray-500">
+                      {format(new Date(app.created_at), "MMM dd, yyyy")}
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-xs">{app.id}</p>
+                </div>
+                <div className="space-y-2">
+                  <Badge variant="secondary">{app.type}</Badge>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">
+                      {roundToK(app.train_rows_count)} train rows
+                    </Badge>
+                    {app.eval_rows_count && (
+                      <Badge variant="secondary">
+                        {roundToK(app.eval_rows_count)} eval rows
+                      </Badge>
+                    )}
+                    <Badge variant="secondary">
+                      {roundToK(app.max_tokens)} max tokens
+                    </Badge>
+                    <Badge variant="secondary">
+                      {roundToK(app.total_tokens)} tokens
+                    </Badge>
+                  </div>
+                </div>
+              </li>
+            ))}
       </ul>
     </div>
   );
