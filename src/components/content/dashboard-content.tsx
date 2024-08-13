@@ -17,6 +17,7 @@ import { RecentSales } from "./dashboard/recent-sales";
 import { Overview } from "./dashboard/overview";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardContent() {
   const tasksCountQuery = useQuery({
@@ -67,8 +68,6 @@ export default function DashboardContent() {
     },
   });
 
-  console.log(tasksCountQuery.data);
-
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <div className="flex flex-wrap items-center justify-between space-y-2">
@@ -112,9 +111,13 @@ export default function DashboardContent() {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {tasksCountQuery.data?.length}
-                </div>
+                {tasksCountQuery.isLoading ? (
+                  <Skeleton className="h-8 w-[100px] animate-pulse" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {tasksCountQuery.data?.length}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   +20.1% from last month
                 </p>
@@ -139,9 +142,13 @@ export default function DashboardContent() {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {datasetsCountQuery.data?.length}
-                </div>
+                {datasetsCountQuery.isLoading ? (
+                  <Skeleton className="h-8 w-[100px] animate-pulse" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {datasetsCountQuery.data?.length}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   +180.1% from last month
                 </p>
@@ -167,9 +174,13 @@ export default function DashboardContent() {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {checkpointsCountQuery.data?.length}
-                </div>
+                {checkpointsCountQuery.isLoading ? (
+                  <Skeleton className="h-8 w-[100px] animate-pulse" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {checkpointsCountQuery.data?.length}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   +19% from last month
                 </p>
@@ -194,9 +205,13 @@ export default function DashboardContent() {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  +{modelsCountQuery.data?.length}
-                </div>
+                {modelsCountQuery.isLoading ? (
+                  <Skeleton className="h-8 w-[100px] animate-pulse" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    +{modelsCountQuery.data?.length}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   +201 since last hour
                 </p>
@@ -216,7 +231,11 @@ export default function DashboardContent() {
               <CardHeader>
                 <CardTitle>Recent Tasks</CardTitle>
                 <CardDescription>
-                  You made {tasksCountQuery.data?.length} tasks this month.
+                  {tasksCountQuery.isLoading ? (
+                    <Skeleton className="h-4 w-[200px] animate-pulse" />
+                  ) : (
+                    `You made ${tasksCountQuery.data?.length} tasks this month.`
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
