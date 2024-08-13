@@ -4,6 +4,7 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TaskWithRelations } from "@/lib/types";
+import { roundToK } from "@/lib/utils";
 
 export function RecentSales() {
   const tasksQuery = useQuery({
@@ -47,8 +48,11 @@ export function RecentSales() {
         <p className="text-sm font-medium leading-none">{task.name}</p>
         <p className="text-sm text-muted-foreground">{task.models?.name}</p>
       </div>
-      <div className="ml-auto font-medium">
-        {task.datasets?.total_tokens} Tokens
+      <div className="ml-auto font-medium text-sm">
+        {task.datasets?.total_tokens
+          ? roundToK(task.datasets?.total_tokens)
+          : ""}{" "}
+        Tokens
       </div>
     </div>
   );
