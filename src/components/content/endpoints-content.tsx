@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -12,29 +13,38 @@ import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
-  IconCheck,
 } from "@tabler/icons-react";
 import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
-import { supabaseBrowser } from "@/lib/supabase/browser";
-import { useQuery } from "@tanstack/react-query";
-import { Database, Tables, Enums } from "@/lib/types/supabase";
 import { Badge } from "@/components/ui/badge";
-import { roundToK } from "@/lib/utils";
 import { ApiViewer } from "@/components/api-viewer";
 import Image from "next/image";
 import { familyToLogo } from "@/lib/constant";
-
-const appText = new Map<string, string>([
-  ["all", "Family"],
-  ["qwen2", "phi3"],
-  ["qwen2", "phi3"],
-]);
+import { supabaseBrowser } from "@/lib/supabase/browser";
+import { roundToK } from "@/lib/utils";
 
 export default function AppContent() {
   const [sort, setSort] = useState("ascending");
-  const [appType, setAppType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const supabase = supabaseBrowser();
+    const subscription = supabase
+      .channel("endpoints")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "endpoints" },
+        (payload) => {
+          const newPayload = payload.new as { task_id?: string };
+          console.log("Change received!", payload);
+          // Refetch the checkpoints data
+          queryClient.invalidateQueries({
+            queryKey: ["endpoints_count"],
+          });
+        }
+      )
+      .subscribe();
+  }, [queryClient]);
 
   const endpointsQuery = useQuery({
     queryKey: ["endpoints_count"],
@@ -51,19 +61,14 @@ export default function AppContent() {
     },
   });
 
-  console.log(endpointsQuery.data);
-
   if (!endpointsQuery.data) {
     return <div>Loading...</div>;
   }
 
-  const filteredApps = endpointsQuery.data
-    .sort((a, b) =>
-      sort === "ascending"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
-    .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredApps = endpointsQuery.data.filter((app) =>
+    app.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <div>
@@ -142,9 +147,20 @@ export default function AppContent() {
               <ApiViewer endpoint={app} />
             </div>
             <div>
-              <a target="_blank" className="mb-1 font-semibold">
-                {app.name.split("_")[1]}
-              </a>
+              <div className="flex items-center justify-between mb-1">
+                <a target="_blank" className="font-semibold">
+                  {app.name.split("_")[1]}
+                </a>
+                {app.stage === "INITIALIZING" ? (
+                  <Badge variant="outline" className="animate-pulse">
+                    Initializing
+                  </Badge>
+                ) : app.stage === "LIVE" ? (
+                  <Badge variant="default" className="bg-green-500 text-white">
+                    Live
+                  </Badge>
+                ) : null}
+              </div>
               <p className="line-clamp-2 text-gray-500 text-sm">
                 Type: {app.type}
               </p>

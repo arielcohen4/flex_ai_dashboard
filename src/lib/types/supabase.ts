@@ -152,9 +152,10 @@ export type Database = {
           lora_checkpoints: Json | null
           model_name: string | null
           name: string
+          stage: Database["public"]["Enums"]["ENDPOINT_STAGE"]
           type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at: string
-          url: string
+          url: string | null
           user_id: string
         }
         Insert: {
@@ -166,9 +167,10 @@ export type Database = {
           lora_checkpoints?: Json | null
           model_name?: string | null
           name: string
+          stage?: Database["public"]["Enums"]["ENDPOINT_STAGE"]
           type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at?: string
-          url?: string
+          url?: string | null
           user_id: string
         }
         Update: {
@@ -180,9 +182,10 @@ export type Database = {
           lora_checkpoints?: Json | null
           model_name?: string | null
           name?: string
+          stage?: Database["public"]["Enums"]["ENDPOINT_STAGE"]
           type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at?: string
-          url?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: [
@@ -460,6 +463,7 @@ export type Database = {
       CHECKPOINT_TYPE: "LORA" | "REGULAR"
       COMPUTE_TYPE: "RUNPOD"
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
+      ENDPOINT_STAGE: "INITIALIZING" | "LIVE"
       INFERENCE_LIBRARY: "VLLM"
       TASK_STAGE:
         | "DOWNLOADING_MODEL"
