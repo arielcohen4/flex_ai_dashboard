@@ -37,29 +37,31 @@ export default function AppContent() {
     queryKey: ["models_tasks_count"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (sessionData.session?.user) {
-        const { data } = await supabase
-          .from("models")
-          .select(`*, tasks:tasks(count)`)
-          .order("created_at", { ascending: false });
-        return data ?? [];
-      }
+      const { data } = await supabase
+        .from("models")
+        .select(
+          `
+          *,
+          tasks:tasks(count)
+        `
+        )
+
+        .order("created_at", { ascending: false });
+
+      // Sort the data by task count after fetching
+      const sortedData = data?.sort((a, b) => {
+        const countA = a.tasks[0]?.count ?? 0;
+        const countB = b.tasks[0]?.count ?? 0;
+        return countB - countA; // Descending order
+      });
+
+      return sortedData ?? [];
+
+      console.log(sortedData);
     },
   });
 
-  const filteredApps = modelsQuery.data
-    ? modelsQuery.data
-        .sort((a, b) =>
-          sort === "ascending"
-            ? a.name.localeCompare(b.name)
-            : b.name.localeCompare(a.name)
-        )
-        .filter((app) => appType === "all" || appType === app.family)
-        .filter((app) =>
-          app.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    : [];
+  const filteredApps = modelsQuery.data ? modelsQuery.data : [];
 
   const SkeletonCard = () => (
     <div className="rounded-lg border p-4">
