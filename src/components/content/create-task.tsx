@@ -52,7 +52,7 @@ export default function LLMTrainingTaskForm() {
   const [targetInferenceLibrary, setTargetInferenceLibrary] = useState("vllm");
 
   // LoRA configuration
-  const [loraR, setLoraR] = useState(16);
+  const [loraR, setLoraR] = useState(64);
   const [loraAlpha, setLoraAlpha] = useState(16);
   const [loraDropout, setLoraDropout] = useState(0);
 
