@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
   const user = useUser();
@@ -179,11 +180,29 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
               <SelectValue placeholder="Select a model" />
             </SelectTrigger>
             <SelectContent>
-              {allModels.map((model) => (
-                <SelectItem key={model} value={model}>
-                  {model}
-                </SelectItem>
-              ))}
+              {endpoint.type == "LORA" &&
+                allModels.map((model, index) => {
+                  if (index > 0) {
+                    return (
+                      <SelectItem key={model} value={model}>
+                        <div className="flex items-center justify-between">
+                          <span>{model}</span>
+                          <Badge variant="secondary" className="ml-2">
+                            Lora
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    );
+                  } else {
+                    return (
+                      <SelectItem key={model} value={model}>
+                        <div className="flex items-center justify-between">
+                          <span>{model}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  }
+                })}
             </SelectContent>
           </Select>
         </div>
