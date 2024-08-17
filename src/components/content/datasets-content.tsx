@@ -20,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -130,14 +131,30 @@ export default function AppContent() {
                 className="rounded-lg border p-4 hover:shadow-md"
               >
                 <div className="mb-4">
-                  <div className="flex justify-between items-center">
-                    <a className="text-xl font-semibold">{app.name}</a>
-                    <span className="text-sm text-gray-500">
-                      {format(new Date(app.created_at), "MMM dd, yyyy")}
-                    </span>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <a className="text-xl font-semibold">{app.name}</a>
+                      <p className="text-gray-500 text-xs">{app.id}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center mb-1">
+                        {app.storage_type === "AWS" && (
+                          <Image
+                            className="w-8 h-8 mr-2"
+                            src={`/aws.svg`}
+                            alt={app.name}
+                            width={50}
+                            height={50}
+                          />
+                        )}
+                        <span className="text-sm text-gray-500 mb-[7px]">
+                          {format(new Date(app.created_at), "MMM dd, yyyy")}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-gray-500 text-xs">{app.id}</p>
                 </div>
+
                 <div className="space-y-2">
                   <Badge variant="secondary">{app.type}</Badge>
                   <div className="flex flex-wrap gap-2">

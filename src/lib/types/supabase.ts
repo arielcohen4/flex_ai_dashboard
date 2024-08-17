@@ -97,6 +97,7 @@ export type Database = {
           id: string
           max_tokens: number
           name: string
+          storage_type: Database["public"]["Enums"]["STORAGE_TYPE"]
           total_tokens: number
           train_path: string
           train_rows_count: number
@@ -111,6 +112,7 @@ export type Database = {
           id?: string
           max_tokens: number
           name: string
+          storage_type?: Database["public"]["Enums"]["STORAGE_TYPE"]
           total_tokens: number
           train_path: string
           train_rows_count: number
@@ -125,6 +127,7 @@ export type Database = {
           id?: string
           max_tokens?: number
           name?: string
+          storage_type?: Database["public"]["Enums"]["STORAGE_TYPE"]
           total_tokens?: number
           train_path?: string
           train_rows_count?: number
@@ -286,30 +289,42 @@ export type Database = {
       profiles: {
         Row: {
           api_key: string
+          aws_access_key_id: string | null
+          aws_bucket: string | null
+          aws_secret_access_key: string | null
           balance: number
           created_at: string
           display_name: string | null
           email: string
           id: string
           image_url: string | null
+          is_aws_s3: boolean
         }
         Insert: {
           api_key?: string
+          aws_access_key_id?: string | null
+          aws_bucket?: string | null
+          aws_secret_access_key?: string | null
           balance?: number
           created_at?: string
           display_name?: string | null
           email: string
           id: string
           image_url?: string | null
+          is_aws_s3?: boolean
         }
         Update: {
           api_key?: string
+          aws_access_key_id?: string | null
+          aws_bucket?: string | null
+          aws_secret_access_key?: string | null
           balance?: number
           created_at?: string
           display_name?: string | null
           email?: string
           id?: string
           image_url?: string | null
+          is_aws_s3?: boolean
         }
         Relationships: [
           {
@@ -465,6 +480,7 @@ export type Database = {
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
       ENDPOINT_STAGE: "INITIALIZING" | "LIVE"
       INFERENCE_LIBRARY: "VLLM"
+      STORAGE_TYPE: "FLEX" | "AWS"
       TASK_STAGE:
         | "DOWNLOADING_MODEL"
         | "DOWNLOADING_DATA"
