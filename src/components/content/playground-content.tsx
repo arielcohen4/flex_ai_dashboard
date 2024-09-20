@@ -95,7 +95,7 @@ export default function LLMPlayground() {
     }, 3000);
 
     const openai = new OpenAI({
-      apiKey: "ed8ef09e-3ca0-4080-bd93-761fa5428d65",
+      apiKey: user.data?.api_key,
       baseURL: selectedEndpoint.url + "/v1",
       dangerouslyAllowBrowser: true,
     });
