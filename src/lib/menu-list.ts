@@ -16,6 +16,7 @@ import {
   CircleFadingPlusIcon,
   NetworkIcon,
   BarChart,
+  MessageSquare,
 } from "lucide-react";
 
 type Submenu = {
@@ -92,6 +93,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Endpoints",
           active: pathname.includes("/endpoints"),
           icon: NetworkIcon,
+          submenus: [],
+        },
+        {
+          href: "/playground",
+          label: "Playground",
+          active: pathname.includes("/playground"),
+          icon: MessageSquare,
           submenus: [],
         },
       ],
