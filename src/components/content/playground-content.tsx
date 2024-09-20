@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import OpenAI from "openai";
@@ -26,7 +26,7 @@ export default function LLMPlayground() {
     useState<string>("");
   const [userInput, setUserInput] = useState("");
   const [chatHistory, setChatHistory] = useState<
-    { role: "user" | "assistant"; content: string }[]
+    { role: "user" | "assistant" | "system"; content: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [temperature, setTemperature] = useState(1);
@@ -35,6 +35,7 @@ export default function LLMPlayground() {
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
   const [presencePenalty, setPresencePenalty] = useState(0);
   const user = useUser();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const endpointsQuery = useQuery({
     queryKey: ["endpoints_count"],
@@ -69,7 +70,7 @@ export default function LLMPlayground() {
       setChatHistory((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: "system",
           content:
             "Error: Please select a LORA checkpoint before sending a message.",
         },
@@ -80,6 +81,18 @@ export default function LLMPlayground() {
     setIsLoading(true);
     const newUserMessage = { role: "user" as const, content: userInput };
     setChatHistory((prev) => [...prev, newUserMessage]);
+
+    // Start the timer
+    timerRef.current = setTimeout(() => {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: "system",
+          content:
+            "Loading the model and warming up the GPU. This may take a moment...",
+        },
+      ]);
+    }, 3000);
 
     const openai = new OpenAI({
       apiKey: "ed8ef09e-3ca0-4080-bd93-761fa5428d65",
@@ -106,6 +119,12 @@ export default function LLMPlayground() {
       setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
 
       for await (const chunk of stream) {
+        // Clear the timer on first response
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+
         const content = chunk.choices[0]?.delta?.content || "";
         accumulatedResponse += content;
         setChatHistory((prev) => {
@@ -119,16 +138,29 @@ export default function LLMPlayground() {
       setChatHistory((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: "system",
           content: "Error: Unable to get response from the model.",
         },
       ]);
     } finally {
       setIsLoading(false);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     }
 
     setUserInput("");
   };
+
+  // Clean up the timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -145,10 +177,20 @@ export default function LLMPlayground() {
                 <div
                   key={index}
                   className={`p-2 rounded ${
-                    message.role === "user" ? "bg-blue-100" : "bg-gray-100"
+                    message.role === "user"
+                      ? "bg-blue-100"
+                      : message.role === "system"
+                      ? "bg-yellow-100"
+                      : "bg-gray-100"
                   }`}
                 >
-                  <strong>{message.role === "user" ? "You:" : "AI:"}</strong>{" "}
+                  <strong>
+                    {message.role === "user"
+                      ? "You:"
+                      : message.role === "system"
+                      ? "System:"
+                      : "AI:"}
+                  </strong>{" "}
                   {message.content}
                 </div>
               ))}
