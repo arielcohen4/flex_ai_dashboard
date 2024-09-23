@@ -13,6 +13,7 @@ export const familyToLogo: { [key: string]: string } = {
   "llama3.1": "meta.webp",
   "command-r": "cohere.webp",
   qwen2: "qwen.webp",
+  "qwen2.5": "qwen.webp",
   tinyllama: "tiny_llama.webp",
   mistral: "mistral.webp",
   "deepseek-coder-v2": "deepseek.webp",
