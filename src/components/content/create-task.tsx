@@ -453,15 +453,22 @@ export default function LLMTrainingTaskForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="batchSize">Batch Size (optional)</Label>
-            <Input
-              id="batchSize"
-              type="number"
-              value={batchSize || ""}
-              onChange={(e) =>
-                setBatchSize(e.target.value ? parseInt(e.target.value) : null)
-              }
-            />
+            <Label htmlFor="batchSize">Batch Size</Label>
+            <Select
+              onValueChange={(value) => setBatchSize(Number(value))}
+              value={batchSize?.toString() || ""}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select batch size" />
+              </SelectTrigger>
+              <SelectContent>
+                {[4, 16, 32, 64, 128].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
