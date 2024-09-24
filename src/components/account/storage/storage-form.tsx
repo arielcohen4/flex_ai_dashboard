@@ -34,13 +34,13 @@ export function StorageForm() {
 
   const handleConnect = async () => {
     setError("");
-    const isValid = await validateS3({
+    const response = await validateS3({
       accessKeyId,
       secretAccessKey,
       bucketName,
     });
 
-    if (isValid && user.data) {
+    if (response.success && user.data) {
       const supabase = supabaseBrowser();
       const { error } = await supabase
         .from("profiles")
@@ -67,9 +67,7 @@ export function StorageForm() {
         setIsConnected(true);
       }
     } else {
-      setError(
-        "Invalid AWS credentials or bucket name. Please check and try again."
-      );
+      setError(response.message);
     }
   };
 
