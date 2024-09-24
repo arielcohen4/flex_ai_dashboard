@@ -470,7 +470,7 @@ export default function LLMTrainingTaskForm() {
               id="learningRate"
               type="number"
               step="0.0001"
-              value={learningRate || ""}
+              value={learningRate != null ? learningRate : ""}
               onChange={(e) =>
                 setLearningRate(
                   e.target.value ? parseFloat(e.target.value) : null
