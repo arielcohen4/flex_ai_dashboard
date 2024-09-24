@@ -362,6 +362,15 @@ export default function LLMTrainingTaskForm() {
                   datasets?.map((dataset) => (
                     <SelectItem key={dataset.id} value={dataset.id}>
                       {dataset.name}
+                      {dataset.storage_type === "AWS" && (
+                        <Image
+                          className="w-6 h-6 ml-2 inline-block"
+                          src={`/aws.svg`}
+                          alt={dataset.name}
+                          width={50}
+                          height={50}
+                        />
+                      )}
                     </SelectItem>
                   ))
                 )}
