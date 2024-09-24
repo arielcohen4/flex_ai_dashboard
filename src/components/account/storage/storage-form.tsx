@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import useUser from "@/app/hook/useUser";
 import { validateS3 } from "@/lib/actions/validations";
 import { toast } from "@/components/ui/use-toast";
+import { ExternalLink } from "lucide-react";
 
 export function StorageForm() {
   const user = useUser();
@@ -135,6 +136,35 @@ export function StorageForm() {
       ) : (
         <Button onClick={handleConnect}>Connect</Button>
       )}
+      <Alert>
+        <AlertDescription>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span className="text-sm">
+              For detailed instructions on secure connection:
+            </span>
+            <div className="flex space-x-4">
+              <a
+                href="https://docs.getflex.ai/guides/connect-your-storage"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:underline"
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Docs
+              </a>
+              <a
+                href="https://www.loom.com/share/ecf83ed0755044a6b50a3dfda20fceb6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:underline"
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Video
+              </a>
+            </div>
+          </div>
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }
