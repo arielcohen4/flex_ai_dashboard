@@ -19,6 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <link rel="icon" href="logo.svg" sizes="any" type="image/svg+xml" />
       <body className={GeistSans.className}>
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
