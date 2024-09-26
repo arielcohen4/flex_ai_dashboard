@@ -88,7 +88,7 @@ export default function AppContent() {
       <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
         <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
           <Input
-            placeholder="Filter apps..."
+            placeholder="Search..."
             className="h-9 w-40 lg:w-[250px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,6 +99,7 @@ export default function AppContent() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Family</SelectItem>
+              <SelectItem value="llama3.2">llama3.2</SelectItem>
               <SelectItem value="llama3.1">llama3.1</SelectItem>
               <SelectItem value="gemma2">gemma2</SelectItem>
               <SelectItem value="qwen2">qwen2</SelectItem>

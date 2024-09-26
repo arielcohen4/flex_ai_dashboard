@@ -11,6 +11,7 @@ export const baseApiUrl = "https://api.getflex.ai";
 export const familyToLogo: { [key: string]: string } = {
   llama3: "meta.webp",
   "llama3.1": "meta.webp",
+  "llama3.2": "meta.webp",
   "command-r": "cohere.webp",
   qwen2: "qwen.webp",
   "qwen2.5": "qwen.webp",
