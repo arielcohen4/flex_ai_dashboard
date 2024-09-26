@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "../ui/input";
 import {
@@ -24,12 +24,14 @@ import { roundToK } from "@/lib/utils";
 import { familyToLogo } from "@/lib/constant";
 
 const appText = new Map([
-  ["all", "Family"],
-  ["qwen2", "phi3"],
+  ["all", "All Families"],
+  ["qwen2", "Qwen2"],
+  ["llama3", "LLaMA 3"],
+  // Add other families here
 ]);
 
 export default function AppContent() {
-  const [sort, setSort] = useState("ascending");
+  const [sort, setSort] = useState("descending");
   const [appType, setAppType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -37,7 +39,7 @@ export default function AppContent() {
     queryKey: ["models_tasks_count"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("models")
         .select(
           `
@@ -45,23 +47,35 @@ export default function AppContent() {
           tasks:tasks(count)
         `
         )
-
         .order("created_at", { ascending: false });
 
-      // Sort the data by task count after fetching
-      const sortedData = data?.sort((a, b) => {
-        const countA = a.tasks[0]?.count ?? 0;
-        const countB = b.tasks[0]?.count ?? 0;
-        return countB - countA; // Descending order
-      });
+      if (error) {
+        console.error("Error fetching data:", error);
+        return [];
+      }
 
-      return sortedData ?? [];
-
-      console.log(sortedData);
+      return data ?? [];
     },
   });
 
-  const filteredApps = modelsQuery.data ? modelsQuery.data : [];
+  const filteredApps = useMemo(() => {
+    if (!modelsQuery.data) return [];
+
+    return modelsQuery.data
+      .filter((app) => {
+        const matchesSearch =
+          app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (app.family &&
+            app.family.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesFamily = appType === "all" || app.family === appType;
+        return matchesSearch && matchesFamily;
+      })
+      .sort((a, b) => {
+        const countA = a.tasks[0]?.count ?? 0;
+        const countB = b.tasks[0]?.count ?? 0;
+        return sort === "ascending" ? countA - countB : countB - countA;
+      });
+  }, [modelsQuery.data, searchTerm, appType, sort]);
 
   const SkeletonCard = () => (
     <div className="rounded-lg border p-4">
@@ -95,22 +109,24 @@ export default function AppContent() {
           />
           <Select value={appType} onValueChange={setAppType}>
             <SelectTrigger className="w-36">
-              <SelectValue>{appText.get(appType)}</SelectValue>
+              <SelectValue>{appText.get(appType) || appType}</SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Family</SelectItem>
-              <SelectItem value="llama3.2">llama3.2</SelectItem>
-              <SelectItem value="llama3.1">llama3.1</SelectItem>
-              <SelectItem value="gemma2">gemma2</SelectItem>
-              <SelectItem value="qwen2">qwen2</SelectItem>
-              <SelectItem value="llama3">llama3</SelectItem>
-              <SelectItem value="tinyllama">tinyllama</SelectItem>
-              <SelectItem value="mistral">mistral</SelectItem>
-              <SelectItem value="internlm2.5">internlm2.5</SelectItem>
-              <SelectItem value="jamba">jamba</SelectItem>
-              <SelectItem value="yi-1.5">yi-1.5</SelectItem>
+              <SelectItem value="all">All Families</SelectItem>
+              <SelectItem value="llama3.2">LLaMA 3.2</SelectItem>
+              <SelectItem value="llama3.1">LLaMA 3.1</SelectItem>
+              <SelectItem value="llama3">LLaMA 3</SelectItem>
+              <SelectItem value="gemma2">Gemma 2</SelectItem>
+              <SelectItem value="phi3">Phi 3</SelectItem>
+              <SelectItem value="qwen2.5">Qwen 2.5</SelectItem>
+              <SelectItem value="qwen2">Qwen 2</SelectItem>
+              <SelectItem value="tinyllama">Tiny LLaMA</SelectItem>
+              <SelectItem value="mistral">Mistral</SelectItem>
+              <SelectItem value="internlm2.5">InternLM 2.5</SelectItem>
+              <SelectItem value="jamba">Jamba</SelectItem>
+              <SelectItem value="yi-1.5">Yi 1.5</SelectItem>
               <SelectItem value="deepseek-coder-v2">
-                deepseek-coder-v2
+                Deepseek Coder v2
               </SelectItem>
             </SelectContent>
           </Select>
@@ -148,7 +164,7 @@ export default function AppContent() {
                   <SkeletonCard />
                 </li>
               ))
-          : filteredApps?.map((app) => (
+          : filteredApps.map((app) => (
               <li
                 key={app.name}
                 className="rounded-lg border p-4 hover:shadow-md"
