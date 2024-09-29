@@ -109,7 +109,7 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
             row.original.config &&
             typeof row.original.config === "object" &&
             "num_epochs" in row.original.config
-              ? `${row.original.config.num_epochs} / ${row.original.current_epoch}`
+              ? `${row.original.current_epoch}/${row.original.config.num_epochs}`
               : ""}
           </span>
         </div>
@@ -126,7 +126,7 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
         <div className="flex space-x-2">
           <span className="max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]">
             {row.original.current_step
-              ? `${row.original.total_steps} / ${row.original.current_step}`
+              ? `${row.original.current_step}/${row.original.total_steps}`
               : ""}
           </span>
         </div>
