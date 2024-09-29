@@ -7,6 +7,14 @@ function formatDuration(seconds: number) {
 
   return [hours, minutes].map((v) => v.toString().padStart(2, "0")).join(":");
 }
+
+export function DivisionComponent({current, outOf}: {current?: string, outOf?: string}) {
+  return  <div className="flex w-[50px] items-center justify-between">
+  <span>{current}</span>
+  <span className="text-muted-foreground">/</span>
+  <span>{outOf}</span>
+</div>
+}
 export function TimeProgressCell({ row }: { row: any }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -22,20 +30,14 @@ export function TimeProgressCell({ row }: { row: any }) {
 
   if (row.original.stage === "PENDING") {
     return (
-      <div className="flex w-[50px] items-center justify-between">
-        <span></span>
-        <span className="text-muted-foreground">/</span>
-        <span></span>
-      </div>
+      <DivisionComponent />
     );
-  } else if (doneStages.includes(row.original.stage)) {
+  } 
+  
+  if (doneStages.includes(row.original.stage)) {
     if (row.original.start_time == null) {
       return (
-        <div className="flex w-[50px] items-center justify-between">
-          <span></span>
-          <span className="text-muted-foreground">/</span>
-          <span></span>
-        </div>
+        <DivisionComponent />
       );
     } else {
       const startTime = new Date(row.original.start_time);
@@ -45,40 +47,27 @@ export function TimeProgressCell({ row }: { row: any }) {
       const formattedEstimation = formatDuration(timePassed);
 
       return (
-        <div className="flex w-[50px] items-center justify-between">
-          <span>{formattedTime}</span>
-          <span className="text-muted-foreground">/</span>
-          <span>{formattedEstimation}</span>
-        </div>
+        <DivisionComponent current={formattedTime} outOf={formattedEstimation} />
       );
     }
-  } else {
-    const startTime = new Date(row.original.start_time);
-    const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;
-    const formattedTime = formatDuration(timePassed);
+  } 
+  const startTime = new Date(row.original.start_time);
+  const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;
+  const formattedTime = formatDuration(timePassed);
 
-    if (row.original.current_step > 10) {
-      const startTrainTime = new Date(row.original.start_train_time);
-      const timePassFromFirstStep =
-        (new Date().getTime() - startTrainTime.getTime()) / 1000;
-      const secondsForStep = timePassFromFirstStep / row.original.current_step;
-      const totalTime = row.original.total_steps * secondsForStep;
-      const formattedTotalTime = formatDuration(totalTime);
-      return (
-        <div className="flex w-[50px] items-center justify-between">
-          <span>{formattedTime}</span>
-          <span className="text-muted-foreground">/</span>
-          <span>{formattedTotalTime}</span>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex w-[50px] items-center justify-between">
-          <span>{formattedTime}</span>
-          <span className="text-muted-foreground">/</span>
-          <span></span>
-        </div>
-      );
-    }
+  if (row.original.current_step > 10) {
+    const startTrainTime = new Date(row.original.start_train_time);
+    const timePassFromFirstStep =
+      (new Date().getTime() - startTrainTime.getTime()) / 1000;
+    const secondsForStep = timePassFromFirstStep / row.original.current_step;
+    const totalTime = row.original.total_steps * secondsForStep;
+    const formattedTotalTime = formatDuration(totalTime);
+    return (
+      <DivisionComponent current={formattedTime} outOf={formattedTotalTime} />
+    );
+  } else {
+    return (
+      <DivisionComponent current={formattedTime} />
+    );
   }
 }
