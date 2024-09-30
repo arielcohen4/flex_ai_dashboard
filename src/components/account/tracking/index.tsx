@@ -1,6 +1,6 @@
 "use client";
 import ContentSection from "../layout/content-section";
-import { WandBForm } from "./wandb-form";
+import { TrackingForm } from "./tracking-form";
 
 export default function 
 () {
@@ -9,7 +9,7 @@ export default function
 			title="Weights and Biases"
 			desc="Set your Weights and Biases key"
 		>
-			<WandBForm />
+			<TrackingForm />
 		</ContentSection>
 	);
 }

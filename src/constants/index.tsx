@@ -2,7 +2,7 @@ import {
   IconTool,
   IconUser,
   IconDatabase,
-  IconWeight
+  IconChartDots2
 } from "@tabler/icons-react";
 
 export const sidebarNavItems = [
@@ -22,8 +22,8 @@ export const sidebarNavItems = [
     href: "/settings/storage",
   },
   {
-    title: "Weights and Biases",
-    icon: <IconWeight size={18} />,
-    href: "/settings/wandb",
+    title: "Tracking",
+    icon: <IconChartDots2 size={18} />,
+    href: "/settings/tracking",
   },
 ];

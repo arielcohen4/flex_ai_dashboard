@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/custom/button";
 import { Input } from "@/components/ui/input";
-import useUser from "@/app/hook/useUser";
-import { useCallback, useEffect, useState } from "react";
+import useUser, { USER_QUERY } from "@/app/hook/useUser";
+import { useCallback, useEffect } from "react";
 import { supabaseBrowser } from "../../../lib/supabase/browser";
 import { toast } from "@/components/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
-const wandbForm = z.object({
+const trackingForm = z.object({
   wandbKey: z
     .string()
     .min(40, {
@@ -28,16 +29,18 @@ const wandbForm = z.object({
     }),
 });
 
-type WandBFormValues = z.infer<typeof wandbForm>;
+type TrackingFormValues = z.infer<typeof trackingForm>;
 
-export function WandBForm() {
+export function TrackingForm() {
   const user = useUser();
-  const form = useForm<WandBFormValues>({
-    resolver: zodResolver(wandbForm),
+  const form = useForm<TrackingFormValues>({
+    resolver: zodResolver(trackingForm),
     defaultValues: {
       wandbKey: user.data?.wandb_key ?? ""
     }
   });
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // reset form with user data
@@ -45,7 +48,7 @@ export function WandBForm() {
       form.reset({wandbKey: user?.data?.wandb_key});
 }, [user.data?.wandb_key, form]);
 
-  const onSubmit = useCallback(async (values: z.infer<typeof wandbForm>) => {
+  const onSubmit = useCallback(async (values: z.infer<typeof trackingForm>) => {
     const supabase = supabaseBrowser();
       const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user) {
@@ -56,12 +59,17 @@ export function WandBForm() {
           wandb_key: values.wandbKey,
         })
         .eq("id", user.data?.id ?? "");
+ 
       }
+
+      queryClient.invalidateQueries({
+        queryKey: [USER_QUERY]
+      })
 
       toast({
         title: "You successfully updated your Weights and Biases key!",
       });
-  }, [])
+  }, [user.data?.id, queryClient])
 
   return (
     <Form {...form}>

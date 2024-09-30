@@ -8,16 +8,16 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import SettingsWandB from "@/components/account/wandb";
+import SettingsTracking from "@/components/account/tracking";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Weights and Biases | Flex AI'
+  title: 'Tracking | Flex AI'
 }
 
-export default function WandBPage() {
+export default function TrackingPage() {
 	return (
-		<ContentLayout title="Weights and Biases">
+		<ContentLayout title="Tracking">
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem>
@@ -37,11 +37,11 @@ export default function WandBPage() {
 					</BreadcrumbItem>
 					<BreadcrumbSeparator />
 					<BreadcrumbItem>
-						<BreadcrumbPage>Weights and Biases</BreadcrumbPage>
+						<BreadcrumbPage>Tracking</BreadcrumbPage>
 					</BreadcrumbItem>
 				</BreadcrumbList>
 			</Breadcrumb>
-			<SettingsWandB />
+			<SettingsTracking />
 		</ContentLayout>
 	);
 }
