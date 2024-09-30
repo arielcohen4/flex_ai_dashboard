@@ -494,7 +494,7 @@ export default function LLMTrainingTaskForm() {
             <Label htmlFor="wandbKey">Weights & Biases Key (optional)</Label>
             <Input
               id="wandbKey"
-              value={wandbKey}
+              value={wandbKey ?? ""}
               onChange={(e) => setWandbKey(e.target.value)}
             />
           </div>
