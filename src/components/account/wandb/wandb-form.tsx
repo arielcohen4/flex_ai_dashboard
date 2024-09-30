@@ -20,11 +20,11 @@ import { toast } from "@/components/ui/use-toast";
 const wandbForm = z.object({
   wandbKey: z
     .string()
-    .min(15, {
-      message: "Weights and Biases key must be 15 minimum",
+    .min(40, {
+      message: "Weights and Biases key must be 40 characters",
     })
-    .max(30, {
-      message: "Weights and Biases key must be 30 maximum",
+    .max(40, {
+      message: "Weights and Biases key must be 40 characters",
     }),
 });
 
