@@ -22,6 +22,7 @@ export type Database = {
           task_id: string
           type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at: string
+          user_id: string
           volume_path: string
         }
         Insert: {
@@ -36,6 +37,7 @@ export type Database = {
           task_id: string
           type: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at?: string
+          user_id: string
           volume_path: string
         }
         Update: {
@@ -50,6 +52,7 @@ export type Database = {
           task_id?: string
           type?: Database["public"]["Enums"]["CHECKPOINT_TYPE"]
           updated_at?: string
+          user_id?: string
           volume_path?: string
         }
         Relationships: [
@@ -58,6 +61,13 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkpoints_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -299,6 +309,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_aws_s3: boolean
+          wandb_key: string | null
         }
         Insert: {
           api_key?: string
@@ -312,6 +323,7 @@ export type Database = {
           id: string
           image_url?: string | null
           is_aws_s3?: boolean
+          wandb_key?: string | null
         }
         Update: {
           api_key?: string
@@ -325,6 +337,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_aws_s3?: boolean
+          wandb_key?: string | null
         }
         Relationships: [
           {

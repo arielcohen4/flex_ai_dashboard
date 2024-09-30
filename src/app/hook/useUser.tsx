@@ -14,12 +14,15 @@ const initUser = {
   aws_access_key_id: "",
   aws_secret_access_key: "",
   aws_bucket: "",
+  wandb_key: "",
   is_aws_s3: false,
 };
 
+export const USER_QUERY = "user"
+
 export default function useUser() {
   return useQuery({
-    queryKey: ["user"],
+    queryKey: [USER_QUERY],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

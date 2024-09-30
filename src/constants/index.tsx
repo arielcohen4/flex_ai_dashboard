@@ -1,11 +1,8 @@
 import {
-  IconBrowserCheck,
-  IconExclamationCircle,
-  IconNotification,
-  IconPalette,
   IconTool,
   IconUser,
   IconDatabase,
+  IconChartDots2
 } from "@tabler/icons-react";
 
 export const sidebarNavItems = [
@@ -23,5 +20,10 @@ export const sidebarNavItems = [
     title: "Storage",
     icon: <IconDatabase size={18} />,
     href: "/settings/storage",
+  },
+  {
+    title: "Tracking",
+    icon: <IconChartDots2 size={18} />,
+    href: "/settings/tracking",
   },
 ];
