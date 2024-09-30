@@ -46,7 +46,7 @@ export default function LLMTrainingTaskForm() {
   const [trainWithLora, setTrainWithLora] = useState(true);
   const [batchSize, setBatchSize] = useState<number | null>(null);
   const [learningRate, setLearningRate] = useState<number | null>(null);
-  const [wandbKey, setWandbKey] = useState("");
+  const [wandbKey, setWandbKey] = useState(user.data?.wandb_key);
   const [nCheckpoints, setNCheckpoints] = useState<number>(1);
   const [saveOnlyBestCheckpoint, setSaveOnlyBestCheckpoint] = useState(false);
   const [targetInferenceLibrary, setTargetInferenceLibrary] = useState("vllm");
@@ -98,8 +98,6 @@ export default function LLMTrainingTaskForm() {
     },
   });
 
-  console.log(models);
-
   const { data: datasets, isLoading: isLoadingDatasets } = useQuery({
     queryKey: ["datasets"],
     queryFn: async () => {
@@ -111,6 +109,12 @@ export default function LLMTrainingTaskForm() {
       return data ?? [];
     },
   });
+
+  useEffect(() => {
+    if (user.data?.wandb_key) {
+      setWandbKey(user.data.wandb_key)
+    }
+  }, [user.data?.wandb_key])
 
   const validate = async () => {
     const model = models?.find(

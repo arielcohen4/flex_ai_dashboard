@@ -69,11 +69,6 @@ export default function ProfileForm() {
     mode: 'onChange',
   })
 
-  const { fields, append } = useFieldArray({
-    name: 'urls',
-    control: form.control,
-  })
-
   function onSubmit(data: ProfileFormValues) {
     toast({
       title: 'You submitted the following values:',

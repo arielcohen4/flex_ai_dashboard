@@ -14,6 +14,7 @@ const initUser = {
   aws_access_key_id: "",
   aws_secret_access_key: "",
   aws_bucket: "",
+  wandb_key: "",
   is_aws_s3: false,
 };
 

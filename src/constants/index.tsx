@@ -1,11 +1,8 @@
 import {
-  IconBrowserCheck,
-  IconExclamationCircle,
-  IconNotification,
-  IconPalette,
   IconTool,
   IconUser,
   IconDatabase,
+  IconWeight
 } from "@tabler/icons-react";
 
 export const sidebarNavItems = [
@@ -23,5 +20,10 @@ export const sidebarNavItems = [
     title: "Storage",
     icon: <IconDatabase size={18} />,
     href: "/settings/storage",
+  },
+  {
+    title: "Weights and Biases",
+    icon: <IconWeight size={18} />,
+    href: "/settings/wandb",
   },
 ];
