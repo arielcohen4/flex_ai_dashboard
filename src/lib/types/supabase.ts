@@ -12,7 +12,7 @@ export type Database = {
       checkpoints: {
         Row: {
           created_at: string
-          gguf_converstion_stage:
+          gguf_conversion_stage:
             | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
             | null
           gguf_storage_key: string | null
@@ -31,7 +31,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          gguf_converstion_stage?:
+          gguf_conversion_stage?:
             | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
             | null
           gguf_storage_key?: string | null
@@ -50,7 +50,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          gguf_converstion_stage?:
+          gguf_conversion_stage?:
             | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
             | null
           gguf_storage_key?: string | null

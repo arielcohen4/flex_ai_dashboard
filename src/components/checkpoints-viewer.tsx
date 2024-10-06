@@ -410,7 +410,7 @@ export function CheckpointsViewer({
                       </TooltipProvider>
                     </TableCell>
                     <TableCell>
-                      {checkpoint.gguf_converstion_stage == null && (
+                      {checkpoint.gguf_conversion_stage == null && (
                         <Button
                           variant="secondary"
                           onClick={() => createGGUF({ id: checkpoint.id })}
@@ -419,14 +419,14 @@ export function CheckpointsViewer({
                         </Button>
                       )}
 
-                      {checkpoint.gguf_converstion_stage != null &&
-                        checkpoint.gguf_converstion_stage != "FINISHED" && (
+                      {checkpoint.gguf_conversion_stage != null &&
+                        checkpoint.gguf_conversion_stage != "FINISHED" && (
                           <div className="flex justify-center items-center">
                             <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                            <span>{checkpoint.gguf_converstion_stage}...</span>
+                            <span>{checkpoint.gguf_conversion_stage}...</span>
                           </div>
                         )}
-                      {checkpoint.gguf_converstion_stage == "FINISHED" && (
+                      {checkpoint.gguf_conversion_stage == "FINISHED" && (
                         <Button
                           loading={loadingGGUFCheckpoints[checkpoint.id]}
                           variant="secondary"
