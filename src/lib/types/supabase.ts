@@ -12,6 +12,10 @@ export type Database = {
       checkpoints: {
         Row: {
           created_at: string
+          gguf_converstion_stage:
+            | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
+            | null
+          gguf_storage_key: string | null
           id: string
           inference_cached: boolean
           logs: Json | null
@@ -27,6 +31,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          gguf_converstion_stage?:
+            | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
+            | null
+          gguf_storage_key?: string | null
           id?: string
           inference_cached?: boolean
           logs?: Json | null
@@ -42,6 +50,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          gguf_converstion_stage?:
+            | Database["public"]["Enums"]["GGUF_CONVERSION_STAGE"]
+            | null
+          gguf_storage_key?: string | null
           id?: string
           inference_cached?: boolean
           logs?: Json | null
@@ -492,6 +504,13 @@ export type Database = {
       COMPUTE_TYPE: "RUNPOD"
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
       ENDPOINT_STAGE: "INITIALIZING" | "LIVE"
+      GGUF_CONVERSION_STAGE:
+        | "PENDING"
+        | "DOWNLOADING"
+        | "CONVERTING"
+        | "ARCHIVING"
+        | "UPLOADING"
+        | "FINISHED"
       INFERENCE_LIBRARY: "VLLM"
       STORAGE_TYPE: "FLEX" | "AWS"
       TASK_STAGE:

@@ -48,3 +48,7 @@ export type CreateEndpointRequest = {
   model_name?: string;
   checkpoint_id?: string;
 };
+
+export type CreateGGUFRequest = {
+  id: string;
+};

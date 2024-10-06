@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-import { TaskWithRelations } from "@/lib/types";
+import { CreateEndpointRequest, TaskWithRelations } from "@/lib/types";
 import { Button } from "@/components/custom/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatSize } from "@/lib/utils";
-import { getDownloadUrl } from "@/lib/actions/checkpoints";
+import { getDownloadUrl, getGGUFDownloadUrl } from "@/lib/actions/checkpoints";
 import { Loader2 } from "lucide-react";
 import {
   Tooltip,
@@ -34,6 +34,10 @@ import {
 import { setCheckpointsState, endpointSlice } from "@/lib/store/endpointSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/store";
 import { JoinedCheckpoint } from "@/lib/types";
+import { CreateGGUFRequest } from "../lib/types";
+import { baseApiUrl } from "@/lib/constant";
+import axios from "axios";
+import useUser from "@/app/hook/useUser";
 
 const REMOVE_LOGS_KEYS = [
   "step",
@@ -55,11 +59,16 @@ export function CheckpointsViewer({
   const [loadingCheckpoints, setLoadingCheckpoints] = useState<{
     [key: string]: boolean;
   }>({});
+  const [loadingGGUFCheckpoints, setLoadingGGUFCheckpoints] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [openTooltips, setOpenTooltips] = useState<{ [key: string]: boolean }>(
     {}
   );
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
+  const user = useUser();
+
   const selectedCheckpoints = useAppSelector(
     (state) => state.endpoint.checkpoints
   );
@@ -114,6 +123,39 @@ export function CheckpointsViewer({
     } finally {
       setLoadingCheckpoints((prev) => ({ ...prev, [id]: false }));
     }
+  };
+
+  const downloadGGUFCheckpoint = async ({ id }: { id: string }) => {
+    setLoadingGGUFCheckpoints((prev) => ({ ...prev, [id]: true }));
+    try {
+      const url = await getGGUFDownloadUrl({ id });
+      if (url) {
+        window.open(url, "_blank");
+      } else {
+        console.error("Failed to generate download URL");
+      }
+    } catch (error) {
+      console.error("Error downloading checkpoint:", error);
+    } finally {
+      setLoadingGGUFCheckpoints((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const createGGUF = async ({ id }: { id: string }) => {
+    const apiKey = user?.data?.api_key;
+
+    const url = `${baseApiUrl}/v1/checkpoints/convert_to_gguf`;
+    const headers = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    };
+
+    const payload: CreateGGUFRequest = {
+      id,
+    };
+
+    const response = await axios.post(url, payload, { headers });
+    return response.data;
   };
 
   const copyToClipboard = async (text: string) => {
@@ -238,9 +280,11 @@ export function CheckpointsViewer({
     }
   };
 
+  console.log(checkpointsQuery.data);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[900px]">
         <DialogHeader>
           <DialogTitle>Checkpoints for {task.name}</DialogTitle>
           <DialogDescription>
@@ -265,6 +309,7 @@ export function CheckpointsViewer({
                   <TableHead>Stage</TableHead>
                   <TableHead>Download</TableHead>
                   <TableHead>Download CLI</TableHead>
+                  <TableHead>Convert to GGUF</TableHead>
                   <TableHead>Deploy</TableHead>
                 </TableRow>
               </TableHeader>
@@ -363,6 +408,35 @@ export function CheckpointsViewer({
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                    </TableCell>
+                    <TableCell>
+                      {checkpoint.gguf_converstion_stage == null && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => createGGUF({ id: checkpoint.id })}
+                        >
+                          Generate
+                        </Button>
+                      )}
+
+                      {checkpoint.gguf_converstion_stage != null &&
+                        checkpoint.gguf_converstion_stage != "FINISHED" && (
+                          <div className="flex justify-center items-center">
+                            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                            <span>{checkpoint.gguf_converstion_stage}...</span>
+                          </div>
+                        )}
+                      {checkpoint.gguf_converstion_stage == "FINISHED" && (
+                        <Button
+                          loading={loadingGGUFCheckpoints[checkpoint.id]}
+                          variant="secondary"
+                          onClick={() =>
+                            downloadGGUFCheckpoint({ id: checkpoint.id })
+                          }
+                        >
+                          Download
+                        </Button>
+                      )}
                     </TableCell>
                     <TableCell>
                       <TooltipProvider>
