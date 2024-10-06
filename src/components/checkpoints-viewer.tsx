@@ -284,7 +284,7 @@ export function CheckpointsViewer({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[900px]">
+      <DialogContent className="sm:max-w-[950px]">
         <DialogHeader>
           <DialogTitle>Checkpoints for {task.name}</DialogTitle>
           <DialogDescription>
