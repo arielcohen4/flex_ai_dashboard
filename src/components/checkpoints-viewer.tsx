@@ -301,6 +301,7 @@ export function CheckpointsViewer({
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Id</TableHead>
                   <TableHead>Step</TableHead>
                   <TableHead>Epoch</TableHead>
                   <TableHead>Size</TableHead>
@@ -316,6 +317,18 @@ export function CheckpointsViewer({
               <TableBody>
                 {checkpointsQuery.data?.map((checkpoint) => (
                   <TableRow key={checkpoint.id}>
+                    <TableCell>
+                      <div
+                        className="cursor-pointer hover:text-blue-500"
+                        title="Click to copy full ID"
+                        onClick={() => {
+                          navigator.clipboard.writeText(checkpoint.id);
+                          // Optionally, you can add a visual feedback here, like a tooltip
+                        }}
+                      >
+                        {checkpoint.id.substring(0, 7)}
+                      </div>
+                    </TableCell>
                     <TableCell>{checkpoint.step}</TableCell>
                     <TableCell>
                       {(

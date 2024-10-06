@@ -43,7 +43,16 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
       <DataTableColumnHeader column={column} title="Task" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.original.id.substring(0, 7)}</div>
+      <div
+        className="w-[80px] cursor-pointer hover:text-blue-500"
+        title="Click to copy full ID"
+        onClick={() => {
+          navigator.clipboard.writeText(row.original.id);
+          // Optionally, you can add a visual feedback here, like a tooltip
+        }}
+      >
+        {row.original.id.substring(0, 7)}
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
