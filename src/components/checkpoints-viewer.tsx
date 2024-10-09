@@ -181,8 +181,7 @@ export function CheckpointsViewer({
     try {
       const url = await getDownloadUrl({ id });
       if (url) {
-        const fileName = `${id}_${name}_checkpoint-${checkpointNumber}.tar.gz`;
-        const downloadCommand = `wget -O ${fileName} "${url}" && tar -xzvf "${fileName}"`;
+        const downloadCommand = `flex_ai checkpoints download --checkpoint-id=${id}`;
         copyToClipboard(downloadCommand);
 
         console.log("Download command copied to clipboard:", downloadCommand);
