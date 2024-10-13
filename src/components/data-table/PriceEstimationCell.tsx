@@ -44,7 +44,41 @@ export function PriceEstimationCell({ row }: { row: any }) {
           <span></span>
         </div>
       );
+    } else if (
+      row.original.stage == "ERRORED" ||
+      row.original.stage == "CANCELED"
+    ) {
+      const startTime = new Date(row.original.start_time);
+      const endTime = new Date(row.original.end_time);
+      const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
+      const cost = calculateCost(timePassed, pricePerSecond);
+
+      if (row.original.current_step > 10) {
+        const startTrainTime = new Date(row.original.start_train_time);
+        const timePassFromFirstStep =
+          (endTime.getTime() - startTrainTime.getTime()) / 1000;
+        const secondsForStep =
+          timePassFromFirstStep / row.original.current_step;
+        const totalTime = row.original.total_steps * secondsForStep;
+        const constPrediction = calculateCost(totalTime, pricePerSecond);
+        return (
+          <div className="flex w-[50px] items-center justify-between">
+            <span>{cost}$</span>
+            <span className="text-muted-foreground">/</span>
+            <span>{constPrediction}$</span>
+          </div>
+        );
+      } else {
+        return (
+          <div className="flex w-[50px] items-center justify-between">
+            <span>{cost}$</span>
+            <span className="text-muted-foreground">/</span>
+            <span></span>
+          </div>
+        );
+      }
     } else {
+      // If stage is COMPLETED
       const startTime = new Date(row.original.start_time);
       const endTime = new Date(row.original.end_time);
       const timePassed = (endTime.getTime() - startTime.getTime()) / 1000;
