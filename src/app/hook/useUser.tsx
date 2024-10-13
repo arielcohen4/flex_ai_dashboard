@@ -14,11 +14,12 @@ const initUser = {
   aws_access_key_id: "",
   aws_secret_access_key: "",
   aws_bucket: "",
+  aws_region: null,
   wandb_key: "",
   is_aws_s3: false,
 };
 
-export const USER_QUERY = "user"
+export const USER_QUERY = "user";
 
 export default function useUser() {
   return useQuery({

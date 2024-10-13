@@ -7,16 +7,18 @@ import {
   DeleteObjectCommand,
   S3ServiceException,
 } from "@aws-sdk/client-s3";
+import { Tables } from "../types/supabase";
 
 export async function validateS3({
   accessKeyId,
   secretAccessKey,
   bucketName,
+  region,
 }: {
   accessKeyId: string;
   secretAccessKey: string;
   bucketName: string;
-  region?: string;
+  region: Tables<"profiles">["aws_region"] | null;
 }) {
   try {
     const client = new S3Client({
@@ -24,6 +26,7 @@ export async function validateS3({
         accessKeyId,
         secretAccessKey,
       },
+      region: region ?? "us-east-1",
     });
 
     // Step 1: Check if credentials are valid and bucket exists

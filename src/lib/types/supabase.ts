@@ -313,6 +313,7 @@ export type Database = {
           api_key: string
           aws_access_key_id: string | null
           aws_bucket: string | null
+          aws_region: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key: string | null
           balance: number
           created_at: string
@@ -327,6 +328,7 @@ export type Database = {
           api_key?: string
           aws_access_key_id?: string | null
           aws_bucket?: string | null
+          aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
           created_at?: string
@@ -341,6 +343,7 @@ export type Database = {
           api_key?: string
           aws_access_key_id?: string | null
           aws_bucket?: string | null
+          aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
           created_at?: string
@@ -499,6 +502,17 @@ export type Database = {
       }
     }
     Enums: {
+      AWS_REGION:
+        | "us-east-1"
+        | "us-east-2"
+        | "us-west-1"
+        | "us-west-2"
+        | "eu-west-1"
+        | "eu-central-1"
+        | "ap-southeast-1"
+        | "ap-southeast-2"
+        | "ap-northeast-1"
+        | "sa-east-1"
       CHECKPOINT_STAGE: "PENDING" | "ARCHIVING" | "UPLOADING" | "FINISHED"
       CHECKPOINT_TYPE: "LORA" | "REGULAR"
       COMPUTE_TYPE: "RUNPOD"
