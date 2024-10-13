@@ -18,6 +18,26 @@ import { Overview } from "./dashboard/overview";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tag,
+  Users,
+  Settings,
+  Bookmark,
+  SquarePen,
+  BookCheck,
+  LayoutGrid,
+  LucideIcon,
+  Brain,
+  KeyRound,
+  ShieldAlert,
+  Grid2X2,
+  ScrollText,
+  SquareArrowOutUpRightIcon,
+  CircleFadingPlusIcon,
+  NetworkIcon,
+  BarChart,
+  MessageSquare,
+} from "lucide-react";
 
 export default function DashboardContent() {
   const tasksCountQuery = useQuery({
@@ -56,13 +76,13 @@ export default function DashboardContent() {
     },
   });
 
-  const modelsCountQuery = useQuery({
-    queryKey: ["models_count"],
+  const endpointsCountQuery = useQuery({
+    queryKey: ["endpoints_count"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
-        const { data, error } = await supabase.from("models").select("*");
+        const { data, error } = await supabase.from("endpoints").select("*");
         return data;
       }
     },
@@ -72,10 +92,10 @@ export default function DashboardContent() {
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <div className="flex flex-wrap items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex flex-wrap items-center space-x-2">
+        {/* <div className="flex flex-wrap items-center space-x-2">
           <CalendarDateRangePicker />
           <Button>Download</Button>
-        </div>
+        </div> */}
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -97,61 +117,41 @@ export default function DashboardContent() {
                 <CardTitle className="text-sm font-medium">
                   Total Tasks
                 </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
+                <BookCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 {tasksCountQuery.isLoading ? (
                   <Skeleton className="h-8 w-[100px] animate-pulse" />
                 ) : (
-                  <div className="text-2xl font-bold">
-                    {tasksCountQuery.data?.length}
-                  </div>
+                  <>
+                    <div className="text-2xl font-bold">
+                      {tasksCountQuery.data?.length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +{tasksCountQuery.data?.length} from last month
+                    </p>
+                  </>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Datasets</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
+                <Grid2X2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 {datasetsCountQuery.isLoading ? (
                   <Skeleton className="h-8 w-[100px] animate-pulse" />
                 ) : (
-                  <div className="text-2xl font-bold">
-                    {datasetsCountQuery.data?.length}
-                  </div>
+                  <>
+                    <div className="text-2xl font-bold">
+                      {datasetsCountQuery.data?.length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +{datasetsCountQuery.data?.length} from last month
+                    </p>
+                  </>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  +180.1% from last month
-                </p>
               </CardContent>
             </Card>
             <Card>
@@ -159,62 +159,41 @@ export default function DashboardContent() {
                 <CardTitle className="text-sm font-medium">
                   Checkpoints
                 </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <rect width="20" height="14" x="2" y="5" rx="2" />
-                  <path d="M2 10h20" />
-                </svg>
+                <Brain className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 {checkpointsCountQuery.isLoading ? (
                   <Skeleton className="h-8 w-[100px] animate-pulse" />
                 ) : (
-                  <div className="text-2xl font-bold">
-                    {checkpointsCountQuery.data?.length}
-                  </div>
+                  <>
+                    <div className="text-2xl font-bold">
+                      {checkpointsCountQuery.data?.length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +{checkpointsCountQuery.data?.length} from last month
+                    </p>
+                  </>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  +19% from last month
-                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Supported Models
-                </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                </svg>
+                <CardTitle className="text-sm font-medium">Endpoints</CardTitle>
+                <NetworkIcon className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                {modelsCountQuery.isLoading ? (
+                {endpointsCountQuery.isLoading ? (
                   <Skeleton className="h-8 w-[100px] animate-pulse" />
                 ) : (
-                  <div className="text-2xl font-bold">
-                    +{modelsCountQuery.data?.length}
-                  </div>
+                  <>
+                    <div className="text-2xl font-bold">
+                      {endpointsCountQuery.data?.length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      +{endpointsCountQuery.data?.length} since last month
+                    </p>
+                  </>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  +201 since last hour
-                </p>
               </CardContent>
             </Card>
           </div>
