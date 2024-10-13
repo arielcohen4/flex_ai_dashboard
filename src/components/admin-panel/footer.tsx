@@ -1,13 +1,38 @@
 import Link from "next/link";
+import {
+  IconBrandSlack,
+  IconBrandX,
+  IconBrandLinkedin,
+} from "@tabler/icons-react";
 
 export function Footer() {
-	return (
-		<div className="z-20 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60">
-			<div className="mx-4 md:mx-8 flex h-14 items-center">
-				<p className="text-xs md:text-sm leading-loose text-muted-foreground text-left">
-					Flex AI Settings
-				</p>
-			</div>
-		</div>
-	);
+  return (
+    <div className="z-20 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="mx-4 md:mx-8 flex h-14 items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link
+            href="https://getflexai.slack.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandSlack className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+          </Link>
+          <Link
+            href="https://x.com/getflex_ai"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandX className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+          </Link>
+          <Link
+            href="https://www.linkedin.com/company/getflex-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandLinkedin className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
