@@ -112,9 +112,9 @@ export default function LLMTrainingTaskForm() {
 
   useEffect(() => {
     if (user.data?.wandb_key) {
-      setWandbKey(user.data.wandb_key)
+      setWandbKey(user.data.wandb_key);
     }
-  }, [user.data?.wandb_key])
+  }, [user.data?.wandb_key]);
 
   const validate = async () => {
     const model = models?.find(
@@ -466,7 +466,7 @@ export default function LLMTrainingTaskForm() {
                 <SelectValue placeholder="Select batch size" />
               </SelectTrigger>
               <SelectContent>
-                {[4, 16, 32, 64, 128].map((size) => (
+                {[1, 4, 8, 16, 32, 64, 128, 256].map((size) => (
                   <SelectItem key={size} value={size.toString()}>
                     {size}
                   </SelectItem>
