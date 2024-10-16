@@ -26,8 +26,9 @@ interface ChatMessage {
 }
 
 export default function LLMPlayground() {
-  const [selectedEndpoint, setSelectedEndpoint] =
-    useState<Tables<"endpoints"> | null>(null);
+  const [selectedEndpoint, setSelectedEndpoint] = useState<
+    (Tables<"endpoints"> & { base_model: Tables<"models"> }) | null
+  >(null);
   const [selectedLoraCheckpoint, setSelectedLoraCheckpoint] =
     useState<string>("");
   const [userInput, setUserInput] = useState("");
@@ -43,15 +44,21 @@ export default function LLMPlayground() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const endpointsQuery = useQuery({
-    queryKey: ["endpoints_count"],
+    queryKey: ["endpoints_count_change"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
         const { data } = await supabase
           .from("endpoints")
-          .select(`*, models(*)`)
+          .select(
+            `
+            *,
+            base_model:models!base_model_id(*)
+          `
+          )
           .order("created_at", { ascending: false });
+
         return data ?? [];
       }
     },
@@ -60,7 +67,11 @@ export default function LLMPlayground() {
   const handleEndpointChange = (endpointId: string) => {
     const endpoint =
       endpointsQuery.data?.find((e) => e.id === endpointId) || null;
-    setSelectedEndpoint(endpoint);
+    setSelectedEndpoint(
+      endpoint as
+        | (Tables<"endpoints"> & { base_model: Tables<"models"> })
+        | null
+    );
     setSelectedLoraCheckpoint("");
   };
 
@@ -127,7 +138,10 @@ export default function LLMPlayground() {
           selectedEndpoint.type === "LORA"
             ? selectedLoraCheckpoint
             : (selectedEndpoint.model_name as string),
-        messages: chatHistory.map(({ role, content }) => ({ role, content })),
+        messages: [...chatHistory, newUserMessage].map(({ role, content }) => ({
+          role,
+          content,
+        })),
         temperature: temperature,
         max_tokens: maxTokens,
         top_p: topP,
@@ -188,6 +202,8 @@ export default function LLMPlayground() {
       }
     };
   }, []);
+
+  console.log(selectedEndpoint);
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -279,6 +295,12 @@ export default function LLMPlayground() {
                     <SelectValue placeholder="Select a lora" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem
+                      key={selectedEndpoint.base_model.name}
+                      value={selectedEndpoint.base_model.name}
+                    >
+                      {selectedEndpoint.base_model.name}
+                    </SelectItem>
                     {(selectedEndpoint.lora_checkpoints as any[])?.map(
                       (c: any, index: number) => (
                         <SelectItem key={index} value={c.name}>
