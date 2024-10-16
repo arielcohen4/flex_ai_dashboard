@@ -19,15 +19,19 @@ import { Loader2 } from "lucide-react";
 import useUser from "@/app/hook/useUser";
 import { Tables } from "@/lib/types/supabase";
 
+interface ChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: string;
+}
+
 export default function LLMPlayground() {
   const [selectedEndpoint, setSelectedEndpoint] =
     useState<Tables<"endpoints"> | null>(null);
   const [selectedLoraCheckpoint, setSelectedLoraCheckpoint] =
     useState<string>("");
   const [userInput, setUserInput] = useState("");
-  const [chatHistory, setChatHistory] = useState<
-    { role: "user" | "assistant" | "system"; content: string }[]
-  >([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [temperature, setTemperature] = useState(1);
   const [maxTokens, setMaxTokens] = useState(2048);
@@ -36,6 +40,7 @@ export default function LLMPlayground() {
   const [presencePenalty, setPresencePenalty] = useState(0);
   const user = useUser();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const endpointsQuery = useQuery({
     queryKey: ["endpoints_count"],
@@ -63,6 +68,17 @@ export default function LLMPlayground() {
     setSelectedLoraCheckpoint(checkpointName);
   };
 
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatHistory]);
+
   const handleSubmit = async () => {
     if (!selectedEndpoint || !userInput.trim()) return;
 
@@ -73,16 +89,20 @@ export default function LLMPlayground() {
           role: "system",
           content:
             "Error: Please select a LORA checkpoint before sending a message.",
+          timestamp: new Date().toLocaleTimeString(),
         },
       ]);
       return;
     }
 
     setIsLoading(true);
-    const newUserMessage = { role: "user" as const, content: userInput };
+    const newUserMessage = {
+      role: "user" as const,
+      content: userInput,
+      timestamp: new Date().toLocaleTimeString(),
+    };
     setChatHistory((prev) => [...prev, newUserMessage]);
 
-    // Start the timer
     timerRef.current = setTimeout(() => {
       setChatHistory((prev) => [
         ...prev,
@@ -90,6 +110,7 @@ export default function LLMPlayground() {
           role: "system",
           content:
             "Loading the model and warming up the GPU. This may take a moment...",
+          timestamp: new Date().toLocaleTimeString(),
         },
       ]);
     }, 3000);
@@ -106,7 +127,7 @@ export default function LLMPlayground() {
           selectedEndpoint.type === "LORA"
             ? selectedLoraCheckpoint
             : (selectedEndpoint.model_name as string),
-        messages: [...chatHistory, newUserMessage],
+        messages: chatHistory.map(({ role, content }) => ({ role, content })),
         temperature: temperature,
         max_tokens: maxTokens,
         top_p: topP,
@@ -116,10 +137,16 @@ export default function LLMPlayground() {
       });
 
       let accumulatedResponse = "";
-      setChatHistory((prev) => [...prev, { role: "assistant", content: "" }]);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "",
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      ]);
 
       for await (const chunk of stream) {
-        // Clear the timer on first response
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
@@ -140,6 +167,7 @@ export default function LLMPlayground() {
         {
           role: "system",
           content: "Error: Unable to get response from the model.",
+          timestamp: new Date().toLocaleTimeString(),
         },
       ]);
     } finally {
@@ -153,7 +181,6 @@ export default function LLMPlayground() {
     setUserInput("");
   };
 
-  // Clean up the timer on component unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -172,7 +199,10 @@ export default function LLMPlayground() {
             <CardTitle>Chat</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 h-[400px] overflow-y-auto mb-4">
+            <div
+              ref={chatContainerRef}
+              className="space-y-4 h-[400px] overflow-y-auto mb-4"
+            >
               {chatHistory.map((message, index) => (
                 <div
                   key={index}
@@ -184,13 +214,18 @@ export default function LLMPlayground() {
                       : "bg-gray-100"
                   }`}
                 >
-                  <strong>
-                    {message.role === "user"
-                      ? "You:"
-                      : message.role === "system"
-                      ? "System:"
-                      : "AI:"}
-                  </strong>{" "}
+                  <div className="flex justify-between items-center mb-1">
+                    <strong>
+                      {message.role === "user"
+                        ? "You:"
+                        : message.role === "system"
+                        ? "System:"
+                        : "AI:"}
+                    </strong>
+                    <span className="text-xs text-gray-500">
+                      {message.timestamp}
+                    </span>
+                  </div>
                   {message.content}
                 </div>
               ))}
