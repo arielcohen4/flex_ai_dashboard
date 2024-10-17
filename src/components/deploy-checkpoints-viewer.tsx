@@ -94,7 +94,10 @@ const DeployCheckpointsModal = () => {
 
     const apiKey = user?.data?.api_key;
 
-    const url = `${baseApiUrl}/v1/endpoints/create_endpoint`;
+    const url =
+      checkpointType == "LORA"
+        ? `${baseApiUrl}/v1/endpoints/create_multi_lora_endpoint`
+        : `${baseApiUrl}/v1/endpoints/create_regular_endpoint`;
     const headers = {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
@@ -118,7 +121,7 @@ const DeployCheckpointsModal = () => {
     try {
       setLoadingCreateEndpoint(true);
       const response = await axios.post(url, payload, { headers });
-      queryClient.invalidateQueries({ queryKey: ["endpoints_count"] });
+      queryClient.invalidateQueries({ queryKey: ["endpoints"] });
       // move to tasks page
       toast({
         title: "New Endpoint created",

@@ -77,7 +77,7 @@ export default function DashboardContent() {
   });
 
   const endpointsCountQuery = useQuery({
-    queryKey: ["endpoints_count"],
+    queryKey: ["endpoints_data"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

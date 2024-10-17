@@ -40,7 +40,7 @@ export default function AppContent() {
           console.log("Change received!", payload);
           // Refetch the checkpoints data
           queryClient.invalidateQueries({
-            queryKey: ["endpoints_count"],
+            queryKey: ["endpoints"],
           });
         }
       )
@@ -48,7 +48,7 @@ export default function AppContent() {
   }, [queryClient]);
 
   const endpointsQuery = useQuery({
-    queryKey: ["endpoints_count"],
+    queryKey: ["endpoints"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
