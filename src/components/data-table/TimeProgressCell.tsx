@@ -8,12 +8,20 @@ function formatDuration(seconds: number) {
   return [hours, minutes].map((v) => v.toString().padStart(2, "0")).join(":");
 }
 
-export function DivisionComponent({current, outOf}: {current?: string, outOf?: string}) {
-  return  <div className="flex w-[50px] items-center justify-between">
-  <span>{current}</span>
-  <span className="text-muted-foreground">/</span>
-  <span>{outOf}</span>
-</div>
+export function DivisionComponent({
+  current,
+  outOf,
+}: {
+  current?: string;
+  outOf?: string;
+}) {
+  return (
+    <div className="flex w-[50px] items-center justify-between text-xs text-muted-foreground">
+      <span>{current}</span>
+      <span className="text-muted-foreground">/</span>
+      <span>{outOf}</span>
+    </div>
+  );
 }
 export function TimeProgressCell({ row }: { row: any }) {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -29,16 +37,12 @@ export function TimeProgressCell({ row }: { row: any }) {
   const doneStages = ["COMPLETED", "ERRORED", "CANCELED"];
 
   if (row.original.stage === "PENDING") {
-    return (
-      <DivisionComponent />
-    );
-  } 
-  
+    return <DivisionComponent />;
+  }
+
   if (doneStages.includes(row.original.stage)) {
     if (row.original.start_time == null) {
-      return (
-        <DivisionComponent />
-      );
+      return <DivisionComponent />;
     } else {
       const startTime = new Date(row.original.start_time);
       const endTime = new Date(row.original.end_time);
@@ -47,10 +51,13 @@ export function TimeProgressCell({ row }: { row: any }) {
       const formattedEstimation = formatDuration(timePassed);
 
       return (
-        <DivisionComponent current={formattedTime} outOf={formattedEstimation} />
+        <DivisionComponent
+          current={formattedTime}
+          outOf={formattedEstimation}
+        />
       );
     }
-  } 
+  }
   const startTime = new Date(row.original.start_time);
   const timePassed = (currentTime.getTime() - startTime.getTime()) / 1000;
   const formattedTime = formatDuration(timePassed);
@@ -66,8 +73,6 @@ export function TimeProgressCell({ row }: { row: any }) {
       <DivisionComponent current={formattedTime} outOf={formattedTotalTime} />
     );
   } else {
-    return (
-      <DivisionComponent current={formattedTime} />
-    );
+    return <DivisionComponent current={formattedTime} />;
   }
 }

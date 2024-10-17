@@ -11,6 +11,7 @@ import { TimeProgressCell } from "./TimeProgressCell";
 import { PriceEstimationCell } from "./PriceEstimationCell";
 import Image from "next/image";
 import { familyToLogo } from "@/lib/constant";
+import { Progress } from "@/components/ui/progress";
 
 export const columns: ColumnDef<TaskWithRelations>[] = [
   {
@@ -170,11 +171,24 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
     },
   },
   {
-    accessorKey: "timeProgress",
+    accessorKey: "progress",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Time Progress" />
     ),
-    cell: ({ row }) => <TimeProgressCell row={row} />,
+    cell: ({ row }) => {
+      const progress = row.original.current_step
+        ? (row.original.current_step / row.original.total_steps) * 100
+        : 0;
+      return (
+        <div className="w-[100px]">
+          <TimeProgressCell row={row} />
+          <Progress value={progress} className="w-full mt-1" />
+          <span className="text-xs text-muted-foreground">
+            {progress.toFixed(1)}%
+          </span>
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
