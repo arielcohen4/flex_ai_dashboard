@@ -75,13 +75,6 @@ export type Database = {
             referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "checkpoints_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       computes: {
@@ -117,6 +110,7 @@ export type Database = {
           eval_path: string | null
           eval_rows_count: number | null
           id: string
+          is_archived: boolean
           max_tokens: number
           name: string
           storage_type: Database["public"]["Enums"]["STORAGE_TYPE"]
@@ -132,6 +126,7 @@ export type Database = {
           eval_path?: string | null
           eval_rows_count?: number | null
           id?: string
+          is_archived?: boolean
           max_tokens: number
           name: string
           storage_type?: Database["public"]["Enums"]["STORAGE_TYPE"]
@@ -147,6 +142,7 @@ export type Database = {
           eval_path?: string | null
           eval_rows_count?: number | null
           id?: string
+          is_archived?: boolean
           max_tokens?: number
           name?: string
           storage_type?: Database["public"]["Enums"]["STORAGE_TYPE"]
@@ -157,15 +153,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       endpoints: {
         Row: {
@@ -219,13 +207,6 @@ export type Database = {
             columns: ["base_model_id"]
             isOneToOne: false
             referencedRelation: "models"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "endpoints_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -354,15 +335,7 @@ export type Database = {
           is_aws_s3?: boolean
           wandb_key?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       subscription: {
         Row: {
@@ -407,6 +380,7 @@ export type Database = {
           current_step: number | null
           dataset_id: string
           end_time: string | null
+          error_string: string | null
           id: string
           model_id: string
           name: string
@@ -428,6 +402,7 @@ export type Database = {
           current_step?: number | null
           dataset_id: string
           end_time?: string | null
+          error_string?: string | null
           id?: string
           model_id: string
           name: string
@@ -449,6 +424,7 @@ export type Database = {
           current_step?: number | null
           dataset_id?: string
           end_time?: string | null
+          error_string?: string | null
           id?: string
           model_id?: string
           name?: string
@@ -480,13 +456,6 @@ export type Database = {
             columns: ["model_id"]
             isOneToOne: false
             referencedRelation: "models"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -622,4 +591,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

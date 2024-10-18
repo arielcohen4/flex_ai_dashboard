@@ -16,11 +16,25 @@ import {
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { roundToK } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/use-toast";
+import { ArchiveX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -33,6 +47,7 @@ export default function AppContent() {
   const [sort, setSort] = useState("ascending");
   const [appType, setAppType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const queryClient = useQueryClient();
 
   const datasetsQuery = useQuery({
     queryKey: ["datasets"],
@@ -43,6 +58,7 @@ export default function AppContent() {
         const { data } = await supabase
           .from("datasets")
           .select("*")
+          .eq("is_archived", false)
           .order("created_at", { ascending: false });
         return data;
       }
@@ -56,6 +72,35 @@ export default function AppContent() {
           app.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
     : [];
+
+  const archiveMutation = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const supabase = supabaseBrowser();
+      await supabase
+        .from("datasets")
+        .update({ is_archived: true })
+        .eq("id", id);
+
+      return { id };
+    },
+    onSuccess: ({ id }) => {
+      queryClient.setQueryData(["datasets"], (oldData: any) => {
+        return oldData.filter((dataset: any) => dataset.id !== id);
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["datasets"] });
+    },
+  });
+
+  const handleArchive = async ({ id, name }: { id: string; name: string }) => {
+    await archiveMutation.mutateAsync({ id });
+
+    // move to tasks page
+    toast({
+      title: "Dataset Archived",
+      description: `Dataset ${name} has been archived successfully`,
+    });
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -127,13 +172,39 @@ export default function AppContent() {
             ))
           : filteredApps.map((app) => (
               <li
-                key={app.name}
+                key={app.id}
                 className="rounded-lg border p-4 hover:shadow-md"
               >
                 <div className="mb-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <a className="text-xl font-semibold">{app.name}</a>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <ArchiveX size={16} />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action will archive this dataset. Are you
+                              sure you want to proceed?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                handleArchive({ id: app.id, name: app.name })
+                              }
+                            >
+                              Yes, archive it
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <p className="text-gray-500 text-xs">{app.id}</p>
                     </div>
                     <div className="flex flex-col items-end">

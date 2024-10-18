@@ -105,6 +105,7 @@ export default function LLMTrainingTaskForm() {
       const { data } = await supabase
         .from("datasets")
         .select("*")
+        .eq("is_archived", false)
         .order("created_at", { ascending: false });
       return data ?? [];
     },

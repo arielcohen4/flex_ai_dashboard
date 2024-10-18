@@ -58,7 +58,10 @@ export default function DashboardContent() {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
-        const { data, error } = await supabase.from("datasets").select("*");
+        const { data, error } = await supabase
+          .from("datasets")
+          .select("*")
+          .eq("is_archived", false);
         return data;
       }
     },

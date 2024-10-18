@@ -45,8 +45,8 @@ export function Sidebar() {
                   y1="28.473%"
                   y2="86.882%"
                 >
-                  <stop offset="0%" stop-color="#F1F5F9" stop-opacity="0" />
-                  <stop offset="100%" stop-color="#F1F5F9" />
+                  <stop offset="0%" stopColor="#F1F5F9" stopOpacity="0" />
+                  <stop offset="100%" stopColor="#F1F5F9" />
                 </linearGradient>
                 <filter
                   id="a"
@@ -59,7 +59,7 @@ export function Sidebar() {
                   <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
                 </filter>
               </defs>
-              <g fill="none" fill-rule="nonzero">
+              <g fill="none" fillRule="nonzero">
                 <path
                   fill="#A855F7"
                   d="M19 33.5c-8.008 0-14.5-6.492-14.5-14.5S10.992 4.5 19 4.5 33.5 10.992 33.5 19 27.008 33.5 19 33.5Zm0-5a9.5 9.5 0 1 0 0-19 9.5 9.5 0 0 0 0 19Z"
