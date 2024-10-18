@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "../ui/input";
@@ -14,19 +15,37 @@ import {
   IconSortAscendingLetters,
   IconSortDescendingLetters,
 } from "@tabler/icons-react";
+import { CircleStop } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Separator } from "../ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ApiViewer } from "@/components/api-viewer";
 import Image from "next/image";
-import { familyToLogo } from "@/lib/constant";
+import { baseApiUrl, familyToLogo } from "@/lib/constant";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { roundToK } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { StopEndpointRequest } from "@/lib/types";
+import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
+import useUser from "@/app/hook/useUser";
 
 export default function AppContent() {
   const [sort, setSort] = useState("ascending");
   const [searchTerm, setSearchTerm] = useState("");
   const queryClient = useQueryClient();
+  const user = useUser();
 
   useEffect(() => {
     const supabase = supabaseBrowser();
@@ -67,6 +86,32 @@ export default function AppContent() {
         app.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
+
+  const handleStop = async ({ id, name }: { id: string; name: string }) => {
+    const apiKey = user?.data?.api_key;
+
+    const url = `${baseApiUrl}/v1/endpoints/stop_endpoint`;
+    const headers = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    };
+
+    const payload: StopEndpointRequest = {
+      endpoint_id: id,
+    };
+
+    const response = await axios.post(url, payload, { headers });
+
+    queryClient.invalidateQueries({ queryKey: ["endpoints"] });
+
+    // move to tasks page
+    toast({
+      title: "Endpoint Stopped",
+      description: `Endpoint ${name} has been stopped successfully`,
+    });
+
+    return response.data;
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -171,6 +216,32 @@ export default function AppContent() {
                     {roundToK(app.models?.params_count ?? 0)}b params
                   </Badge>
                   <ApiViewer endpoint={app} />
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <CircleStop size={16} />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action will stop the serverless endpoint. Are you
+                          sure you want to proceed?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() =>
+                            handleStop({ id: app.id, name: app.name })
+                          }
+                        >
+                          Yes, stop it
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">

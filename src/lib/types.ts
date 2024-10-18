@@ -52,3 +52,7 @@ export type CreateEndpointRequest = {
 export type CreateGGUFRequest = {
   id: string;
 };
+
+export type StopEndpointRequest = {
+  endpoint_id: string;
+};
