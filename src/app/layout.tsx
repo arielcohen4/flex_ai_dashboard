@@ -8,8 +8,8 @@ import QueryProvider from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "shadcn/ui",
-  description: "shadcn/ui",
+  title: "FlexAI",
+  description: "Serverless Finetune and Inference for Open Source LLMs",
 };
 
 export default function RootLayout({
