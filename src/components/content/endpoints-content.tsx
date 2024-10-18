@@ -75,7 +75,8 @@ export default function AppContent() {
           Serverless Endpoints
         </h1>
         <p className="text-muted-foreground">
-          All your serverless endpoints of your finetune models. Pay as you go
+          Your serverless endpoints for fine-tuned models. Pay only for what you
+          use per request
         </p>
       </div>
       <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
@@ -174,7 +175,10 @@ export default function AppContent() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <a target="_blank" className="font-semibold">
-                      {app.name.split("_")[1]}
+                      {app.name.split("_")[1]}{" "}
+                      <Badge variant="outline" className="ml-1">
+                        Serverless
+                      </Badge>
                     </a>
                     {app.stage === "INITIALIZING" ? (
                       <Badge variant="outline" className="animate-pulse">
@@ -185,7 +189,7 @@ export default function AppContent() {
                         variant="default"
                         className="bg-green-500 text-white"
                       >
-                        Live
+                        Ready
                       </Badge>
                     ) : null}
                   </div>
