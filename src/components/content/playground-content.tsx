@@ -15,14 +15,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Loader2 } from "lucide-react";
+import { Loader2, Edit2, Check } from "lucide-react";
 import useUser from "@/app/hook/useUser";
 import { Tables } from "@/lib/types/supabase";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: string;
+  id?: number;
 }
 
 export default function LLMPlayground() {
@@ -32,6 +34,9 @@ export default function LLMPlayground() {
   const [selectedLoraCheckpoint, setSelectedLoraCheckpoint] =
     useState<string>("");
   const [userInput, setUserInput] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState(
+    "You are a helpful assistant."
+  );
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [temperature, setTemperature] = useState(1);
@@ -39,9 +44,12 @@ export default function LLMPlayground() {
   const [topP, setTopP] = useState(1);
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
   const [presencePenalty, setPresencePenalty] = useState(0);
+  const [isModelLoading, setIsModelLoading] = useState(false);
   const user = useUser();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
+  const systemPromptInputRef = useRef<HTMLTextAreaElement>(null);
 
   const endpointsQuery = useQuery({
     queryKey: ["endpoints_count_change"],
@@ -86,6 +94,28 @@ export default function LLMPlayground() {
     }
   };
 
+  const handleSystemPromptChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setSystemPrompt(e.target.value);
+  };
+
+  const handleSystemPromptEdit = () => {
+    setIsEditingSystemPrompt(true);
+    setTimeout(() => {
+      if (systemPromptInputRef.current) {
+        systemPromptInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const handleSystemPromptSave = () => {
+    setIsEditingSystemPrompt(false);
+    if (systemPromptInputRef.current) {
+      setSystemPrompt(systemPromptInputRef.current.value);
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory]);
@@ -94,18 +124,10 @@ export default function LLMPlayground() {
     if (!selectedEndpoint || !userInput.trim()) return;
 
     if (selectedEndpoint.type === "LORA" && !selectedLoraCheckpoint) {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          role: "system",
-          content:
-            "Error: Please select a LORA checkpoint before sending a message.",
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ]);
       return;
     }
 
+    setIsModelLoading(false);
     setIsLoading(true);
     const newUserMessage = {
       role: "user" as const,
@@ -115,15 +137,7 @@ export default function LLMPlayground() {
     setChatHistory((prev) => [...prev, newUserMessage]);
 
     timerRef.current = setTimeout(() => {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          role: "system",
-          content:
-            "Loading the model and warming up the GPU. This may take a moment...",
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ]);
+      setIsModelLoading(true);
     }, 3000);
 
     const openai = new OpenAI({
@@ -133,13 +147,22 @@ export default function LLMPlayground() {
     });
 
     try {
+      const messages = [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        ...chatHistory,
+        newUserMessage,
+      ];
+
       const stream = await openai.chat.completions.create({
         model:
           selectedEndpoint.type === "LORA"
             ? selectedLoraCheckpoint
             : (selectedEndpoint.model_name as string),
-        messages: [...chatHistory, newUserMessage].map(({ role, content }) => ({
-          role,
+        messages: messages.map(({ role, content }) => ({
+          role: role as "system" | "user" | "assistant",
           content,
         })),
         temperature: temperature,
@@ -151,6 +174,7 @@ export default function LLMPlayground() {
       });
 
       let accumulatedResponse = "";
+
       setChatHistory((prev) => [
         ...prev,
         {
@@ -161,6 +185,7 @@ export default function LLMPlayground() {
       ]);
 
       for await (const chunk of stream) {
+        setIsModelLoading(false);
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
@@ -175,16 +200,11 @@ export default function LLMPlayground() {
         });
       }
     } catch (error) {
+      setIsModelLoading(false);
       console.error("Error calling LLM:", error);
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          role: "system",
-          content: "Error: Unable to get response from the model.",
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ]);
+      // Remove the loading indicator and add an error message
     } finally {
+      setIsModelLoading(false);
       setIsLoading(false);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -205,6 +225,10 @@ export default function LLMPlayground() {
 
   console.log(selectedEndpoint);
 
+  const isInputDisabled =
+    !selectedEndpoint ||
+    (selectedEndpoint.type === "LORA" && !selectedLoraCheckpoint);
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <h2 className="text-3xl font-bold tracking-tight">LLM Playground</h2>
@@ -215,6 +239,37 @@ export default function LLMPlayground() {
             <CardTitle>Chat</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-1">
+                <strong>System Prompt:</strong>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={
+                    isEditingSystemPrompt
+                      ? handleSystemPromptSave
+                      : handleSystemPromptEdit
+                  }
+                >
+                  {isEditingSystemPrompt ? (
+                    <Check size={16} />
+                  ) : (
+                    <Edit2 size={16} />
+                  )}
+                </Button>
+              </div>
+              {isEditingSystemPrompt ? (
+                <Textarea
+                  ref={systemPromptInputRef}
+                  defaultValue={systemPrompt}
+                  onChange={handleSystemPromptChange}
+                  rows={3}
+                  className="w-full mt-2"
+                />
+              ) : (
+                <div className="p-2 bg-secondary rounded">{systemPrompt}</div>
+              )}
+            </div>
             <div
               ref={chatContainerRef}
               className="space-y-4 h-[400px] overflow-y-auto mb-4"
@@ -223,20 +278,12 @@ export default function LLMPlayground() {
                 <div
                   key={index}
                   className={`p-2 rounded ${
-                    message.role === "user"
-                      ? "bg-blue-100"
-                      : message.role === "system"
-                      ? "bg-yellow-100"
-                      : "bg-gray-100"
+                    message.role === "user" ? "bg-blue-100" : "bg-gray-100"
                   }`}
                 >
                   <div className="flex justify-between items-center mb-1">
                     <strong>
-                      {message.role === "user"
-                        ? "You:"
-                        : message.role === "system"
-                        ? "System:"
-                        : "AI:"}
+                      {message.role === "user" ? "User:" : "Assistant:"}
                     </strong>
                     <span className="text-xs text-gray-500">
                       {message.timestamp}
@@ -245,16 +292,35 @@ export default function LLMPlayground() {
                   {message.content}
                 </div>
               ))}
+              {isModelLoading && (
+                <div className="flex items-center justify-center p-4 rounded mb-4">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>
+                    Loading the model and warming up the GPU. This may take a
+                    moment...
+                  </span>
+                </div>
+              )}
             </div>
+
             <div className="flex space-x-2">
               <Input
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Type your message..."
-                onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
-                disabled={isLoading}
+                placeholder={
+                  isInputDisabled
+                    ? "Select an endpoint and LORA checkpoint (if applicable)"
+                    : "Type your message..."
+                }
+                onKeyPress={(e) =>
+                  e.key === "Enter" && !isInputDisabled && handleSubmit()
+                }
+                disabled={isLoading || isInputDisabled}
               />
-              <Button onClick={handleSubmit} disabled={isLoading}>
+              <Button
+                onClick={handleSubmit}
+                disabled={isLoading || isInputDisabled}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
