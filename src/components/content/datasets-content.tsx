@@ -1,4 +1,6 @@
 "use client";
+
+import React from "react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import {
@@ -33,8 +35,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/use-toast";
-import { ArchiveX } from "lucide-react";
+import {
+  ArchiveX,
+  Database,
+  Edit,
+  MessageCircle,
+  Hammer,
+  FileType,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -43,10 +54,18 @@ const appText = new Map<string, string>([
   ["text", "Text"],
 ]);
 
+const typeIcons = {
+  INSTRUCTION: <Hammer className="w-3 h-3 mr-1" />,
+  CHAT: <MessageCircle className="w-4 h-4 mr-1" />,
+  TEXT: <FileType className="w-4 h-4 mr-1" />,
+};
+
 export default function AppContent() {
   const [sort, setSort] = useState("ascending");
   const [appType, setAppType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState<string>("");
   const queryClient = useQueryClient();
 
   const datasetsQuery = useQuery({
@@ -92,10 +111,39 @@ export default function AppContent() {
     },
   });
 
+  const editNameMutation = useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const supabase = supabaseBrowser();
+      await supabase.from("datasets").update({ name }).eq("id", id);
+      return { id, name };
+    },
+    onSuccess: ({ id, name }) => {
+      queryClient.setQueryData(["datasets"], (oldData: any) => {
+        return oldData.map((dataset: any) =>
+          dataset.id === id ? { ...dataset, name } : dataset
+        );
+      });
+      queryClient.invalidateQueries({ queryKey: ["datasets"] });
+    },
+  });
+
+  const handleEditName = (id: string, currentName: string) => {
+    setEditingId(id);
+    setEditName(currentName);
+  };
+
+  const handleSaveName = async (id: string) => {
+    await editNameMutation.mutateAsync({ id, name: editName });
+    setEditingId(null);
+    toast({
+      title: "Dataset Name Updated",
+      description: "The dataset name has been updated successfully",
+    });
+  };
+
   const handleArchive = async ({ id, name }: { id: string; name: string }) => {
     await archiveMutation.mutateAsync({ id });
 
-    // move to tasks page
     toast({
       title: "Dataset Archived",
       description: `Dataset ${name} has been archived successfully`,
@@ -104,150 +152,200 @@ export default function AppContent() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Datasets</h1>
-        <p className="text-muted-foreground">View all your datasets</p>
-      </div>
-      <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
-        <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
-          <Input
-            placeholder="Filter datasets..."
-            className="h-9 w-40 lg:w-[250px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Select value={appType} onValueChange={setAppType}>
-            <SelectTrigger className="w-36">
-              <SelectValue>{appText.get(appType)}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="instruction">Instruction</SelectItem>
-              <SelectItem value="chat">Chat</SelectItem>
-              <SelectItem value="text">Text</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-16">
-            <SelectValue>
-              <IconAdjustmentsHorizontal size={18} />
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent align="end">
-            <SelectItem value="ascending">
-              <div className="flex items-center gap-4">
-                <IconSortAscendingLetters size={16} />
-                <span>Ascending</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="descending">
-              <div className="flex items-center gap-4">
-                <IconSortDescendingLetters size={16} />
-                <span>Descending</span>
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <Separator className="shadow" />
-      <ul className="grid gap-4 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
-        {datasetsQuery.isLoading
-          ? // Skeleton loading
-            Array.from({ length: 12 }).map((_, index) => (
-              <li key={index} className="rounded-lg border p-4">
-                <div className="mb-4">
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-1/4" />
-                  <div className="flex flex-wrap gap-2">
-                    <Skeleton className="h-6 w-1/4" />
-                    <Skeleton className="h-6 w-1/4" />
-                    <Skeleton className="h-6 w-1/4" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Datasets
+          </CardTitle>
+          <p className="text-muted-foreground">View and manage your datasets</p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Input
+                placeholder="Filter datasets..."
+                className="h-9 w-full sm:w-[250px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Select value={appType} onValueChange={setAppType}>
+                <SelectTrigger className="w-full sm:w-36">
+                  <SelectValue>{appText.get(appType)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="instruction">Instruction</SelectItem>
+                  <SelectItem value="chat">Chat</SelectItem>
+                  <SelectItem value="text">Text</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Select value={sort} onValueChange={setSort}>
+              <SelectTrigger className="w-full sm:w-36">
+                <SelectValue>
+                  <div className="flex items-center">
+                    <IconAdjustmentsHorizontal size={18} className="mr-2" />
+                    <span>
+                      {sort === "ascending" ? "Ascending" : "Descending"}
+                    </span>
                   </div>
-                </div>
-              </li>
-            ))
-          : filteredApps.map((app) => (
-              <li
-                key={app.id}
-                className="rounded-lg border p-4 hover:shadow-md"
-              >
-                <div className="mb-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <a className="text-xl font-semibold">{app.name}</a>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <ArchiveX size={16} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will archive this dataset. Are you
-                              sure you want to proceed?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() =>
-                                handleArchive({ id: app.id, name: app.name })
-                              }
-                            >
-                              Yes, archive it
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      <p className="text-gray-500 text-xs">{app.id}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <div className="flex items-center mb-1">
-                        {app.storage_type === "AWS" && (
-                          <Image
-                            className="w-8 h-8 mr-2"
-                            src={`/aws.svg`}
-                            alt={app.name}
-                            width={50}
-                            height={50}
-                          />
-                        )}
-                        <span className="text-sm text-gray-500 mb-[7px]">
-                          {format(new Date(app.created_at), "MMM dd, yyyy")}
-                        </span>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ascending">
+                  <div className="flex items-center gap-2">
+                    <IconSortAscendingLetters size={16} />
+                    <span>Ascending</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="descending">
+                  <div className="flex items-center gap-2">
+                    <IconSortDescendingLetters size={16} />
+                    <span>Descending</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Separator className="my-6" />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {datasetsQuery.isLoading
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <Card key={index} className="p-4">
+                    <CardContent className="p-0">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-1/2 mb-4" />
+                      <div className="flex flex-wrap gap-2">
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-6 w-1/4" />
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Badge variant="secondary">{app.type}</Badge>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">
-                      {roundToK(app.train_rows_count)} train rows
-                    </Badge>
-                    {app.eval_rows_count && (
-                      <Badge variant="secondary">
-                        {roundToK(app.eval_rows_count)} eval rows
-                      </Badge>
-                    )}
-                    <Badge variant="secondary">
-                      {roundToK(app.max_tokens)} max tokens
-                    </Badge>
-                    <Badge variant="secondary">
-                      {roundToK(app.total_tokens)} tokens
-                    </Badge>
-                  </div>
-                </div>
-              </li>
-            ))}
-      </ul>
+                    </CardContent>
+                  </Card>
+                ))
+              : filteredApps.map((app) => (
+                  <Card
+                    key={app.id}
+                    className="hover:shadow-md transition-shadow duration-300"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-grow mr-2">
+                          {editingId === app.id ? (
+                            <div className="flex items-center">
+                              <Input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleSaveName(app.id);
+                                  }
+                                }}
+                                className="mr-2"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleSaveName(app.id)}
+                              >
+                                <Check size={16} />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <h3 className="text-lg font-semibold mb-1">
+                                {app.name}
+                              </h3>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditName(app.id, app.name)}
+                                className="ml-2"
+                              >
+                                <Edit size={16} />
+                              </Button>
+                            </div>
+                          )}
+                          <p className="text-gray-500 text-xs">{app.id}</p>
+                        </div>
+                        <div className="flex items-center">
+                          {app.storage_type === "AWS" && (
+                            <Image
+                              className="w-6 h-6 mr-2"
+                              src={`/aws.svg`}
+                              alt={app.name}
+                              width={24}
+                              height={24}
+                            />
+                          )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <ArchiveX size={16} />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action will archive this dataset. Are you
+                                  sure you want to proceed?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleArchive({
+                                      id: app.id,
+                                      name: app.name,
+                                    })
+                                  }
+                                >
+                                  Yes, archive it
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Badge
+                          variant="outline"
+                          className="flex items-center w-fit"
+                        >
+                          {typeIcons[app.type]}
+                          {app.type}
+                        </Badge>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="secondary">
+                            {roundToK(app.train_rows_count)} train rows
+                          </Badge>
+                          {app.eval_rows_count && (
+                            <Badge variant="secondary">
+                              {roundToK(app.eval_rows_count)} eval rows
+                            </Badge>
+                          )}
+                          <Badge variant="secondary">
+                            {roundToK(app.max_tokens)} max tokens
+                          </Badge>
+                          <Badge variant="secondary">
+                            {roundToK(app.total_tokens)} tokens
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="mt-4 text-sm text-gray-500">
+                        Created:{" "}
+                        {format(new Date(app.created_at), "MMM dd, yyyy")}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
