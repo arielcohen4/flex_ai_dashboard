@@ -43,7 +43,6 @@ export type CreateFinetuneRequest = {
 
 export type CreateEndpointRequest = {
   name: string;
-  type: Enums<"CHECKPOINT_TYPE">;
   lora_checkpoints?: { name: string; id: string }[];
   model_name?: string;
   checkpoint_id?: string;

@@ -105,7 +105,6 @@ const DeployCheckpointsModal = () => {
 
     const payload: CreateEndpointRequest = {
       name: endpointName,
-      type: checkpointType,
     };
 
     if (checkpointType == "LORA") {
