@@ -70,20 +70,20 @@ export function AccountForm() {
             <FormItem>
               <FormLabel>Key</FormLabel>
               <FormControl>
-                <div className="flex items-center">
+                <div className="relative">
                   <Input
                     placeholder="Your API key"
                     {...field}
                     value={user.data?.api_key || ""}
                     readOnly
-                    className="flex-grow"
+                    className="pr-10" // Add padding to the right to make space for the icon
                   />
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={copyToClipboard}
-                    className="ml-2"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full w-8 h-8 p-0 flex items-center justify-center hover:bg-gray-200 transition-colors"
                   >
                     <Copy
                       className={copied ? "text-green-500" : ""}
