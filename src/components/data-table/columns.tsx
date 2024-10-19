@@ -13,6 +13,22 @@ import Image from "next/image";
 import { familyToLogo } from "@/lib/constant";
 import { Progress } from "@/components/ui/progress";
 
+// Define a type for stage colors
+type StageColorMap = {
+  [key: string]: string;
+};
+
+// Define colors for each stage
+const stageColors: StageColorMap = {
+  DOWNLOADING_MODEL: "bg-blue-500",
+  DOWNLOADING_DATA: "bg-purple-500",
+  TRAINING: "bg-yellow-500",
+  COMPLETED: "bg-green-500",
+  ERRORED: "bg-red-500",
+  PENDING: "bg-gray-500",
+  CANCELED: "bg-orange-500",
+};
+
 export const columns: ColumnDef<TaskWithRelations>[] = [
   {
     id: "select",
@@ -149,20 +165,13 @@ export const columns: ColumnDef<TaskWithRelations>[] = [
       <DataTableColumnHeader column={column} title="Stage" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
-        (status) => status.value === row.original.stage
-      );
-
-      if (!status) {
-        return null;
-      }
+      const stage = row.original.stage as keyof typeof stageColors;
+      const color = stageColors[stage] || "bg-gray-500";
 
       return (
-        <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{status.label}</span>
+        <div className="flex items-center space-x-2">
+          <div className={`w-2 h-2 rounded-full ${color}`}></div>
+          <span className="text-sm font-medium">{stage}</span>
         </div>
       );
     },
