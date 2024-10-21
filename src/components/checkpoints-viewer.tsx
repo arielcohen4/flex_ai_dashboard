@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-import { CreateEndpointRequest, TaskWithRelations } from "@/lib/types";
+import { TaskWithRelations } from "@/lib/types";
 import { Button } from "@/components/custom/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,8 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatSize } from "@/lib/utils";
-import { getDownloadUrl, getGGUFDownloadUrl } from "@/lib/actions/checkpoints";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -56,15 +55,13 @@ export function CheckpointsViewer({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [loadingCheckpoints, setLoadingCheckpoints] = useState<{
-    [key: string]: boolean;
-  }>({});
-  const [loadingGGUFCheckpoints, setLoadingGGUFCheckpoints] = useState<{
-    [key: string]: boolean;
-  }>({});
   const [openTooltips, setOpenTooltips] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [openGGUFTooltips, setOpenGGUFTooltips] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const user = useUser();
@@ -109,36 +106,18 @@ export function CheckpointsViewer({
       .subscribe();
   }, [queryClient]);
 
-  const downloadCheckpoint = async ({ id }: { id: string }) => {
-    setLoadingCheckpoints((prev) => ({ ...prev, [id]: true }));
-    try {
-      const url = await getDownloadUrl({ id });
-      if (url) {
-        window.open(url, "_blank");
-      } else {
-        console.error("Failed to generate download URL");
-      }
-    } catch (error) {
-      console.error("Error downloading checkpoint:", error);
-    } finally {
-      setLoadingCheckpoints((prev) => ({ ...prev, [id]: false }));
-    }
-  };
-
   const downloadGGUFCheckpoint = async ({ id }: { id: string }) => {
-    setLoadingGGUFCheckpoints((prev) => ({ ...prev, [id]: true }));
-    try {
-      const url = await getGGUFDownloadUrl({ id });
-      if (url) {
-        window.open(url, "_blank");
-      } else {
-        console.error("Failed to generate download URL");
-      }
-    } catch (error) {
-      console.error("Error downloading checkpoint:", error);
-    } finally {
-      setLoadingGGUFCheckpoints((prev) => ({ ...prev, [id]: false }));
-    }
+    const downloadCommand = `flex_ai checkpoints download-gguf --checkpoint-id=${id}`;
+    copyToClipboard(downloadCommand);
+
+    console.log("Download command copied to clipboard:", downloadCommand);
+    // Open the tooltip for this specific button
+    setOpenGGUFTooltips((prev) => ({ ...prev, [id]: true }));
+
+    // Close the tooltip after 2 seconds
+    setTimeout(() => {
+      setOpenGGUFTooltips((prev) => ({ ...prev, [id]: false }));
+    }, 500);
   };
 
   const createGGUF = async ({ id }: { id: string }) => {
@@ -171,30 +150,23 @@ export function CheckpointsViewer({
 
   const downloadCliCheckpoint = async ({
     id,
-    name,
-    checkpointNumber,
   }: {
     id: string;
     name: string;
     checkpointNumber: number;
   }) => {
     try {
-      const url = await getDownloadUrl({ id });
-      if (url) {
-        const downloadCommand = `flex_ai checkpoints download --checkpoint-id=${id}`;
-        copyToClipboard(downloadCommand);
+      const downloadCommand = `flex_ai checkpoints download --checkpoint-id=${id}`;
+      copyToClipboard(downloadCommand);
 
-        console.log("Download command copied to clipboard:", downloadCommand);
-        // Open the tooltip for this specific button
-        setOpenTooltips((prev) => ({ ...prev, [id]: true }));
+      console.log("Download command copied to clipboard:", downloadCommand);
+      // Open the tooltip for this specific button
+      setOpenTooltips((prev) => ({ ...prev, [id]: true }));
 
-        // Close the tooltip after 2 seconds
-        setTimeout(() => {
-          setOpenTooltips((prev) => ({ ...prev, [id]: false }));
-        }, 500);
-      } else {
-        console.error("Failed to generate download URL");
-      }
+      // Close the tooltip after 2 seconds
+      setTimeout(() => {
+        setOpenTooltips((prev) => ({ ...prev, [id]: false }));
+      }, 500);
     } catch (error) {
       console.error("Error downloading checkpoint:", error);
     }
@@ -308,7 +280,6 @@ export function CheckpointsViewer({
                   <TableHead>Metrics</TableHead>
                   <TableHead>Stage</TableHead>
                   <TableHead>Download</TableHead>
-                  <TableHead>Download CLI</TableHead>
                   <TableHead>Convert to GGUF</TableHead>
                   <TableHead>Deploy</TableHead>
                 </TableRow>
@@ -380,18 +351,6 @@ export function CheckpointsViewer({
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        loading={loadingCheckpoints[checkpoint.id]}
-                        variant="secondary"
-                        onClick={() =>
-                          downloadCheckpoint({ id: checkpoint.id })
-                        }
-                        disabled={checkpoint.stage !== "FINISHED"}
-                      >
-                        Download
-                      </Button>
-                    </TableCell>
-                    <TableCell>
                       <TooltipProvider>
                         <Tooltip
                           open={
@@ -412,6 +371,7 @@ export function CheckpointsViewer({
                               }
                               disabled={checkpoint.stage !== "FINISHED"}
                             >
+                              <Terminal className="w-4 h-4 mr-2" />
                               Copy
                             </Button>
                           </TooltipTrigger>
@@ -439,15 +399,30 @@ export function CheckpointsViewer({
                           </div>
                         )}
                       {checkpoint.gguf_conversion_stage == "FINISHED" && (
-                        <Button
-                          loading={loadingGGUFCheckpoints[checkpoint.id]}
-                          variant="secondary"
-                          onClick={() =>
-                            downloadGGUFCheckpoint({ id: checkpoint.id })
-                          }
-                        >
-                          Download
-                        </Button>
+                        <TooltipProvider>
+                          <Tooltip
+                            open={
+                              openGGUFTooltips[checkpoint.id] == undefined
+                                ? false
+                                : openGGUFTooltips[checkpoint.id]
+                            }
+                          >
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="secondary"
+                                onClick={() =>
+                                  downloadGGUFCheckpoint({ id: checkpoint.id })
+                                }
+                              >
+                                <Terminal className="w-4 h-4 mr-2" />
+                                Copy
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Copied</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </TableCell>
                     <TableCell>
