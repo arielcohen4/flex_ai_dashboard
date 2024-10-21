@@ -375,6 +375,7 @@ export type Database = {
           compute: string
           compute_data: Json | null
           config: Json
+          cost: number | null
           created_at: string
           current_epoch: number | null
           current_step: number | null
@@ -382,6 +383,7 @@ export type Database = {
           end_time: string | null
           error_string: string | null
           id: string
+          is_balance_updated: boolean
           model_id: string
           name: string
           stage: Database["public"]["Enums"]["TASK_STAGE"]
@@ -397,6 +399,7 @@ export type Database = {
           compute: string
           compute_data?: Json | null
           config: Json
+          cost?: number | null
           created_at?: string
           current_epoch?: number | null
           current_step?: number | null
@@ -404,6 +407,7 @@ export type Database = {
           end_time?: string | null
           error_string?: string | null
           id?: string
+          is_balance_updated?: boolean
           model_id: string
           name: string
           stage?: Database["public"]["Enums"]["TASK_STAGE"]
@@ -419,6 +423,7 @@ export type Database = {
           compute?: string
           compute_data?: Json | null
           config?: Json
+          cost?: number | null
           created_at?: string
           current_epoch?: number | null
           current_step?: number | null
@@ -426,6 +431,7 @@ export type Database = {
           end_time?: string | null
           error_string?: string | null
           id?: string
+          is_balance_updated?: boolean
           model_id?: string
           name?: string
           stage?: Database["public"]["Enums"]["TASK_STAGE"]
@@ -468,6 +474,14 @@ export type Database = {
       is_sub_active: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      update_balance_and_task: {
+        Args: {
+          p_user_id: string
+          p_task_id: string
+          p_cost: number
+        }
+        Returns: undefined
       }
     }
     Enums: {
