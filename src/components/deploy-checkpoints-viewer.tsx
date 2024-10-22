@@ -127,6 +127,8 @@ const DeployCheckpointsModal = () => {
         description: `${endpointName} has been created successfully`,
       });
       router.push("/endpoints");
+      dispatch(setCheckpointsState([]));
+
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {

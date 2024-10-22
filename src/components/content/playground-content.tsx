@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, Edit2, Check } from "lucide-react";
+import { Loader2, Edit2, Check, CircleStop } from "lucide-react";
 import useUser from "@/app/hook/useUser";
 import { Tables } from "@/lib/types/supabase";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +39,7 @@ export default function LLMPlayground() {
   );
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [temperature, setTemperature] = useState(1);
   const [maxTokens, setMaxTokens] = useState(2048);
   const [topP, setTopP] = useState(1);
@@ -48,6 +49,7 @@ export default function LLMPlayground() {
   const user = useUser();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
   const systemPromptInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -122,6 +124,13 @@ export default function LLMPlayground() {
     scrollToBottom();
   }, [chatHistory]);
 
+  // Keep focus on input after sending message
+  useEffect(() => {
+    if (!isLoading && !isGenerating && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading, isGenerating]);
+
   const handleSubmit = async () => {
     if (!selectedEndpoint || !userInput.trim()) return;
 
@@ -129,8 +138,13 @@ export default function LLMPlayground() {
       return;
     }
 
+    // Clear the input immediately
+    const messageContent = userInput;
+    setUserInput("");
+
     setIsModelLoading(false);
     setIsLoading(true);
+    setIsGenerating(true);
     const newUserMessage = {
       role: "user" as const,
       content: userInput,
@@ -204,17 +218,15 @@ export default function LLMPlayground() {
     } catch (error) {
       setIsModelLoading(false);
       console.error("Error calling LLM:", error);
-      // Remove the loading indicator and add an error message
     } finally {
       setIsModelLoading(false);
       setIsLoading(false);
+      setIsGenerating(false);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
     }
-
-    setUserInput("");
   };
 
   useEffect(() => {
@@ -225,11 +237,10 @@ export default function LLMPlayground() {
     };
   }, []);
 
-  console.log(selectedEndpoint);
-
   const isInputDisabled =
     !selectedEndpoint ||
     (selectedEndpoint.type === "LORA" && !selectedLoraCheckpoint);
+  const isSendDisabled = isLoading || isInputDisabled || isGenerating;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
@@ -307,6 +318,7 @@ export default function LLMPlayground() {
 
             <div className="flex space-x-2">
               <Input
+                ref={inputRef}
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 placeholder={
@@ -315,18 +327,14 @@ export default function LLMPlayground() {
                     : "Type your message..."
                 }
                 onKeyPress={(e) =>
-                  e.key === "Enter" && !isInputDisabled && handleSubmit()
+                  e.key === "Enter" && !isSendDisabled && handleSubmit()
                 }
-                disabled={isLoading || isInputDisabled}
+                disabled={isInputDisabled}
               />
-              <Button
-                onClick={handleSubmit}
-                disabled={isLoading || isInputDisabled}
-              >
+              <Button onClick={handleSubmit} disabled={isSendDisabled}>
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
+                    <CircleStop className="h-5 w-5" />
                   </>
                 ) : (
                   "Send"
