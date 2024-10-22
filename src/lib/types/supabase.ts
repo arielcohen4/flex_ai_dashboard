@@ -162,6 +162,7 @@ export type Database = {
           created_at: string
           id: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          is_archived: boolean | null
           lora_checkpoints: Json | null
           model_name: string | null
           name: string
@@ -177,6 +178,7 @@ export type Database = {
           created_at?: string
           id?: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          is_archived?: boolean | null
           lora_checkpoints?: Json | null
           model_name?: string | null
           name: string
@@ -192,6 +194,7 @@ export type Database = {
           created_at?: string
           id?: string
           inference_library?: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
+          is_archived?: boolean | null
           lora_checkpoints?: Json | null
           model_name?: string | null
           name?: string
@@ -207,6 +210,38 @@ export type Database = {
             columns: ["base_model_id"]
             isOneToOne: false
             referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      endpoints_sessions: {
+        Row: {
+          end_time: string | null
+          endpoint_id: string
+          id: string
+          start_time: string
+          total_seconds: number | null
+        }
+        Insert: {
+          end_time?: string | null
+          endpoint_id: string
+          id?: string
+          start_time: string
+          total_seconds?: number | null
+        }
+        Update: {
+          end_time?: string | null
+          endpoint_id?: string
+          id?: string
+          start_time?: string
+          total_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "endpoints_sessions_endpoint_id_fkey"
+            columns: ["endpoint_id"]
+            isOneToOne: false
+            referencedRelation: "endpoints"
             referencedColumns: ["id"]
           },
         ]

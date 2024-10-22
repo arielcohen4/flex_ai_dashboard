@@ -143,6 +143,7 @@ const DeployCheckpointsModal = () => {
     const { data, error } = await supabase
       .from("endpoints")
       .select("*")
+      .eq("is_archived", false)
       .eq("name", id.substring(0, 5) + "_" + name)
       .single();
 

@@ -75,6 +75,7 @@ export default function AppContent() {
         const { data } = await supabase
           .from("endpoints")
           .select(`*, models(*)`)
+          .eq("is_archived", false)
           .order("created_at", { ascending: false });
         return data ?? [];
       }

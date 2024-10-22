@@ -65,6 +65,7 @@ export default function LLMPlayground() {
             base_model:models!base_model_id(*)
           `
           )
+          .eq("is_archived", false)
           .order("created_at", { ascending: false });
 
         return data ?? [];
