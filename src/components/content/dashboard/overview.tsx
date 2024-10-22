@@ -12,7 +12,7 @@ import {
 
 export function Overview() {
   const tasksQuery = useQuery({
-    queryKey: ["task1111s"],
+    queryKey: ["tasks", "dashboard->overview"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

@@ -71,7 +71,7 @@ export function CheckpointsViewer({
   );
 
   const checkpointsQuery = useQuery({
-    queryKey: ["checkpoints", task.id],
+    queryKey: ["checkpoints", "checkpoints-viewer"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data: sessionData } = await supabase.auth.getSession();
@@ -99,7 +99,7 @@ export function CheckpointsViewer({
           console.log("Change received!", payload);
           // Refetch the checkpoints data
           queryClient.invalidateQueries({
-            queryKey: ["checkpoints", newPayload?.task_id],
+            queryKey: ["checkpoints"],
           });
         }
       )

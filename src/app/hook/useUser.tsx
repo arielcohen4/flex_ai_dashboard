@@ -19,11 +19,9 @@ const initUser = {
   is_aws_s3: false,
 };
 
-export const USER_QUERY = "user";
-
 export default function useUser() {
   return useQuery({
-    queryKey: [USER_QUERY],
+    queryKey: ["profiles"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

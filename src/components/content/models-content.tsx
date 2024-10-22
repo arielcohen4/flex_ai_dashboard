@@ -36,7 +36,7 @@ export default function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const modelsQuery = useQuery({
-    queryKey: ["models_tasks_count"],
+    queryKey: ["models", "models-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data, error } = await supabase

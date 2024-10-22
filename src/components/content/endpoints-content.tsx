@@ -67,7 +67,7 @@ export default function AppContent() {
   }, [queryClient]);
 
   const endpointsQuery = useQuery({
-    queryKey: ["endpoints"],
+    queryKey: ["endpoints", "endpoints-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

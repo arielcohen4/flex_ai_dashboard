@@ -52,7 +52,7 @@ export default function LLMPlayground() {
   const systemPromptInputRef = useRef<HTMLTextAreaElement>(null);
 
   const endpointsQuery = useQuery({
-    queryKey: ["endpoints_count_change"],
+    queryKey: ["endpoints", "playground-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

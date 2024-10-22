@@ -41,7 +41,7 @@ import {
 
 export default function DashboardContent() {
   const tasksCountQuery = useQuery({
-    queryKey: ["tasks_count"],
+    queryKey: ["tasks", "dashboard-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
@@ -53,7 +53,7 @@ export default function DashboardContent() {
   });
 
   const datasetsCountQuery = useQuery({
-    queryKey: ["datasets_count"],
+    queryKey: ["datasets", "dashboard-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
@@ -68,7 +68,7 @@ export default function DashboardContent() {
   });
 
   const checkpointsCountQuery = useQuery({
-    queryKey: ["checkpoints_count"],
+    queryKey: ["checkpoints", "dashboard-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();
@@ -80,7 +80,7 @@ export default function DashboardContent() {
   });
 
   const endpointsCountQuery = useQuery({
-    queryKey: ["endpoints_data"],
+    queryKey: ["endpoints", "dashboard-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

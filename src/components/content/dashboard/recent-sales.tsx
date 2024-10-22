@@ -8,7 +8,7 @@ import { roundToK } from "@/lib/utils";
 
 export function RecentSales() {
   const tasksQuery = useQuery({
-    queryKey: ["tasks_sorted"],
+    queryKey: ["tasks", "recent-sales"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

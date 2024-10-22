@@ -69,7 +69,7 @@ export default function AppContent() {
   const queryClient = useQueryClient();
 
   const datasetsQuery = useQuery({
-    queryKey: ["datasets"],
+    queryKey: ["datasets", "datasets-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

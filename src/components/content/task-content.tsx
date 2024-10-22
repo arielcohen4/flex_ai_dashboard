@@ -11,7 +11,7 @@ export default function TaskContent() {
   const queryClient = useQueryClient();
 
   const tasksQuery = useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", "task-content"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase.auth.getSession();

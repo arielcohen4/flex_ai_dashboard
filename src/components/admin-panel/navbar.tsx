@@ -29,7 +29,7 @@ export function Navbar({ title }: NavbarProps) {
           console.log("Change received!", payload);
           // Refetch the user data
           queryClient.invalidateQueries({
-            queryKey: ["user"],
+            queryKey: ["profiles"],
           });
         }
       )

@@ -73,7 +73,7 @@ export default function LLMTrainingTaskForm() {
   const router = useRouter();
 
   const { data: models, isLoading: isLoadingModels } = useQuery({
-    queryKey: ["models"],
+    queryKey: ["models", "create-task"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase
@@ -99,7 +99,7 @@ export default function LLMTrainingTaskForm() {
   });
 
   const { data: datasets, isLoading: isLoadingDatasets } = useQuery({
-    queryKey: ["datasets"],
+    queryKey: ["datasets", "create-task"],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data } = await supabase
