@@ -103,9 +103,12 @@ export default function AppContent() {
       return { id };
     },
     onSuccess: ({ id }) => {
-      queryClient.setQueryData(["datasets"], (oldData: any) => {
-        return oldData.filter((dataset: any) => dataset.id !== id);
-      });
+      queryClient.setQueryData(
+        ["datasets", "datasets-content"],
+        (oldData: any) => {
+          return oldData.filter((dataset: any) => dataset.id !== id);
+        }
+      );
 
       queryClient.invalidateQueries({ queryKey: ["datasets"] });
     },
@@ -118,11 +121,14 @@ export default function AppContent() {
       return { id, name };
     },
     onSuccess: ({ id, name }) => {
-      queryClient.setQueryData(["datasets"], (oldData: any) => {
-        return oldData.map((dataset: any) =>
-          dataset.id === id ? { ...dataset, name } : dataset
-        );
-      });
+      queryClient.setQueryData(
+        ["datasets", "datasets-content"],
+        (oldData: any) => {
+          return oldData.map((dataset: any) =>
+            dataset.id === id ? { ...dataset, name } : dataset
+          );
+        }
+      );
       queryClient.invalidateQueries({ queryKey: ["datasets"] });
     },
   });
