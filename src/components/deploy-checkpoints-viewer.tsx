@@ -26,7 +26,7 @@ import axios from "axios";
 import { toast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const DeployCheckpointsModal = () => {
   const supabase = supabaseBrowser();
@@ -37,6 +37,7 @@ const DeployCheckpointsModal = () => {
   );
   const [inferenceLibrary, setInferenceLibrary] = useState("VLLM");
   const [maxContextSize, setMaxContextSize] = useState<number | null>(null);
+  const [computeType, setComputeType] = useState("A100-40GB");
   const [editedNames, setEditedNames] = useState({});
   const [loadingCreateEndpoint, setLoadingCreateEndpoint] = useState(false);
   const [endpointName, setEndpointName] = useState(""); // New state for endpoint name
@@ -54,6 +55,24 @@ const DeployCheckpointsModal = () => {
       validateCheckpoints();
     }
   }, [inferenceLibrary, selectedCheckpoints]);
+
+  const computesQuery = useQuery({
+    queryKey: ["computes"],
+    queryFn: async () => {
+      const supabase = supabaseBrowser();
+      const { data, error } = await supabase
+        .from("computes")
+        .select(`*`)
+        .eq("type", "MODAL");
+
+      if (error) {
+        console.error("Error fetching data:", error);
+        return [];
+      }
+
+      return data ?? [];
+    },
+  });
 
   const validateCheckpoints = () => {
     if (selectedCheckpoints.length > 1) {
@@ -92,6 +111,11 @@ const DeployCheckpointsModal = () => {
       setEndpointNameError("");
     }
 
+    if (!computeType) {
+      setEndpointNameError("Please select a compute type");
+      return;
+    }
+
     const apiKey = user?.data?.api_key;
 
     const url =
@@ -105,6 +129,7 @@ const DeployCheckpointsModal = () => {
 
     const payload: CreateEndpointRequest = {
       name: endpointName,
+      compute: computeType,
     };
 
     if (checkpointType == "LORA") {
@@ -207,6 +232,30 @@ const DeployCheckpointsModal = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="VLLM">VLLM</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="mt-4">
+            <label
+              htmlFor="compute-type"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Compute Type
+            </label>
+            <Select onValueChange={setComputeType} value={computeType}>
+              <SelectTrigger id="compute-type">
+                <SelectValue placeholder="Select compute type" />
+              </SelectTrigger>
+              <SelectContent>
+                {computesQuery.data?.map((compute) => (
+                  <SelectItem
+                    key={compute.identifier}
+                    value={compute.identifier}
+                  >
+                    {compute.name} / {compute.price_per_second + " per second"}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

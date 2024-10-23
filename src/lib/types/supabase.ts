@@ -159,6 +159,7 @@ export type Database = {
         Row: {
           base_model_id: string
           checkpoint_id: string | null
+          compute: string
           created_at: string
           id: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
@@ -175,6 +176,7 @@ export type Database = {
         Insert: {
           base_model_id: string
           checkpoint_id?: string | null
+          compute?: string
           created_at?: string
           id?: string
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
@@ -191,6 +193,7 @@ export type Database = {
         Update: {
           base_model_id?: string
           checkpoint_id?: string | null
+          compute?: string
           created_at?: string
           id?: string
           inference_library?: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
@@ -210,6 +213,13 @@ export type Database = {
             columns: ["base_model_id"]
             isOneToOne: false
             referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "endpoints_compute_fkey"
+            columns: ["compute"]
+            isOneToOne: false
+            referencedRelation: "computes"
             referencedColumns: ["id"]
           },
         ]
@@ -533,7 +543,7 @@ export type Database = {
         | "sa-east-1"
       CHECKPOINT_STAGE: "PENDING" | "ARCHIVING" | "UPLOADING" | "FINISHED"
       CHECKPOINT_TYPE: "LORA" | "REGULAR"
-      COMPUTE_TYPE: "RUNPOD"
+      COMPUTE_TYPE: "RUNPOD" | "MODAL"
       DATASET_TYPE: "TEXT" | "INSTRUCTION" | "CHAT"
       ENDPOINT_STAGE: "INITIALIZING" | "LIVE"
       GGUF_CONVERSION_STAGE:

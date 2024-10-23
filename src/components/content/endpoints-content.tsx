@@ -74,13 +74,15 @@ export default function AppContent() {
       if (data.session?.user) {
         const { data } = await supabase
           .from("endpoints")
-          .select(`*, models(*)`)
+          .select(`*, models(*),computes(*)`)
           .eq("is_archived", false)
           .order("created_at", { ascending: false });
         return data ?? [];
       }
     },
   });
+
+  console.log(endpointsQuery.data);
 
   const filteredApps = endpointsQuery.data
     ? endpointsQuery.data.filter((app) =>
@@ -250,6 +252,9 @@ export default function AppContent() {
                       {app.name.split("_")[1]}{" "}
                       <Badge variant="outline" className="ml-1">
                         Serverless
+                      </Badge>
+                      <Badge variant="outline" className="ml-1">
+                        {app.computes?.name}
                       </Badge>
                     </a>
                     {app.stage === "INITIALIZING" ? (

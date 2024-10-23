@@ -46,6 +46,7 @@ export type CreateEndpointRequest = {
   lora_checkpoints?: { name: string; id: string }[];
   model_name?: string;
   checkpoint_id?: string;
+  compute: string;
 };
 
 export type CreateGGUFRequest = {
