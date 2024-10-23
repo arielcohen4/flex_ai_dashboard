@@ -71,7 +71,7 @@ export function CheckpointsViewer({
   );
 
   const checkpointsQuery = useQuery({
-    queryKey: ["checkpoints", "checkpoints-viewer"],
+    queryKey: ["checkpoints", "checkpoints-viewer", task.id],
     queryFn: async () => {
       const supabase = supabaseBrowser();
       const { data: sessionData } = await supabase.auth.getSession();
