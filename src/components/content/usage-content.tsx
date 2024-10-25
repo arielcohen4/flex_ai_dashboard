@@ -31,8 +31,8 @@ export type DateRange = {
 
 const UsageContent = () => {
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
+    from: subDays(new Date(), 6),
+    to: addDays(new Date(), 1),
   });
 
   // Query for fine-tuning costs
@@ -82,7 +82,7 @@ const UsageContent = () => {
   };
 
   const handleQuickDateSelect = (value: string) => {
-    const today = new Date();
+    const today = addDays(new Date(), 1);
     switch (value) {
       case "last-day":
         setDateRange({ from: subDays(today, 1), to: today });
