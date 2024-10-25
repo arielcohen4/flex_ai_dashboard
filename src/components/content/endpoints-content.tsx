@@ -127,18 +127,20 @@ export default function AppContent() {
           use per request
         </p>
       </div>
-      <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
-        <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
+
+      {/* Improved mobile responsive filter section */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full sm:w-auto">
           <Input
             placeholder="Filter apps..."
-            className="h-9 w-40 lg:w-[250px]"
+            className="h-9 w-full sm:w-40 lg:w-[250px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-16">
+          <SelectTrigger className="w-full sm:w-16">
             <SelectValue>
               <IconAdjustmentsHorizontal size={18} />
             </SelectValue>
@@ -159,20 +161,21 @@ export default function AppContent() {
           </SelectContent>
         </Select>
       </div>
+
       <Separator className="shadow" />
+
       <ul className="faded-bottom no-scrollbar grid gap-4 overflow-auto pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
         {endpointsQuery.isLoading
-          ? // Skeleton loading
-            Array.from({ length: 6 }).map((_, index) => (
+          ? Array.from({ length: 6 }).map((_, index) => (
               <li key={index} className="rounded-lg border p-4">
-                <div className="mb-8 flex items-center justify-between">
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
                   <Skeleton className="h-8 w-8 rounded-lg" />
                   <Skeleton className="h-6 w-24" />
                   <Skeleton className="h-6 w-24" />
                   <Skeleton className="h-8 w-8 rounded-full" />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                     <Skeleton className="h-6 w-1/2" />
                     <Skeleton className="h-6 w-24" />
                   </div>
@@ -187,10 +190,8 @@ export default function AppContent() {
                 key={app.name}
                 className="rounded-lg border p-4 hover:shadow-md"
               >
-                <div className="mb-8 flex items-center justify-between">
-                  <div
-                    className={`items-center justify-center rounded-lg bg-muted p-2`}
-                  >
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
+                  <div className="items-center justify-center rounded-lg bg-muted p-2">
                     {app.models?.family &&
                     familyToLogo.hasOwnProperty(app.models.family) ? (
                       <Image
@@ -218,45 +219,45 @@ export default function AppContent() {
                   <Badge variant="secondary">
                     {roundToK(app.models?.params_count ?? 0)}b params
                   </Badge>
-                  <ApiViewer endpoint={app} />
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <CircleStop size={16} />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action will stop the serverless endpoint. Are you
-                          sure you want to proceed?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() =>
-                            handleStop({ id: app.id, name: app.name })
-                          }
-                        >
-                          Yes, stop it
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <div className="flex gap-2">
+                    <ApiViewer endpoint={app} />
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <CircleStop size={16} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action will stop the serverless endpoint. Are
+                            you sure you want to proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() =>
+                              handleStop({ id: app.id, name: app.name })
+                            }
+                          >
+                            Yes, stop it
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <a target="_blank" className="font-semibold">
-                      {app.name.split("_")[1]}{" "}
-                      <Badge variant="outline" className="ml-1">
-                        Serverless
-                      </Badge>
-                      <Badge variant="outline" className="ml-1">
-                        {app.computes?.name}
-                      </Badge>
-                    </a>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <a target="_blank" className="font-semibold">
+                        {app.name.split("_")[1]}
+                      </a>
+                      <Badge variant="outline">Serverless</Badge>
+                      <Badge variant="outline">{app.computes?.name}</Badge>
+                    </div>
                     {app.stage === "INITIALIZING" ? (
                       <Badge variant="outline" className="animate-pulse">
                         Initializing
@@ -270,10 +271,10 @@ export default function AppContent() {
                       </Badge>
                     ) : null}
                   </div>
-                  <p className="line-clamp-2 text-gray-500 text-sm">
+                  <p className="line-clamp-2 text-sm text-gray-500">
                     Type: {app.type}
                   </p>
-                  <p className="line-clamp-2 text-gray-500 text-sm">
+                  <p className="line-clamp-2 text-sm text-gray-500">
                     Inference Lib:
                     {app.inference_library == "VLLM" && (
                       <Badge variant="outline" className="ml-1">
@@ -281,11 +282,11 @@ export default function AppContent() {
                       </Badge>
                     )}
                   </p>
-                  <p className="line-clamp-2 text-gray-500 text-sm">
+                  <p className="line-clamp-2 text-sm text-gray-500">
                     Base Model: {app.models?.name}
                   </p>
                   {app.type == "LORA" && (
-                    <p className="line-clamp-2 text-gray-500 text-sm">
+                    <p className="line-clamp-2 text-sm text-gray-500">
                       Lora Adapters Models:{" "}
                       {(app.lora_checkpoints as any[])?.map(
                         (c: any, index: number) => (

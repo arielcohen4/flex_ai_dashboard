@@ -99,16 +99,18 @@ export default function AppContent() {
           Select the open source LLM you want to train
         </p>
       </div>
-      <div className="my-4 flex items-end justify-between sm:my-0 sm:items-center">
-        <div className="flex flex-col gap-4 sm:my-4 sm:flex-row">
+
+      {/* Improved mobile responsiveness for the filter section */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Input
             placeholder="Search..."
-            className="h-9 w-40 lg:w-[250px]"
+            className="h-9 w-full sm:w-40 lg:w-[250px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Select value={appType} onValueChange={setAppType}>
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-full sm:w-36">
               <SelectValue>{appText.get(appType) || appType}</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -133,7 +135,7 @@ export default function AppContent() {
         </div>
 
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-16">
+          <SelectTrigger className="w-full sm:w-16">
             <SelectValue>
               <IconAdjustmentsHorizontal size={18} />
             </SelectValue>
@@ -154,7 +156,9 @@ export default function AppContent() {
           </SelectContent>
         </Select>
       </div>
+
       <Separator className="shadow" />
+
       <ul className="faded-bottom no-scrollbar grid gap-4 overflow-auto pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3">
         {modelsQuery.isLoading
           ? Array(12)
@@ -169,10 +173,8 @@ export default function AppContent() {
                 key={app.name}
                 className="rounded-lg border p-4 hover:shadow-md"
               >
-                <div className="mb-8 flex items-center justify-between">
-                  <div
-                    className={`items-center justify-center rounded-lg bg-muted p-2`}
-                  >
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
+                  <div className="items-center justify-center rounded-lg bg-muted p-2">
                     {app.family && familyToLogo.hasOwnProperty(app.family) ? (
                       <Image
                         src={`/model_families/${familyToLogo[app.family]}`}
@@ -199,10 +201,10 @@ export default function AppContent() {
                   >
                     {app.name}
                   </a>
-                  <p className="line-clamp-2 text-gray-500 text-sm">
+                  <p className="line-clamp-2 text-sm text-gray-500">
                     {app.tasks[0].count + " Total community finetunes"}
                   </p>
-                  <p className="line-clamp-2 text-gray-500 text-sm">
+                  <p className="line-clamp-2 text-sm text-gray-500">
                     Inference:
                     {app.vllm_support && (
                       <Badge variant="outline" className="ml-1">

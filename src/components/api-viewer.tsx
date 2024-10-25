@@ -166,7 +166,7 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
       <DialogTrigger asChild>
         <Button variant="secondary">API code</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[625px]">
+      <DialogContent className="sm:max-w-[685px]">
         <DialogHeader>
           <DialogTitle>API code</DialogTitle>
           <DialogDescription>
