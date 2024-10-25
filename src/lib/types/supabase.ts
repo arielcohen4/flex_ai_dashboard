@@ -226,25 +226,34 @@ export type Database = {
       }
       endpoints_sessions: {
         Row: {
+          cost: number | null
           end_time: string | null
           endpoint_id: string
           id: string
+          is_balance_updated: boolean
           start_time: string
           total_seconds: number | null
+          user_id: string
         }
         Insert: {
+          cost?: number | null
           end_time?: string | null
           endpoint_id: string
           id?: string
+          is_balance_updated?: boolean
           start_time: string
           total_seconds?: number | null
+          user_id: string
         }
         Update: {
+          cost?: number | null
           end_time?: string | null
           endpoint_id?: string
           id?: string
+          is_balance_updated?: boolean
           start_time?: string
           total_seconds?: number | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -519,6 +528,14 @@ export type Database = {
       is_sub_active: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      update_balance_and_session: {
+        Args: {
+          p_user_id: string
+          p_session_id: string
+          p_cost: number
+        }
+        Returns: undefined
       }
       update_balance_and_task: {
         Args: {
