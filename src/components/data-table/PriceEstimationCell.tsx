@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 
-function calculateCost(seconds: number, priceForSecond: number) {
-  return (seconds * priceForSecond).toFixed(2);
+const SAFETY_MARGIN = 1.15; // 15% safety margin
+
+function calculateCost(
+  seconds: number,
+  priceForSecond: number,
+  isSafetyMargin: boolean = false
+) {
+  return (
+    seconds *
+    priceForSecond *
+    (isSafetyMargin ? SAFETY_MARGIN : 1)
+  ).toFixed(2);
 }
 
 function formatDuration(seconds: number) {
@@ -103,7 +113,7 @@ export function PriceEstimationCell({ row }: { row: any }) {
         (new Date().getTime() - startTrainTime.getTime()) / 1000;
       const secondsForStep = timePassFromFirstStep / row.original.current_step;
       const totalTime = row.original.total_steps * secondsForStep;
-      const constPrediction = calculateCost(totalTime, pricePerSecond);
+      const constPrediction = calculateCost(totalTime, pricePerSecond, true);
       return (
         <div className="flex w-[50px] items-center justify-between">
           <span>{constUntilNow}$</span>
