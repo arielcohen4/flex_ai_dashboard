@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import QueryProvider from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
+import ScriptsWidget from "./ScriptsWidget";
 
 export const metadata: Metadata = {
   title: "FlexAI",
@@ -24,6 +25,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            <ScriptsWidget />
             <Toaster />
           </ThemeProvider>
         </QueryProvider>
