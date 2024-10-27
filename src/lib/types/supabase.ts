@@ -278,6 +278,7 @@ export type Database = {
           inference_cached_path: string | null
           lora_compute: string
           lora_compute_batch_size: number
+          min_subscription_level: number
           model_class: string
           name: string
           params_count: number
@@ -298,6 +299,7 @@ export type Database = {
           inference_cached_path?: string | null
           lora_compute?: string
           lora_compute_batch_size?: number
+          min_subscription_level?: number
           model_class?: string
           name?: string
           params_count: number
@@ -318,6 +320,7 @@ export type Database = {
           inference_cached_path?: string | null
           lora_compute?: string
           lora_compute_batch_size?: number
+          min_subscription_level?: number
           model_class?: string
           name?: string
           params_count?: number
@@ -357,6 +360,8 @@ export type Database = {
           id: string
           image_url: string | null
           is_aws_s3: boolean
+          is_first_sign: boolean
+          subscription_level: number
           wandb_key: string | null
         }
         Insert: {
@@ -372,6 +377,8 @@ export type Database = {
           id: string
           image_url?: string | null
           is_aws_s3?: boolean
+          is_first_sign?: boolean
+          subscription_level?: number
           wandb_key?: string | null
         }
         Update: {
@@ -387,6 +394,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_aws_s3?: boolean
+          is_first_sign?: boolean
+          subscription_level?: number
           wandb_key?: string | null
         }
         Relationships: []

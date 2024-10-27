@@ -22,6 +22,18 @@ export function PostHogIdentifyWrapper({ children }: PropsWithChildren) {
       url.searchParams.delete("signin");
       window.history.replaceState({}, "", url.toString());
     }
+
+    const signup = searchParams.get("signup");
+    if (signup === "true") {
+      posthog.capture("user_signed_up", {
+        source: "query_parameter",
+      });
+
+      // Remove the signup parameter from the URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("signup");
+      window.history.replaceState({}, "", url.toString());
+    }
   }, [searchParams]);
 
   useEffect(() => {
