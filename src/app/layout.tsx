@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import QueryProvider from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import ScriptsWidget from "./ScriptsWidget";
+import { CSPostHogProvider } from "@/providers/posthog";
+import { PostHogIdentifyWrapper } from "@/providers/posthog-identify-wrapper";
 
 export const metadata: Metadata = {
   title: "FlexAI",
@@ -21,15 +23,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <link rel="icon" href="logo.svg" sizes="any" type="image/svg+xml" />
-      <body className={GeistSans.className}>
-        <QueryProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-            <ScriptsWidget />
-            <Toaster />
-          </ThemeProvider>
-        </QueryProvider>
-      </body>
+      <CSPostHogProvider>
+        <body className={GeistSans.className}>
+          <QueryProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <PostHogIdentifyWrapper>{children}</PostHogIdentifyWrapper>
+              <ScriptsWidget />
+              <Toaster />
+            </ThemeProvider>
+          </QueryProvider>
+        </body>
+      </CSPostHogProvider>
     </html>
   );
 }
