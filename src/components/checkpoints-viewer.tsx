@@ -108,7 +108,10 @@ export function CheckpointsViewer({
   }, [queryClient]);
 
   const downloadGGUFCheckpoint = async ({ id }: { id: string }) => {
-    TrackService.send({ name: "copy_gguf_checkpoint_command" });
+    TrackService.send({
+      name: "copy_gguf_checkpoint_command",
+      properties: { checkpoint_id: id },
+    });
     const downloadCommand = `flex_ai checkpoints download-gguf --checkpoint-id=${id}`;
     copyToClipboard(downloadCommand);
 

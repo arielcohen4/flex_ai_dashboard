@@ -154,7 +154,13 @@ export default function LLMPlayground() {
     };
     setChatHistory((prev) => [...prev, newUserMessage]);
 
-    TrackService.send({ name: "playground_send_message" });
+    TrackService.send({
+      name: "playground_send_message",
+      properties: {
+        message_content: userInput,
+        endpoint_id: selectedEndpoint.id,
+      },
+    });
 
     timerRef.current = setTimeout(() => {
       setIsModelLoading(true);
@@ -220,10 +226,16 @@ export default function LLMPlayground() {
         });
       }
 
-      TrackService.send({ name: "playground_receive_message" });
+      TrackService.send({
+        name: "playground_receive_message",
+        properties: { message_content: accumulatedResponse },
+      });
     } catch (error) {
       setIsModelLoading(false);
-      TrackService.send({ name: "playground_send_message_error" });
+      TrackService.send({
+        name: "playground_send_message_error",
+        properties: { message_content: userInput },
+      });
       console.error("Error calling LLM:", error);
     } finally {
       setIsModelLoading(false);

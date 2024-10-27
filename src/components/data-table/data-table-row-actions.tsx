@@ -72,7 +72,10 @@ export function DataTableRowActions<TData>({
           )}
           <DropdownMenuItem
             onSelect={() => {
-              TrackService.send({ name: "view_checkpoints" });
+              TrackService.send({
+                name: "view_checkpoints",
+                properties: { task_id: task.id },
+              });
               setShowCheckpoints(true);
             }}
           >
@@ -80,7 +83,10 @@ export function DataTableRowActions<TData>({
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => {
-              TrackService.send({ name: "view_training_config" });
+              TrackService.send({
+                name: "view_training_config",
+                properties: { task_id: task.id },
+              });
               setShowTrainingConfig(true);
             }}
           >
