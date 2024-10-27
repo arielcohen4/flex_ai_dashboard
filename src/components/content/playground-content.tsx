@@ -19,6 +19,7 @@ import { Loader2, Edit2, Check, CircleStop } from "lucide-react";
 import useUser from "@/app/hook/useUser";
 import { Tables } from "@/lib/types/supabase";
 import { Textarea } from "@/components/ui/textarea";
+import TrackService from "@/lib/client-services/track";
 
 interface ChatMessage {
   role: "user" | "assistant" | "system";
@@ -114,6 +115,7 @@ export default function LLMPlayground() {
   };
 
   const handleSystemPromptSave = () => {
+    TrackService.send({ name: "edit_system_prompt" });
     setIsEditingSystemPrompt(false);
     if (systemPromptInputRef.current) {
       setSystemPrompt(systemPromptInputRef.current.value);
@@ -151,6 +153,8 @@ export default function LLMPlayground() {
       timestamp: new Date().toLocaleTimeString(),
     };
     setChatHistory((prev) => [...prev, newUserMessage]);
+
+    TrackService.send({ name: "playground_send_message" });
 
     timerRef.current = setTimeout(() => {
       setIsModelLoading(true);
@@ -215,8 +219,11 @@ export default function LLMPlayground() {
           return newHistory;
         });
       }
+
+      TrackService.send({ name: "playground_receive_message" });
     } catch (error) {
       setIsModelLoading(false);
+      TrackService.send({ name: "playground_send_message_error" });
       console.error("Error calling LLM:", error);
     } finally {
       setIsModelLoading(false);

@@ -37,6 +37,7 @@ import { CreateGGUFRequest } from "../lib/types";
 import { baseApiUrl } from "@/lib/constant";
 import axios from "axios";
 import useUser from "@/app/hook/useUser";
+import TrackService from "@/lib/client-services/track";
 
 const REMOVE_LOGS_KEYS = [
   "step",
@@ -107,6 +108,7 @@ export function CheckpointsViewer({
   }, [queryClient]);
 
   const downloadGGUFCheckpoint = async ({ id }: { id: string }) => {
+    TrackService.send({ name: "copy_gguf_checkpoint_command" });
     const downloadCommand = `flex_ai checkpoints download-gguf --checkpoint-id=${id}`;
     copyToClipboard(downloadCommand);
 
@@ -156,6 +158,7 @@ export function CheckpointsViewer({
     checkpointNumber: number;
   }) => {
     try {
+      TrackService.send({ name: "copy_cli_download_checkpoint_command" });
       const downloadCommand = `flex_ai checkpoints download --checkpoint-id=${id}`;
       copyToClipboard(downloadCommand);
 
@@ -191,6 +194,14 @@ export function CheckpointsViewer({
       };
     }
     if (!checkpoint.tasks?.models?.vllm_support) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          model_name: checkpoint.tasks?.models?.name,
+          reason: "vllm_support",
+        },
+      });
+
       return {
         message: `${checkpoint.tasks?.models?.name} is not supported by VLLM or nay other library we have now`,
         valid: false,
@@ -200,6 +211,13 @@ export function CheckpointsViewer({
       checkpoint.type == "LORA" &&
       !checkpoint.tasks?.models?.vllm_lora_support
     ) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          model_name: checkpoint.tasks?.models?.name,
+          reason: "vllm_lora_support",
+        },
+      });
       return {
         message: `${checkpoint.tasks?.models?.name} is not supported by VLLM with Lora Adapters or nay other library we have now`,
         valid: false,
@@ -209,6 +227,14 @@ export function CheckpointsViewer({
       checkpoint.type == "LORA" &&
       (checkpoint.tasks?.config as any)?.lora_config?.lora_r > 64
     ) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          model_name: checkpoint.tasks?.models?.name,
+          reason: "vllm_lora_r_greater_than_64",
+        },
+      });
+
       return {
         message: `VLLM doesn't support Lora Adapters with r > 64`,
         valid: false,
@@ -217,6 +243,12 @@ export function CheckpointsViewer({
       selectedCheckpoints.length > 0 &&
       selectedCheckpoints[0].type == "REGULAR"
     ) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          reason: "already_selected_regular_checkpoint",
+        },
+      });
       return {
         message:
           "You already selected full fine tune checkpoint, you cant deploy it with other",
@@ -227,6 +259,13 @@ export function CheckpointsViewer({
       selectedCheckpoints[0].type == "LORA" &&
       checkpoint.type !== "LORA"
     ) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          reason: "already_selected_lora_checkpoint",
+        },
+      });
+
       return {
         message:
           "You cant deploy full fine tune checkpoint with the lora you already selected",
@@ -239,6 +278,13 @@ export function CheckpointsViewer({
       selectedCheckpoints[0]?.tasks?.models?.id !==
         checkpoint?.tasks?.models?.id
     ) {
+      TrackService.send({
+        name: "deploy_checkpoint_validation_error",
+        properties: {
+          reason: "different_base_model",
+        },
+      });
+
       return {
         message: `You already selected the lora with base model ${selectedCheckpoints[0]?.tasks?.models?.name}. You cant deploy lora adapters that doesn't have the same base model`,
         valid: false,

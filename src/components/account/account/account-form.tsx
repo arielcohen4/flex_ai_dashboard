@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import useUser from "@/app/hook/useUser";
 import { Copy } from "lucide-react";
+import TrackService from "@/lib/client-services/track";
 
 const accountFormSchema = z.object({
   name: z
@@ -49,6 +50,7 @@ export function AccountForm() {
           title: "Copied!",
           description: "API key copied to clipboard",
         });
+        TrackService.send({ name: "copy_api_key" });
         setTimeout(() => setCopied(false), 2000);
       } catch (err) {
         toast({

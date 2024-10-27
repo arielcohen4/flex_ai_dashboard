@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TrackService from "@/lib/client-services/track";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -103,6 +104,11 @@ export default function AppContent() {
       return { id };
     },
     onSuccess: ({ id }) => {
+      TrackService.send({
+        name: "archive_dataset",
+        properties: { dataset_id: id },
+      });
+
       queryClient.setQueryData(
         ["datasets", "datasets-content"],
         (oldData: any) => {
@@ -121,6 +127,11 @@ export default function AppContent() {
       return { id, name };
     },
     onSuccess: ({ id, name }) => {
+      TrackService.send({
+        name: "edit_dataset_name",
+        properties: { dataset_id: id, new_name: name },
+      });
+
       queryClient.setQueryData(
         ["datasets", "datasets-content"],
         (oldData: any) => {

@@ -24,6 +24,7 @@ import { CheckpointsViewer } from "../checkpoints-viewer";
 import { TrainingConfigsViewer } from "../training-config-viewer";
 import { useState } from "react";
 import { cancelTask } from "@/lib/actions/tasks";
+import TrackService from "@/lib/client-services/track";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -69,10 +70,20 @@ export function DataTableRowActions<TData>({
               </a>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onSelect={() => setShowCheckpoints(true)}>
+          <DropdownMenuItem
+            onSelect={() => {
+              TrackService.send({ name: "view_checkpoints" });
+              setShowCheckpoints(true);
+            }}
+          >
             View checkpoints
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setShowTrainingConfig(true)}>
+          <DropdownMenuItem
+            onSelect={() => {
+              TrackService.send({ name: "view_training_config" });
+              setShowTrainingConfig(true);
+            }}
+          >
             View training config
           </DropdownMenuItem>
           <DropdownMenuSeparator />

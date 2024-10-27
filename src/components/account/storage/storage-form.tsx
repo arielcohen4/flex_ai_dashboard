@@ -17,6 +17,7 @@ import { validateS3 } from "@/lib/actions/validations";
 import { toast } from "@/components/ui/use-toast";
 import { ExternalLink } from "lucide-react";
 import { Tables } from "@/lib/types/supabase";
+import TrackService from "@/lib/client-services/track";
 
 export function StorageForm() {
   const user = useUser();
@@ -70,6 +71,8 @@ export function StorageForm() {
       return;
     }
 
+    TrackService.send({ name: "try_connect_aws_s3" });
+
     const response = await validateS3({
       accessKeyId,
       secretAccessKey,
@@ -91,8 +94,10 @@ export function StorageForm() {
         .eq("id", user.data?.id);
 
       if (error) {
+        TrackService.send({ name: "connect_aws_s3_error" });
         setError("Failed to update profile. Please try again.");
       } else {
+        TrackService.send({ name: "connect_aws_s3" });
         toast({
           title: "You Connected to AWS S3",
           description: (
@@ -123,6 +128,7 @@ export function StorageForm() {
       .eq("id", user.data?.id ?? "");
 
     if (response.error) {
+      TrackService.send({ name: "disconnect_aws_s3_error" });
       setError("Failed to disconnect. Please try again.");
     } else {
       toast({
@@ -134,6 +140,7 @@ export function StorageForm() {
           </div>
         ),
       });
+      TrackService.send({ name: "disconnect_aws_s3" });
       setIsConnected(false);
       setBucketName("");
       setAccessKeyId("");
