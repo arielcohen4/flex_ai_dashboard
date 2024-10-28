@@ -46,6 +46,9 @@ const DeployCheckpointsModal = () => {
     selectedCheckpoints[0].tasks?.name + "-step-" + selectedCheckpoints[0].step
   ); // New state for endpoint name
   const [endpointNameError, setEndpointNameError] = useState("");
+  const [idleTimeoutSeconds, setIdleTimeoutSeconds] = useState(60); // 1 minute default
+  const [idleTimeoutError, setIdleTimeoutError] = useState("");
+  const [open, setOpen] = useState(false);
 
   const user = useUser();
   const router = useRouter();
@@ -117,6 +120,13 @@ const DeployCheckpointsModal = () => {
       return;
     }
 
+    if (idleTimeoutSeconds < 2 || idleTimeoutSeconds > 1200) {
+      setIdleTimeoutError(
+        "Idle timeout must be between 2 seconds and 20 minutes"
+      );
+      return;
+    }
+
     const apiKey = user?.data?.api_key;
 
     const url =
@@ -131,6 +141,7 @@ const DeployCheckpointsModal = () => {
     const payload: CreateEndpointRequest = {
       name: endpointName,
       compute: computeType,
+      idle_timeout_seconds: idleTimeoutSeconds,
     };
 
     if (checkpointType == "LORA") {
@@ -193,7 +204,7 @@ const DeployCheckpointsModal = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="secondary">
           Deploy {selectedCheckpoints.length} Checkpoints
@@ -270,6 +281,32 @@ const DeployCheckpointsModal = () => {
             </Select>
           </div>
 
+          <div className="mt-4">
+            <label
+              htmlFor="idle-timeout"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Idle Timeout (seconds)
+            </label>
+            <Input
+              id="idle-timeout"
+              type="number"
+              value={idleTimeoutSeconds}
+              onChange={(e) => setIdleTimeoutSeconds(Number(e.target.value))}
+              placeholder="Enter idle timeout in seconds"
+              min={2}
+              max={1200}
+              className={`mt-1 ${idleTimeoutError ? "border-red-500" : ""}`}
+            />
+            {idleTimeoutError && (
+              <p className="mt-1 text-sm text-red-500">{idleTimeoutError}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Time in seconds before the endpoint goes down when inactive
+              (2-1200 seconds)
+            </p>
+          </div>
+
           {inferenceLibrary === "VLLM" && (
             <div className="mt-4">
               <p>Max VLLM Context Size: {maxContextSize}</p>
@@ -343,7 +380,9 @@ const DeployCheckpointsModal = () => {
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline">Cancel</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
           <Button
             loading={loadingCreateEndpoint}
             onClick={handleDeploy}

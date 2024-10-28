@@ -47,6 +47,7 @@ export type CreateEndpointRequest = {
   model_name?: string;
   checkpoint_id?: string;
   compute: string;
+  idle_timeout_seconds: number;
 };
 
 export type CreateGGUFRequest = {
