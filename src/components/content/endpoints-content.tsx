@@ -306,6 +306,10 @@ export default function AppContent() {
                       )}
                     </p>
                   )}
+                  <p className="line-clamp-2 text-sm text-gray-500">
+                    Idle Timeout:{" "}
+                    <Badge variant="outline">{app.idle_timeout_seconds}s</Badge>
+                  </p>
                 </div>
               </li>
             ))}

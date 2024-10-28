@@ -162,6 +162,7 @@ export type Database = {
           compute: string
           created_at: string
           id: string
+          idle_timeout_seconds: number
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
           is_archived: boolean | null
           lora_checkpoints: Json | null
@@ -179,6 +180,7 @@ export type Database = {
           compute?: string
           created_at?: string
           id?: string
+          idle_timeout_seconds?: number
           inference_library: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
           is_archived?: boolean | null
           lora_checkpoints?: Json | null
@@ -196,6 +198,7 @@ export type Database = {
           compute?: string
           created_at?: string
           id?: string
+          idle_timeout_seconds?: number
           inference_library?: Database["public"]["Enums"]["INFERENCE_LIBRARY"]
           is_archived?: boolean | null
           lora_checkpoints?: Json | null

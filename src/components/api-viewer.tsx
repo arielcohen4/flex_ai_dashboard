@@ -25,12 +25,6 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
   const [selectedModel, setSelectedModel] = useState("");
   const [allModels, setAllModels] = useState<string[]>([]);
 
-  if (!user.data) {
-    return <div>Loading...</div>;
-  }
-
-  console.log(endpoint);
-
   useEffect(() => {
     if (endpoint.type === "LORA") {
       const baseModel = (endpoint as any).models?.name || "default-model";
@@ -160,6 +154,13 @@ export function ApiViewer({ endpoint }: { endpoint: Tables<"endpoints"> }) {
       </code>
     </pre>
   );
+
+  // Move the conditional return after all hooks
+  if (!user.data) {
+    return <div>Loading...</div>;
+  }
+
+  console.log(endpoint);
 
   return (
     <Dialog>
