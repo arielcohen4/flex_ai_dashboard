@@ -7,18 +7,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { Button } from "../ui/button";
-import { labels } from "@/constants/data/task/data";
 import { TaskWithRelations } from "@/lib/types";
 import { CheckpointsViewer } from "../checkpoints-viewer";
 import { TrainingConfigsViewer } from "../training-config-viewer";
@@ -42,6 +36,10 @@ export function DataTableRowActions<TData>({
     setLoadingCancelTask(true);
     try {
       const url = await cancelTask({ id: task.id });
+      TrackService.send({
+        name: "cancel_task",
+        properties: { task_id: task.id },
+      });
     } catch (error) {
       console.error("Error cancel task:", error);
     } finally {

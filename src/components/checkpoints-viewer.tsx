@@ -126,6 +126,7 @@ export function CheckpointsViewer({
   };
 
   const createGGUF = async ({ id }: { id: string }) => {
+    TrackService.send({ name: "create_gguf_checkpoint" });
     const apiKey = user?.data?.api_key;
 
     const url = `${baseApiUrl}/v1/checkpoints/convert_to_gguf`;

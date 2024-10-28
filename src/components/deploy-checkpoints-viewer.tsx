@@ -27,6 +27,7 @@ import { toast } from "./ui/use-toast";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import TrackService from "@/lib/client-services/track";
 
 const DeployCheckpointsModal = () => {
   const supabase = supabaseBrowser();
@@ -146,6 +147,15 @@ const DeployCheckpointsModal = () => {
       setLoadingCreateEndpoint(true);
       const response = await axios.post(url, payload, { headers });
       queryClient.invalidateQueries({ queryKey: ["endpoints"] });
+
+      TrackService.send({
+        name: "create_endpoint_success",
+        properties: {
+          endpoint_name: endpointName,
+          type: checkpointType,
+        },
+      });
+
       // move to tasks page
       toast({
         title: "New Endpoint created",

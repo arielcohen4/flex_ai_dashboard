@@ -40,6 +40,7 @@ import { StopEndpointRequest } from "@/lib/types";
 import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
 import useUser from "@/app/hook/useUser";
+import TrackService from "@/lib/client-services/track";
 
 export default function AppContent() {
   const [sort, setSort] = useState("ascending");
@@ -106,6 +107,11 @@ export default function AppContent() {
     const response = await axios.post(url, payload, { headers });
 
     queryClient.invalidateQueries({ queryKey: ["endpoints"] });
+
+    TrackService.send({
+      name: "stop_endpoint",
+      properties: { endpoint_name: name },
+    });
 
     // move to tasks page
     toast({

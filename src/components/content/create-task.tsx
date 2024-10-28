@@ -35,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
 import { Tables } from "@/lib/types/supabase";
 import SearchableSelect from "@/components/searchable-select";
+import TrackService from "@/lib/client-services/track";
 
 export default function LLMTrainingTaskForm() {
   const user = useUser();
@@ -127,6 +128,13 @@ export default function LLMTrainingTaskForm() {
 
     if (targetInferenceLibrary == "vllm") {
       if (!model?.vllm_support) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "vllm_support",
+          },
+        });
         setAlertTitle(`vLLM Inference Not Supported for ${modelName}`);
         setAlertText(
           "Please select a model that supports vLLM inference or remove LLM as the target inference library."
@@ -137,6 +145,13 @@ export default function LLMTrainingTaskForm() {
       }
 
       if (!model?.vllm_lora_support && trainWithLora) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "vllm_lora_support",
+          },
+        });
         setAlertTitle(
           `vLLM Inference Not Supported for ${modelName} with Multi LoRA Adapters`
         );
@@ -149,6 +164,13 @@ export default function LLMTrainingTaskForm() {
       }
 
       if (model?.vllm_lora_support && trainWithLora && loraR > 64) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "vllm_lora_rank_more_than_64",
+          },
+        });
         setAlertTitle(
           `vLLM Inference Not Supported for ${modelName} with Multi LoRA Adapters with LoRA Rank more then 64`
         );
@@ -161,6 +183,14 @@ export default function LLMTrainingTaskForm() {
       }
 
       if (model?.context_length < dataset?.max_tokens) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "model_context_length_not_enough",
+          },
+        });
+
         setAlertTitle(
           `Model max context size is not enough for your dataset for ${modelName}`
         );
@@ -176,6 +206,13 @@ export default function LLMTrainingTaskForm() {
         model?.vllm_context_length &&
         model?.vllm_context_length < dataset?.max_tokens
       ) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "vllm_context_length_not_enough",
+          },
+        });
         setAlertTitle(
           `vLLM Inference will reduce the context length for ${modelName} to ${model.vllm_context_length}`
         );
@@ -191,6 +228,13 @@ export default function LLMTrainingTaskForm() {
         model?.vllm_lora_context_length &&
         model?.vllm_lora_context_length < dataset?.max_tokens
       ) {
+        TrackService.send({
+          name: "create_finetune_validation_error",
+          properties: {
+            model_name: modelName,
+            reason: "vllm_lora_context_length_not_enough",
+          },
+        });
         setAlertTitle(
           `vLLM Inference with Multi Lora adapters will reduce the context length for ${modelName} to ${model.vllm_lora_context_length}`
         );
@@ -261,6 +305,12 @@ export default function LLMTrainingTaskForm() {
         title: "New Training Task created",
         description: `${name} has been created successfully`,
       });
+
+      TrackService.send({
+        name: "create_finetune",
+        properties: { task_name: name },
+      });
+
       router.push("/tasks");
       return response.data;
     } catch (error) {
