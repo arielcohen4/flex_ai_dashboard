@@ -41,7 +41,7 @@ export async function POST(req: any) {
         // update the payment status to PAID
         await supabase
           .from("payments")
-          .update({ status: "PAID", amount: total })
+          .update({ status: "PAID" })
           .eq("id", paymentId)
           .eq("user_id", userId);
       }

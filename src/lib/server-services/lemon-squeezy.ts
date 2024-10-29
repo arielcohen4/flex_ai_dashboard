@@ -23,6 +23,9 @@ export async function createCheckout({
         data: {
           type: "checkouts",
           attributes: {
+            product_options: {
+              redirect_url: `https://app.getflex.ai?payment_id=${paymentId}&amount=${amount}`,
+            },
             custom_price: amount * 100,
             checkout_data: {
               email,

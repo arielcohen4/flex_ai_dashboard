@@ -12,6 +12,7 @@ import { formatDistance } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import useUser from "@/app/hook/useUser";
+import TrackService from "@/lib/client-services/track";
 
 const BillingContent = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -64,10 +65,18 @@ const BillingContent = () => {
     setIsProcessing(true);
 
     try {
+      TrackService.send({
+        name: "checkout_started",
+        properties: { amount },
+      });
       const response = await createCheckout({ amount });
       (window as any).LemonSqueezy.Url.Open(response.data.attributes.url);
       setIsProcessing(false);
     } catch (error) {
+      TrackService.send({
+        name: "checkout_failed",
+        properties: { amount },
+      });
       setIsProcessing(false);
       console.error("Failed to open checkout overlay:", error);
       toast({

@@ -17,7 +17,7 @@ export async function createCheckout({ amount }: { amount: number }) {
   // cerate a row in the payments table and get the id that was generated
   const { data: payment, error } = await supabase
     .from("payments")
-    .insert({ user_id: profile?.id as string })
+    .insert({ user_id: profile?.id as string, amount })
     .select()
     .single();
 
