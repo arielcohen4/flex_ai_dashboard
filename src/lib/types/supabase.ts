@@ -349,6 +349,33 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["PAYMENT_STATUS"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["PAYMENT_STATUS"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["PAYMENT_STATUS"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           api_key: string
@@ -583,6 +610,7 @@ export type Database = {
         | "UPLOADING"
         | "FINISHED"
       INFERENCE_LIBRARY: "VLLM"
+      PAYMENT_STATUS: "PENDING" | "PAID"
       STORAGE_TYPE: "FLEX" | "AWS"
       TASK_STAGE:
         | "DOWNLOADING_MODEL"

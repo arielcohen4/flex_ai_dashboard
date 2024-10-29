@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ScriptsWidget from "./ScriptsWidget";
 import { CSPostHogProvider } from "@/providers/posthog";
 import { PostHogIdentifyWrapper } from "@/providers/posthog-identify-wrapper";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "FlexAI",
@@ -32,6 +33,7 @@ export default function RootLayout({
               <Toaster />
             </ThemeProvider>
           </QueryProvider>
+          <Script src="https://assets.lemonsqueezy.com/lemon.js" />
         </body>
       </CSPostHogProvider>
     </html>

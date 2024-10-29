@@ -1,0 +1,38 @@
+import Link from "next/link";
+
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import BillingContent from "@/components/content/billing-content";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Billing | Flex AI",
+};
+
+export default function BillingPage() {
+  return (
+    <ContentLayout title="Usage">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Usage</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <BillingContent />
+    </ContentLayout>
+  );
+}

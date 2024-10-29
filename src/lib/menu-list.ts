@@ -19,6 +19,7 @@ import {
   NetworkIcon,
   BarChart,
   MessageSquare,
+  Wallet,
 } from "lucide-react";
 
 type Submenu = {
@@ -121,6 +122,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Usage",
           active: pathname.includes("/usage"),
           icon: BarChart2,
+          submenus: [],
+        },
+        {
+          href: "/billing",
+          label: "Billing",
+          active: pathname.includes("/billing"),
+          icon: Wallet,
           submenus: [],
         },
       ],
