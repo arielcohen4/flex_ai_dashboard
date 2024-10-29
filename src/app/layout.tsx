@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ScriptsWidget from "./ScriptsWidget";
 import { CSPostHogProvider } from "@/providers/posthog";
 import { PostHogIdentifyWrapper } from "@/providers/posthog-identify-wrapper";
+import { LemonSqueezyWrapper } from "@/providers/lemonsqueezy-wrapper";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -28,7 +29,9 @@ export default function RootLayout({
         <body className={GeistSans.className}>
           <QueryProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <PostHogIdentifyWrapper>{children}</PostHogIdentifyWrapper>
+              <PostHogIdentifyWrapper>
+                <LemonSqueezyWrapper> {children}</LemonSqueezyWrapper>
+              </PostHogIdentifyWrapper>
               <ScriptsWidget />
               <Toaster />
             </ThemeProvider>
