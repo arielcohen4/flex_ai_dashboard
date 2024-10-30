@@ -13,6 +13,7 @@ import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
+  IconLock,
 } from "@tabler/icons-react";
 import { Separator } from "../ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { roundToK } from "@/lib/utils";
 import { familyToLogo } from "@/lib/constant";
+import useUser from "@/app/hook/useUser";
 
 const appText = new Map([
   ["all", "All Families"],
@@ -34,6 +36,7 @@ export default function AppContent() {
   const [sort, setSort] = useState("descending");
   const [appType, setAppType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const user = useUser();
 
   const modelsQuery = useQuery({
     queryKey: ["models", "models-content"],
@@ -168,54 +171,66 @@ export default function AppContent() {
                   <SkeletonCard />
                 </li>
               ))
-          : filteredApps.map((app) => (
-              <li
-                key={app.name}
-                className="rounded-lg border p-4 hover:shadow-md"
-              >
-                <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
-                  <div className="items-center justify-center rounded-lg bg-muted p-2">
-                    {app.family && familyToLogo.hasOwnProperty(app.family) ? (
-                      <Image
-                        src={`/model_families/${familyToLogo[app.family]}`}
-                        alt={app.name}
-                        width={20}
-                        height={20}
-                      />
-                    ) : null}
+          : filteredApps.map((app) => {
+              const isLocked = (user.data?.subscription_level ?? 0) < app.min_subscription_level;
+              return (
+                <li
+                  key={app.name}
+                  className={`rounded-lg border p-4 hover:shadow-md relative ${
+                    isLocked ? 'opacity-60 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
+                    <div className="items-center justify-center rounded-lg bg-muted p-2">
+                      {app.family && familyToLogo.hasOwnProperty(app.family) ? (
+                        <Image
+                          src={`/model_families/${familyToLogo[app.family]}`}
+                          alt={app.name}
+                          width={20}
+                          height={20}
+                        />
+                      ) : null}
+                    </div>
+                    <Badge variant="secondary">
+                      {roundToK(app.context_length)} context size
+                    </Badge>
+                    <Badge variant="secondary">
+                      {roundToK(app.params_count)}b params
+                    </Badge>
+                    <div className={isLocked ? 'pointer-events-none opacity-60' : ''}>
+                      <CodeViewer model={app} />
+                    </div>
                   </div>
-                  <Badge variant="secondary">
-                    {roundToK(app.context_length)} context size
-                  </Badge>
-                  <Badge variant="secondary">
-                    {roundToK(app.params_count)}b params
-                  </Badge>
-                  <CodeViewer model={app} />
-                </div>
-                <div>
-                  <a
-                    href={`https://huggingface.co/${app.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mb-1 font-semibold"
-                  >
-                    {app.name}
-                  </a>
-                  <p className="line-clamp-2 text-sm text-gray-500">
-                    {app.tasks[0].count + " Total community finetunes"}
-                  </p>
-                  <p className="line-clamp-2 text-sm text-gray-500">
-                    Inference:
-                    {app.vllm_support && (
-                      <Badge variant="outline" className="ml-1">
-                        vLLM
-                        {app.vllm_lora_support && " & LoRA"}
-                      </Badge>
-                    )}
-                  </p>
-                </div>
-              </li>
-            ))}
+                  <div>
+                    <a
+                      href={`https://huggingface.co/${app.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-1 font-semibold"
+                    >
+                      {app.name}
+                    </a>
+                    <p className="line-clamp-2 text-sm text-gray-500">
+                      {app.tasks[0].count + " Total community finetunes"}
+                    </p>
+                    <p className="line-clamp-2 text-sm text-gray-500">
+                      Inference:
+                      {app.vllm_support && (
+                        <Badge variant="outline" className="ml-1">
+                          vLLM
+                          {app.vllm_lora_support && " & LoRA"}
+                        </Badge>
+                      )}
+                    </p>
+                  </div>
+                  {isLocked && (
+                    <div className="absolute bottom-4 right-4">
+                      <IconLock size={24} className="text-gray-500" />
+                    </div>
+                  )}
+                </li>
+              );
+            })}
       </ul>
     </div>
   );
