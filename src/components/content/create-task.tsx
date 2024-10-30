@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Slider } from "@/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
@@ -29,7 +30,6 @@ import useUser from "@/app/hook/useUser";
 import { baseApiUrl, familyToLogo } from "@/lib/constant";
 import axios, { AxiosError } from "axios";
 
-import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
@@ -414,7 +414,7 @@ export default function LLMTrainingTaskForm() {
                   <div className="flex items-center gap-2">
                     {option.family && familyToLogo[option.family] && (
                       <Image
-                      src={`/model_families/${familyToLogo[option.family]}`}
+                        src={`/model_families/${familyToLogo[option.family]}`}
                         alt={option.family}
                         width={24}
                         height={24}
@@ -423,7 +423,12 @@ export default function LLMTrainingTaskForm() {
                     <span>{option.name}</span>
                   </div>
                   {option.is_locked && (
-                    <IconLock size={16} className="text-gray-400" />
+                    <div className="flex items-center">
+                      <IconLock size={16} className="text-gray-400" />
+                      <span className="ml-1 text-sm text-gray-400">
+                        To use this model, contact us at getflex.ai
+                      </span>
+                    </div>
                   )}
                 </div>
               )}

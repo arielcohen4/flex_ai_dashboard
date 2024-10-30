@@ -24,7 +24,7 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import { roundToK } from "@/lib/utils";
 import { familyToLogo } from "@/lib/constant";
 import useUser from "@/app/hook/useUser";
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 const appText = new Map([
   ["all", "All Families"],
   ["qwen2", "Qwen2"],
@@ -225,7 +225,24 @@ export default function AppContent() {
                   </div>
                   {isLocked && (
                     <div className="absolute bottom-4 right-4">
-                      <IconLock size={24} className="text-gray-500" />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="cursor-help">
+                              <IconLock size={24} className="text-gray-500" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent 
+                            side="bottom" 
+                            className="z-[9999] text-base p-4 border border-gray-200 shadow-lg rounded-lg bg-popover text-popover-foreground"
+                          >
+                            <div className="flex flex-col gap-2">
+                              <p className="font-medium">Locked model</p>
+                              <p className="text-sm text-gray-600">To use this model, contact us on the chat at <a href="https://getflex.ai" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">getflex.ai</a></p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   )}
                 </li>
