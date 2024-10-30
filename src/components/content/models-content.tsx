@@ -238,7 +238,7 @@ export default function AppContent() {
                           >
                             <div className="flex flex-col gap-2">
                               <p className="font-medium">Locked model</p>
-                              <p className="text-sm text-gray-600">To use this model, contact us on the chat at <a href="https://getflex.ai" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">getflex.ai</a></p>
+                              <p className="text-sm text-gray-600">To use this model, please contact us on the chat</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>

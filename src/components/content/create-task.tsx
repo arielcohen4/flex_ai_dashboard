@@ -426,7 +426,7 @@ export default function LLMTrainingTaskForm() {
                     <div className="flex items-center">
                       <IconLock size={16} className="text-gray-400" />
                       <span className="ml-1 text-sm text-gray-400">
-                        To use this model, contact us at getflex.ai
+                        To use this model, please contact us on the chat
                       </span>
                     </div>
                   )}
