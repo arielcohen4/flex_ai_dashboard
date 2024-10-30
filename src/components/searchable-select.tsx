@@ -13,17 +13,23 @@ interface FamilyToLogo {
   [key: string]: string;
 }
 
+interface SearchableSelectProps<T> {
+  options: T[];
+  onValueChange: (value: string) => void;
+  placeholder: string;
+  familyToLogo: FamilyToLogo;
+  renderOption?: (option: T) => React.ReactNode;
+  isOptionDisabled?: (option: T) => boolean;
+}
+
 const SearchableSelect = ({
   options,
   onValueChange,
   placeholder,
   familyToLogo,
-}: {
-  options: any[];
-  onValueChange: (value: string) => void;
-  placeholder: string;
-  familyToLogo: FamilyToLogo;
-}) => {
+  renderOption,
+  isOptionDisabled,
+}: SearchableSelectProps<any>) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,10 +62,12 @@ const SearchableSelect = ({
           <SelectItem
             key={option.id}
             value={option.name}
-            className="flex items-center space-x-2"
+            disabled={isOptionDisabled?.(option)}
           >
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center space-x-2">
+            {renderOption ? (
+              renderOption(option)
+            ) : (
+              <div className="flex items-center gap-2">
                 {option.family &&
                   familyToLogo.hasOwnProperty(option.family) && (
                     <Image
@@ -72,7 +80,7 @@ const SearchableSelect = ({
                   )}
                 <span>{option.name}</span>
               </div>
-            </div>
+            )}
           </SelectItem>
         ))}
       </SelectContent>

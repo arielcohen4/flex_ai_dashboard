@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Slider } from "@/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
@@ -29,13 +30,18 @@ import useUser from "@/app/hook/useUser";
 import { baseApiUrl, familyToLogo } from "@/lib/constant";
 import axios, { AxiosError } from "axios";
 
-import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CreateTaskAlertDialog } from "@/components/create-task-alert-dialog";
 import { Tables } from "@/lib/types/supabase";
 import SearchableSelect from "@/components/searchable-select";
 import TrackService from "@/lib/client-services/track";
+import { IconLock } from "@tabler/icons-react";
+
+type ModelWithTasks = Tables<"models"> & {
+  tasks: { count: number }[];
+  is_locked?: boolean;
+};
 
 export default function LLMTrainingTaskForm() {
   const user = useUser();
@@ -85,14 +91,16 @@ export default function LLMTrainingTaskForm() {
           tasks:tasks(count)
         `
         )
-
         .order("created_at", { ascending: false });
 
-      // Sort the data by task count after fetching
-      const sortedData = data?.sort((a, b) => {
+      // Sort the data and add is_locked field
+      const sortedData = data?.map(model => ({
+        ...model,
+        is_locked: (user.data?.subscription_level ?? 1) < model.min_subscription_level
+      })).sort((a, b) => {
         const countA = a.tasks[0]?.count ?? 0;
         const countB = b.tasks[0]?.count ?? 0;
-        return countB - countA; // Descending order
+        return countB - countA;
       });
 
       return sortedData ?? [];
@@ -401,6 +409,30 @@ export default function LLMTrainingTaskForm() {
               onValueChange={setModelName}
               placeholder="Select a model"
               familyToLogo={familyToLogo}
+              renderOption={(option: ModelWithTasks) => (
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    {option.family && familyToLogo[option.family] && (
+                      <Image
+                        src={`/model_families/${familyToLogo[option.family]}`}
+                        alt={option.family}
+                        width={24}
+                        height={24}
+                      />
+                    )}
+                    <span>{option.name}</span>
+                  </div>
+                  {option.is_locked && (
+                    <div className="flex items-center">
+                      <IconLock size={16} className="text-gray-400" />
+                      <span className="ml-1 text-sm text-gray-400">
+                        To use this model, contact us at getflex.ai
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+              isOptionDisabled={(option: ModelWithTasks) => option.is_locked ?? false}
             />
           </div>
 
