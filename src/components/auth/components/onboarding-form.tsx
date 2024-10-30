@@ -142,7 +142,7 @@ export function OnboardingForm() {
         description: "Thank you for providing your information.",
       });
 
-      router.push("/");
+      router.push("/schedule-call");
     } catch (error) {
       toast({
         title: "Error",
@@ -398,7 +398,7 @@ export function OnboardingForm() {
           />
 
           <Button type="submit" className="w-full" loading={isLoading}>
-            Complete Onboarding
+            Submit
           </Button>
         </form>
       </Form>

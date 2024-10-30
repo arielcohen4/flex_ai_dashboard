@@ -59,7 +59,13 @@ export async function middleware(request: NextRequest) {
   const url = new URL(request.url);
 
   // Public paths that don't require onboarding
-  const publicPaths = ["/sign-in", "/sign-up", "/auth/callback", "/onboarding"];
+  const publicPaths = [
+    "/sign-in",
+    "/sign-up",
+    "/auth/callback",
+    "/onboarding",
+    "/schedule-call",
+  ];
 
   if (data.session) {
     // Get user profile data

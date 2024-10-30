@@ -20,6 +20,7 @@ import {
   BarChart,
   MessageSquare,
   Wallet,
+  CalendarDays,
 } from "lucide-react";
 
 type Submenu = {
@@ -136,6 +137,13 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "External",
       menus: [
+        {
+          href: "https://app.apollo.io/#/meet/ariel/30-min",
+          label: "Call with Founders",
+          active: pathname.includes("/book-a-call"),
+          icon: CalendarDays,
+          submenus: [],
+        },
         {
           href: "https://chat.lmsys.org/?leaderboard",
           label: "Leaderboard",
