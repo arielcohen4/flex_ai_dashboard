@@ -384,13 +384,22 @@ export type Database = {
           aws_region: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key: string | null
           balance: number
+          company_name: string | null
+          company_size: string | null
+          company_website: string | null
           created_at: string
           display_name: string | null
           email: string
+          fine_tuning_methods: string | null
           id: string
           image_url: string | null
           is_aws_s3: boolean
           is_first_sign: boolean
+          llm_goals: string | null
+          onboarding_completed: boolean
+          production_models: string | null
+          referral_source: string | null
+          role: string | null
           subscription_level: number
           wandb_key: string | null
         }
@@ -401,13 +410,22 @@ export type Database = {
           aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
+          company_name?: string | null
+          company_size?: string | null
+          company_website?: string | null
           created_at?: string
           display_name?: string | null
           email: string
+          fine_tuning_methods?: string | null
           id: string
           image_url?: string | null
           is_aws_s3?: boolean
           is_first_sign?: boolean
+          llm_goals?: string | null
+          onboarding_completed?: boolean
+          production_models?: string | null
+          referral_source?: string | null
+          role?: string | null
           subscription_level?: number
           wandb_key?: string | null
         }
@@ -418,13 +436,22 @@ export type Database = {
           aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
+          company_name?: string | null
+          company_size?: string | null
+          company_website?: string | null
           created_at?: string
           display_name?: string | null
           email?: string
+          fine_tuning_methods?: string | null
           id?: string
           image_url?: string | null
           is_aws_s3?: boolean
           is_first_sign?: boolean
+          llm_goals?: string | null
+          onboarding_completed?: boolean
+          production_models?: string | null
+          referral_source?: string | null
+          role?: string | null
           subscription_level?: number
           wandb_key?: string | null
         }

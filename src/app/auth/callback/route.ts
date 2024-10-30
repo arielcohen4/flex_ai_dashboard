@@ -42,9 +42,14 @@ export async function GET(request: Request) {
           .from("profiles")
           .update({ is_first_sign: false })
           .eq("email", data.user?.email as string);
-        return NextResponse.redirect(`${origin}${next}?signup=true`);
+
+        return NextResponse.redirect(`${origin}/onboarding?signup=true`);
       } else {
-        return NextResponse.redirect(`${origin}${next}?signin=true`);
+        if (!profileData?.onboarding_completed) {
+          return NextResponse.redirect(`${origin}/onboarding?signin=true`);
+        } else {
+          return NextResponse.redirect(`${origin}${next}?signin=true`);
+        }
       }
     }
   }

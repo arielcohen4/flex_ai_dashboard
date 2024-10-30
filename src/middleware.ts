@@ -57,10 +57,27 @@ export async function middleware(request: NextRequest) {
 
   const { data } = await supabase.auth.getSession();
   const url = new URL(request.url);
+
+  // Public paths that don't require onboarding
+  const publicPaths = ["/sign-in", "/sign-up", "/auth/callback", "/onboarding"];
+
   if (data.session) {
+    // Get user profile data
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", data.session.user.id)
+      .single();
+
     if (url.pathname === "/sign-in") {
       return NextResponse.redirect(new URL("/", request.url));
     }
+
+    // If onboarding is not completed and user is not on onboarding page
+    if (!profile?.onboarding_completed && !publicPaths.includes(url.pathname)) {
+      return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+
     return response;
   } else {
     if (protectedPaths.includes(url.pathname)) {
