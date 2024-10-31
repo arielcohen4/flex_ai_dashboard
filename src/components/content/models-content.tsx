@@ -182,84 +182,88 @@ export default function AppContent() {
                 (user.data?.subscription_level ?? 0) <
                 app.min_subscription_level;
               return (
-                <li
-                  key={app.name}
-                  className={`rounded-lg border p-4 hover:shadow-md relative ${
-                    isLocked ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
-                    <div className="items-center justify-center rounded-lg bg-muted p-2">
-                      {app.family && familyToLogo.hasOwnProperty(app.family) ? (
-                        <Image
-                          src={`/model_families/${familyToLogo[app.family]}`}
-                          alt={app.name}
-                          width={20}
-                          height={20}
-                        />
-                      ) : null}
-                    </div>
-                    <Badge variant="secondary">
-                      {roundToK(app.context_length)} context size
-                    </Badge>
-                    <Badge variant="secondary">
-                      {roundToK(app.params_count)}b params
-                    </Badge>
-                    <div
-                      className={
-                        isLocked ? "pointer-events-none opacity-60" : ""
-                      }
-                    >
-                      <CodeViewer model={app} />
-                    </div>
-                  </div>
-                  <div>
-                    <a
-                      href={`https://huggingface.co/${app.name}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mb-1 font-semibold"
-                    >
-                      {app.name}
-                    </a>
-                    <p className="line-clamp-2 text-sm text-gray-500">
-                      {app.tasks[0].count + " Total community finetunes"}
-                    </p>
-                    <p className="line-clamp-2 text-sm text-gray-500">
-                      Inference:
-                      {app.vllm_support && (
-                        <Badge variant="outline" className="ml-1">
-                          vLLM
-                          {app.vllm_lora_support && " & LoRA"}
-                        </Badge>
-                      )}
-                    </p>
-                  </div>
-                  {isLocked && (
-                    <div className="absolute bottom-4 right-4">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <div className="cursor-help">
-                              <IconLock size={24} className="text-gray-500" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="bottom"
-                            className="z-[9999] text-base p-4 border border-gray-200 shadow-lg rounded-lg bg-popover text-popover-foreground"
+                <TooltipProvider key={app.name}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <li
+                        className={`rounded-lg border p-4 hover:shadow-md relative ${
+                          isLocked ? "opacity-60 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
+                          <div className="items-center justify-center rounded-lg bg-muted p-2">
+                            {app.family &&
+                            familyToLogo.hasOwnProperty(app.family) ? (
+                              <Image
+                                src={`/model_families/${
+                                  familyToLogo[app.family]
+                                }`}
+                                alt={app.name}
+                                width={20}
+                                height={20}
+                              />
+                            ) : null}
+                          </div>
+                          <Badge variant="secondary">
+                            {roundToK(app.context_length)} context size
+                          </Badge>
+                          <Badge variant="secondary">
+                            {roundToK(app.params_count)}b params
+                          </Badge>
+                          <div
+                            className={
+                              isLocked ? "pointer-events-none opacity-60" : ""
+                            }
                           >
-                            <div className="flex flex-col gap-2">
-                              <p className="font-medium">Locked model</p>
-                              <p className="text-sm text-gray-600">
-                                To use this model, please contact us on the chat
-                              </p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  )}
-                </li>
+                            <CodeViewer model={app} />
+                          </div>
+                        </div>
+                        <div>
+                          <a
+                            href={`https://huggingface.co/${app.name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mb-1 font-semibold"
+                          >
+                            {app.name}
+                          </a>
+                          <p className="line-clamp-2 text-sm text-gray-500">
+                            {app.tasks[0].count + " Total community finetunes"}
+                          </p>
+                          <p className="line-clamp-2 text-sm text-gray-500">
+                            Inference:
+                            {app.vllm_support && (
+                              <Badge variant="outline" className="ml-1">
+                                vLLM
+                                {app.vllm_lora_support && " & LoRA"}
+                              </Badge>
+                            )}
+                          </p>
+                        </div>
+                        {isLocked && (
+                          <div className="absolute bottom-4 right-4">
+                            <IconLock size={24} className="text-gray-500" />
+                          </div>
+                        )}
+                      </li>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="z-[9999] text-base p-4 border border-gray-200 shadow-lg rounded-lg bg-popover text-popover-foreground"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <p className="font-medium">
+                          {isLocked ? "Locked model" : app.name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {isLocked
+                            ? "To use this model, please contact us on the chat"
+                            : `${app.tasks[0].count} Total community finetunes`}
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               );
             })}
       </ul>
