@@ -24,7 +24,12 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import { roundToK } from "@/lib/utils";
 import { familyToLogo } from "@/lib/constant";
 import useUser from "@/app/hook/useUser";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 const appText = new Map([
   ["all", "All Families"],
   ["qwen2", "Qwen2"],
@@ -118,6 +123,7 @@ export default function AppContent() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Families</SelectItem>
+              <SelectItem value="nemotron">Nemotron</SelectItem>
               <SelectItem value="llama3.2">LLaMA 3.2</SelectItem>
               <SelectItem value="llama3.1">LLaMA 3.1</SelectItem>
               <SelectItem value="llama3">LLaMA 3</SelectItem>
@@ -172,12 +178,14 @@ export default function AppContent() {
                 </li>
               ))
           : filteredApps.map((app) => {
-              const isLocked = (user.data?.subscription_level ?? 0) < app.min_subscription_level;
+              const isLocked =
+                (user.data?.subscription_level ?? 0) <
+                app.min_subscription_level;
               return (
                 <li
                   key={app.name}
                   className={`rounded-lg border p-4 hover:shadow-md relative ${
-                    isLocked ? 'opacity-60 cursor-not-allowed' : ''
+                    isLocked ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 >
                   <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
@@ -197,7 +205,11 @@ export default function AppContent() {
                     <Badge variant="secondary">
                       {roundToK(app.params_count)}b params
                     </Badge>
-                    <div className={isLocked ? 'pointer-events-none opacity-60' : ''}>
+                    <div
+                      className={
+                        isLocked ? "pointer-events-none opacity-60" : ""
+                      }
+                    >
                       <CodeViewer model={app} />
                     </div>
                   </div>
@@ -232,13 +244,15 @@ export default function AppContent() {
                               <IconLock size={24} className="text-gray-500" />
                             </div>
                           </TooltipTrigger>
-                          <TooltipContent 
-                            side="bottom" 
+                          <TooltipContent
+                            side="bottom"
                             className="z-[9999] text-base p-4 border border-gray-200 shadow-lg rounded-lg bg-popover text-popover-foreground"
                           >
                             <div className="flex flex-col gap-2">
                               <p className="font-medium">Locked model</p>
-                              <p className="text-sm text-gray-600">To use this model, please contact us on the chat</p>
+                              <p className="text-sm text-gray-600">
+                                To use this model, please contact us on the chat
+                              </p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
