@@ -3,6 +3,7 @@ import {
   IconBrandSlack,
   IconBrandX,
   IconBrandLinkedin,
+  IconBrandGithub,
 } from "@tabler/icons-react";
 
 export function Footer() {
@@ -30,6 +31,13 @@ export function Footer() {
             rel="noopener noreferrer"
           >
             <IconBrandLinkedin className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+          </Link>
+          <Link
+            href="https://github.com/getflexai/flex_ai"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconBrandGithub className="h-5 w-5 text-muted-foreground hover:text-foreground" />
           </Link>
         </div>
       </div>
