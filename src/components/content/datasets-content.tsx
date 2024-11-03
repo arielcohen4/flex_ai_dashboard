@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import {
@@ -84,6 +84,22 @@ export default function AppContent() {
       }
     },
   });
+
+  useEffect(() => {
+    const supabase = supabaseBrowser();
+    const subscription = supabase
+      .channel("datasets")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "datasets" },
+        (payload) => {
+          console.log("Change received!", payload);
+          // Refetch the datasets data
+          queryClient.invalidateQueries({ queryKey: ["datasets"] });
+        }
+      )
+      .subscribe();
+  }, [queryClient]);
 
   const filteredApps = datasetsQuery.data
     ? datasetsQuery.data
