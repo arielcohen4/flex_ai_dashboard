@@ -57,18 +57,6 @@ export function getMenuList(pathname: string): Group[] {
       ],
     },
     {
-      groupLabel: "Create",
-      menus: [
-        {
-          href: "/create",
-          label: "Create Task",
-          active: pathname.includes("/create"),
-          icon: CircleFadingPlusIcon,
-          submenus: [],
-        },
-      ],
-    },
-    {
       groupLabel: "Contents",
       menus: [
         {

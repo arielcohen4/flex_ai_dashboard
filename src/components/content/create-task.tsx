@@ -22,7 +22,12 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Slider } from "@/components/ui/slider";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateFinetuneRequest } from "@/lib/types";
@@ -94,14 +99,17 @@ export default function LLMTrainingTaskForm() {
         .order("created_at", { ascending: false });
 
       // Sort the data and add is_locked field
-      const sortedData = data?.map(model => ({
-        ...model,
-        is_locked: (user.data?.subscription_level ?? 1) < model.min_subscription_level
-      })).sort((a, b) => {
-        const countA = a.tasks[0]?.count ?? 0;
-        const countB = b.tasks[0]?.count ?? 0;
-        return countB - countA;
-      });
+      const sortedData = data
+        ?.map((model) => ({
+          ...model,
+          is_locked:
+            (user.data?.subscription_level ?? 1) < model.min_subscription_level,
+        }))
+        .sort((a, b) => {
+          const countA = a.tasks[0]?.count ?? 0;
+          const countB = b.tasks[0]?.count ?? 0;
+          return countB - countA;
+        });
 
       return sortedData ?? [];
     },
@@ -432,7 +440,9 @@ export default function LLMTrainingTaskForm() {
                   )}
                 </div>
               )}
-              isOptionDisabled={(option: ModelWithTasks) => option.is_locked ?? false}
+              isOptionDisabled={(option: ModelWithTasks) =>
+                option.is_locked ?? false
+              }
             />
           </div>
 

@@ -47,6 +47,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TrackService from "@/lib/client-services/track";
+import Link from "next/link";
 
 const appText = new Map<string, string>([
   ["all", "All Types"],
@@ -187,10 +188,23 @@ export default function AppContent() {
     <div className="flex-1 space-y-4 p-4 md:p-6 lg:p-8 pt-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold tracking-tight">
-            Datasets
-          </CardTitle>
-          <p className="text-muted-foreground">View and manage your datasets</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-2xl font-bold tracking-tight">
+                Datasets
+              </CardTitle>
+              <p className="text-muted-foreground">
+                View and manage your datasets
+              </p>
+            </div>
+            <Link
+              href="/create-dataset"
+              className="inline-flex items-center rounded-md bg-[#FF5C35] px-4 py-1 text-sm font-medium text-white hover:bg-[#FF7355] gap-2"
+            >
+              <span className="text-lg">+</span>
+              Create Dataset
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">

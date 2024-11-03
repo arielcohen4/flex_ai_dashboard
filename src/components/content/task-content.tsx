@@ -4,6 +4,7 @@ import { columns } from "../data-table/columns";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import Link from "next/link";
 
 import ReduxProvider from "@/lib/store/redux-provider";
 
@@ -53,6 +54,13 @@ export default function TaskContent() {
               Here&apos;s a list of your tasks for this month!
             </p>
           </div>
+          <Link
+            href="/create-task"
+            className="inline-flex items-center rounded-md bg-[#FF5C35] px-4 py-1 text-sm font-medium text-white hover:bg-[#FF7355] gap-2"
+          >
+            <span className="text-lg">+</span>
+            Create Task
+          </Link>
         </div>
         <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
           <DataTable
