@@ -398,6 +398,7 @@ export type Database = {
           llm_goals: string | null
           onboarding_completed: boolean
           production_models: string | null
+          referral: string | null
           referral_source: string | null
           role: string | null
           subscription_level: number
@@ -424,6 +425,7 @@ export type Database = {
           llm_goals?: string | null
           onboarding_completed?: boolean
           production_models?: string | null
+          referral?: string | null
           referral_source?: string | null
           role?: string | null
           subscription_level?: number
@@ -450,6 +452,7 @@ export type Database = {
           llm_goals?: string | null
           onboarding_completed?: boolean
           production_models?: string | null
+          referral?: string | null
           referral_source?: string | null
           role?: string | null
           subscription_level?: number

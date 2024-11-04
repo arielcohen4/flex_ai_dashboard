@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import AffiliatesService from "@/lib/server-services/affiliates";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -28,6 +29,11 @@ export async function GET(request: Request) {
         },
       }
     );
+
+    const cookieStoreSecond = cookies();
+    const referral = cookieStoreSecond.get("referral")?.value ?? null;
+    console.log("referral", referral);
+
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       const supabase = await supabaseAdmin();
@@ -40,8 +46,15 @@ export async function GET(request: Request) {
       if (profileData?.is_first_sign) {
         const response = await supabase
           .from("profiles")
-          .update({ is_first_sign: false })
+          .update({ is_first_sign: false, referral })
           .eq("email", data.user?.email as string);
+
+        if (referral) {
+          await AffiliatesService.signUp({
+            email: data.user?.email as string,
+            referral,
+          });
+        }
 
         return NextResponse.redirect(`${origin}/onboarding?signup=true`);
       } else {

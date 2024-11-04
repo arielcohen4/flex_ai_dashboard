@@ -70,7 +70,6 @@ const UsageContent = () => {
           .gte("start_time", startOfDay(dateRange.from).toISOString())
           .lte("start_time", endOfDay(dateRange.to).toISOString());
 
-        console.log(data);
         if (error) throw error;
         return data;
       }

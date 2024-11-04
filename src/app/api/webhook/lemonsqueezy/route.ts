@@ -1,3 +1,4 @@
+import AffiliatesService from "@/lib/server-services/affiliates";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: any) {
@@ -25,16 +26,16 @@ export async function POST(req: any) {
         const total = data.data.attributes.total / 100;
 
         // get the user balance and then add the total to it
-        const { data: userBalance } = await supabase
+        const { data: user } = await supabase
           .from("profiles")
-          .select("balance")
+          .select("balance, email")
           .eq("id", userId)
           .single();
 
         await supabase
           .from("profiles")
           .update({
-            balance: parseFloat((userBalance?.balance! + total).toFixed(6)),
+            balance: parseFloat((user?.balance! + total).toFixed(6)),
           })
           .eq("id", userId);
 
@@ -44,6 +45,12 @@ export async function POST(req: any) {
           .update({ status: "PAID" })
           .eq("id", paymentId)
           .eq("user_id", userId);
+
+        AffiliatesService.sendFirstPromoter({
+          email: user?.email as string,
+          // total in cents
+          amount: data.data.attributes.total,
+        });
       }
       try {
         console.log(data);
