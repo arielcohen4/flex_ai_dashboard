@@ -23,6 +23,7 @@ export async function POST(req: any) {
         .single();
 
       if (payment?.status === "PENDING") {
+        console.log(data);
         const total = data.data.attributes.total / 100;
 
         // get the user balance and then add the total to it
@@ -45,6 +46,10 @@ export async function POST(req: any) {
           .update({ status: "PAID" })
           .eq("id", paymentId)
           .eq("user_id", userId);
+
+        console.log("Sending to firstpromoter");
+        console.log(user?.email);
+        console.log(data.data.attributes.total);
 
         AffiliatesService.sendFirstPromoter({
           email: user?.email as string,
