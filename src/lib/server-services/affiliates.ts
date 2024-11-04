@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY = "0bcbb03d05897d369ed010a1a5c9c093";
+const API_KEY = process.env.FIRSTPROMOTER_API_KEY;
 
 export default class AffiliatesService {
   public static signUp = async ({
@@ -31,7 +31,6 @@ export default class AffiliatesService {
     email: string;
     amount: number;
   }) {
-    // Send a message to a Slack channel
     const postData = {
       email,
       currency: "USD",
