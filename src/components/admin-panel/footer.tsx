@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  IconBrandSlack,
+  IconBrandDiscord
   IconBrandX,
   IconBrandLinkedin,
   IconBrandGithub,
@@ -12,11 +12,11 @@ export function Footer() {
       <div className="mx-4 md:mx-8 flex h-14 items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            href="https://getflexai.slack.com"
+            href="https://discord.gg/TTBxDCkT"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <IconBrandSlack className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+            <IconBrandDiscord className="h-5 w-5 text-muted-foreground hover:text-foreground" />
           </Link>
           <Link
             href="https://x.com/getflex_ai"
