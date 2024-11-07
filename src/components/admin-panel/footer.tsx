@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  IconBrandDiscord
+  IconBrandDiscord,
   IconBrandX,
   IconBrandLinkedin,
   IconBrandGithub,
