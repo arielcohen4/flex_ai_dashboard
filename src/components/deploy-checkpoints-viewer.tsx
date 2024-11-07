@@ -274,7 +274,7 @@ const DeployCheckpointsModal = () => {
                     key={compute.identifier}
                     value={compute.identifier}
                   >
-                    {compute.name} / {compute.price_per_second + " per second"}
+                    {compute.name} / {compute.price_per_second + "$ per second"}
                   </SelectItem>
                 ))}
               </SelectContent>
