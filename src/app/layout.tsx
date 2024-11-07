@@ -13,8 +13,9 @@ import { LemonSqueezyWrapper } from "@/providers/lemonsqueezy-wrapper";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "FlexAI",
-  description: "Serverless Finetune and Inference for Open Source LLMs",
+  title: "Flex AI | Serverless Finetune and Inference for Open Source LLMs",
+  description:
+    "Flex AI | Serverless Finetune and Inference for Open Source LLMs",
 };
 
 export default function RootLayout({
