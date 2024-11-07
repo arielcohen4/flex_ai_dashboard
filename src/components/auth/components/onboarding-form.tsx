@@ -89,7 +89,7 @@ const formSchema = z.object({
   role: z.enum(roles),
   companySize: z.enum(companySizes),
   companyName: z.string().min(1, "Company name is required"),
-  companyWebsite: z.string().url("Please enter a valid URL"),
+  linkedinUrl: z.string().url("Please enter a valid LinkedIn URL"),
   productionModels: z.array(z.enum(productionModels)).optional(),
   llmGoals: z.array(z.enum(llmGoals)).optional(),
   fineTuningMethods: z.array(z.enum(fineTuningMethods)).optional(),
@@ -126,7 +126,7 @@ export function OnboardingForm() {
           role: data.role,
           company_size: data.companySize,
           company_name: data.companyName,
-          company_website: data.companyWebsite,
+          linkedin_url: data.linkedinUrl,
           production_models: data.productionModels?.join(","),
           llm_goals: data.llmGoals?.join(","),
           fine_tuning_methods: data.fineTuningMethods?.join(","),
@@ -158,6 +158,22 @@ export function OnboardingForm() {
     <Card className="p-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="linkedinUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Your LinkedIn</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="https://linkedin.com/in/username"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="role"
@@ -250,20 +266,6 @@ export function OnboardingForm() {
                 <FormLabel>Company/Organization*</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter company name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="companyWebsite"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

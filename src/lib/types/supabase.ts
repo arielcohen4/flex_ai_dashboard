@@ -384,7 +384,6 @@ export type Database = {
           aws_region: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key: string | null
           balance: number
-          company_name: string | null
           company_size: string | null
           company_website: string | null
           created_at: string
@@ -395,6 +394,7 @@ export type Database = {
           image_url: string | null
           is_aws_s3: boolean
           is_first_sign: boolean
+          linkedin_url: string | null
           llm_goals: string | null
           onboarding_completed: boolean
           production_models: string | null
@@ -411,7 +411,6 @@ export type Database = {
           aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
-          company_name?: string | null
           company_size?: string | null
           company_website?: string | null
           created_at?: string
@@ -422,6 +421,7 @@ export type Database = {
           image_url?: string | null
           is_aws_s3?: boolean
           is_first_sign?: boolean
+          linkedin_url?: string | null
           llm_goals?: string | null
           onboarding_completed?: boolean
           production_models?: string | null
@@ -438,7 +438,6 @@ export type Database = {
           aws_region?: Database["public"]["Enums"]["AWS_REGION"] | null
           aws_secret_access_key?: string | null
           balance?: number
-          company_name?: string | null
           company_size?: string | null
           company_website?: string | null
           created_at?: string
@@ -449,6 +448,7 @@ export type Database = {
           image_url?: string | null
           is_aws_s3?: boolean
           is_first_sign?: boolean
+          linkedin_url?: string | null
           llm_goals?: string | null
           onboarding_completed?: boolean
           production_models?: string | null
