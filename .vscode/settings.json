@@ -22,6 +22,7 @@
     "supabase",
     "tabler",
     "tanstack",
+    "tidio",
     "vllm",
     "wandb"
   ],

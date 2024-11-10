@@ -29,15 +29,15 @@ export default function RootLayout({
       <CSPostHogProvider>
         <body className={GeistSans.className}>
           <QueryProvider>
+            <Script
+              src="//code.tidio.co/twaovsscmfx2shhmwo4zvq2bh4njwenm.js"
+              strategy="lazyOnload"
+            />
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <PostHogIdentifyWrapper>
                 <LemonSqueezyWrapper> {children}</LemonSqueezyWrapper>
               </PostHogIdentifyWrapper>
               <ScriptsWidget />
-              <Script
-                src="//code.tidio.co/twaovsscmfx2shhmwo4zvq2bh4njwenm.js"
-                strategy="lazyOnload"
-              />
               <Toaster />
             </ThemeProvider>
           </QueryProvider>
