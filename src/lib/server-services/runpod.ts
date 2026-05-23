@@ -1,6 +1,6 @@
 "use server";
 import axios from "axios";
-const API_KEY = "1PR807JX2IWODKRE997ONQNIF9GVTT5YREAM9E3L";
+const API_KEY = process.env.RUNPOD_API_KEY;
 
 export async function cancelJobId({
   endpointId,

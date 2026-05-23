@@ -4,10 +4,10 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Configuration
-const endpointUrl = "https://nyc3.digitaloceanspaces.com";
-const accessKeyId = "DO00TNGBCCCAQYGDDNGV";
-const secretAccessKey = "/FjJc5Ok51EdNAajx06dvjWfNIFN5VjkgbZbJHvh/t0";
-const region = "nyc3";
+const endpointUrl = process.env.DO_SPACES_ENDPOINT ?? "https://nyc3.digitaloceanspaces.com";
+const accessKeyId = process.env.DO_SPACES_ACCESS_KEY_ID ?? "";
+const secretAccessKey = process.env.DO_SPACES_SECRET_ACCESS_KEY ?? "";
+const region = process.env.DO_SPACES_REGION ?? "nyc3";
 
 const s3Client = new S3Client({
   region: region,
