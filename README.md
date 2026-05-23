@@ -21,7 +21,6 @@ Flex AI lets any developer fine-tune and serve open-source LLMs with just a few 
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
-- [Security Notice](#-security-notice)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [License](#license)
@@ -246,27 +245,6 @@ Copy `.env.example` to `.env.local` and fill in the values. **Never commit `.env
 
 ---
 
-## 🚨 Security Notice
-
-> **If you forked or cloned this repo before these credentials were rotated, treat them as compromised and rotate them immediately.**
-
-The following secrets were previously **hardcoded in source code** and have been removed in this open-source release. They must be set as environment variables:
-
-| File | Secret | Env Var to Use |
-|---|---|---|
-| `src/lib/server-services/runpod.ts` | RunPod API key | `RUNPOD_API_KEY` |
-| `src/lib/server-services/s3.ts` | DigitalOcean Spaces `accessKeyId` | `DO_SPACES_ACCESS_KEY_ID` |
-| `src/lib/server-services/s3.ts` | DigitalOcean Spaces `secretAccessKey` | `DO_SPACES_SECRET_ACCESS_KEY` |
-
-### Additional Security Notes
-
-- The Supabase project ID is visible in `package.json` in the `sync-types` script. This is the project identifier (not a secret), but be aware it is public.
-- The Lemon Squeezy webhook at `/api/webhook/lemonsqueezy` should be secured with signature verification.
-- User AWS credentials (for custom S3 storage) are stored in `profiles` table — ensure RLS policies are tight.
-- The playground uses `dangerouslyAllowBrowser: true` in the OpenAI client — this is intentional (the user's own API key is used client-side).
-- `.gitignore` only ignores `.env*.local` — make sure you never commit `.env` directly.
-
----
 
 ## Project Structure
 
